@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+</head>
+<body>
+    <div style="float:left">
+        <div><span>Enter a message below to send</span></div>
+        <div><input type="text" name="msg" id="msg">
+        <button onclick="send()">Send</button></div>
+        <div><button onclick="connect()">连接</button></div>
+    </div>
+    <div style="float:left">
+        <p>ws://localhost:8888/ws</p>
+        <div id="content" style="overflow: scroll;height: 300px;width: 300px;">
+            
+        </div>
+    </div>
+</body>
+<script>
+    /* if(!("WebSocket" in window)){
+        alert("您的浏览器不支持，请换Chrome");
+        return;
+    } */
+    var ws;
+    var doc=document.getElementById("content");
+    var word=document.getElementById("msg");
+
+    function connect(){
+        ws = new WebSocket('ws://172.16.88.58:8888/ws');
+        ws.onopen=function(){
+            var p=document.createElement("p")
+            p.textContent='已连接...'
+            doc.appendChild(p);
+            console.log("已连接...")
+        }
+
+        ws.onmessage=function(evt){
+            var p=document.createElement("p")
+            p.textContent=evt.data
+            doc.appendChild(p);
+            console.log("收到数据:"+evt.data)
+        }
+
+        ws.onclose=function(){
+            var p=document.createElement("p")
+            p.textContent='已关闭连接...'
+            doc.appendChild(p);
+            console.log("已关闭连接.")
+        }
+    }
+
+    function send(){
+        if(ws==undefined) {
+            alert('未连接');
+            return;
+        }
+        ws.send(word.value);
+        console.log("已发送:"+word.value)
+    }
+
+</script>
+</html>
