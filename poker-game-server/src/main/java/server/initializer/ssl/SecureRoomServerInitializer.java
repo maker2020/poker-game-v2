@@ -1,11 +1,5 @@
 package server.initializer.ssl;
 
-import javax.net.ssl.SSLEngine;
-
-import io.netty.channel.Channel;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslHandler;
 import server.initializer.ServerInitializer;
 
 /**
@@ -13,7 +7,7 @@ import server.initializer.ServerInitializer;
  */
 public class SecureRoomServerInitializer extends ServerInitializer {
 
-    private final SslContext context;
+    /* private final SslContext context;
 
     public SecureRoomServerInitializer(ChannelGroup group,SslContext context) {
         super(group);
@@ -26,6 +20,6 @@ public class SecureRoomServerInitializer extends ServerInitializer {
         SSLEngine engine=context.newEngine(ch.alloc());
         engine.setUseClientMode(false);
         ch.pipeline().addFirst(new SslHandler(engine));
-    }
+    } */
     
 }
