@@ -8,7 +8,7 @@ public class RoomReadyHandler extends SimpleChannelInboundHandler<Room>{
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Room room) throws Exception {
-        System.out.println(room);      
+                  
     }
     
 }
