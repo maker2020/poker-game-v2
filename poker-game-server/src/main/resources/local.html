@@ -41,7 +41,7 @@
     var username = document.getElementById("username");
 
     function connect() {
-        ws = new WebSocket('ws://172.16.88.58:8888/ws?username=' + username.value);
+        ws = new WebSocket('ws://localhost:8888/ws?username=' + username.value);
         ws.onopen = function () {
             var p = document.createElement("p")
             p.textContent = '已连接...'

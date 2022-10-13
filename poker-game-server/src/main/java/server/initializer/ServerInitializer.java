@@ -7,8 +7,10 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import server.handler.HttpRequestHandler;
+import server.handler.GameReadyHandler;
+import server.handler.RoomReadyHandler;
 import server.handler.TextWebSocketFrameHandler;
+import server.handler.http.HttpRequestHandler;
 
 /**
  * 服务器连接通道初始化
@@ -26,6 +28,8 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new HttpRequestHandler("/ws"));
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws",true));
         pipeline.addLast(new TextWebSocketFrameHandler());
+        pipeline.addLast(new RoomReadyHandler());
+        pipeline.addLast(new GameReadyHandler());
     }
     
 }

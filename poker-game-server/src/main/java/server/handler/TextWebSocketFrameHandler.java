@@ -14,6 +14,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.util.AttributeKey;
 import server.handler.holder.RoomHolder;
+import server.handler.http.HttpRequestHandler;
 
 @SuppressWarnings("deprecation")
 public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>{
@@ -31,10 +32,22 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {        
-        // 获取player对应的ChannelGroup
-        Player player = (Player) (ctx.channel().attr(AttributeKey.valueOf("player")).get()); 
-        ChannelGroup group=RoomHolder.playerChannelGroup.get(player.getName());
-        group.writeAndFlush(msg.retain());
+        String message=msg.text();
+        // 将message(json数据)转化为java对象，从而由不同Handler<Class>处理
+        Class<?> clazz=dispatcher(message);
+        Object object=JSON.parseObject(message, clazz);
+        // 触发下一个handler（游戏准备阶段业务）
+        ctx.fireChannelRead(object);// 注：retain()、否则netty4中ctx默认调用release()回收导致异常
+    }
+
+    /**
+     * 根据message决定消息类型对应的Java类型，并返回
+     * @param message
+     * @return
+     */
+    private Class<?> dispatcher(String message){
+        
+        return Room.class;
     }
 
     private void onJoined(ChannelHandlerContext ctx){

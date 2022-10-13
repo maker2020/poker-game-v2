@@ -1,4 +1,4 @@
-package server.handler;
+package server.handler.http;
 
 import game.entity.Player;
 import io.netty.buffer.Unpooled;
