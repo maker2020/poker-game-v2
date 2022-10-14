@@ -74,7 +74,10 @@ public class RoomReadyHandler extends SimpleChannelInboundHandler<RoomReadyDTO>{
                 Player p=(Player)(ch.attr(AttributeKey.valueOf("player")).get());
                 for(int i=0;i<game.getPlayers().size();i++){
                     if(p.getName().equals(game.getPlayers().get(i).getName())){
-                        ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(p.getPokers())));
+                        Map<String,Object> result=new HashMap<>();
+                        result.put("user", p.getName());
+                        result.put("pokers", p.getPokers());
+                        ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
                     }
                 }
             }
