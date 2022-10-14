@@ -89,11 +89,20 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         }
         // 初次实例化玩家
         Player player=new Player(username);
+        initPlayerData(username);
         // 将通道与玩家绑定
         ctx.channel().attr(AttributeKey.valueOf("player")).set(player);
         
         // 将该玩家随机加入一个房间
         RoomHolder.randomJoinRoom(ctx);
+    }
+
+    /**
+     * 可以是从数据库获取玩家相关数据，并初始化
+     * @param playerID 指玩家唯一标识
+     */
+    private void initPlayerData(String playerID){
+
     }
 
 }
