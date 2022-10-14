@@ -1,0 +1,13 @@
+<!--pages/ganmeP/ganmeP.wxml-->
+<view class='gamecontainer' > 
+    <view class='bg'></view>
+    <image src='../../static/img/logo1.png' mode='widthFix' class='logo'></image>
+    <view class='wxbtn' bindtap='getUserProfile'>
+        <image src='../../static/img/wx.png' mode='widthFix'></image>
+        <text>微信登录</text>
+    </view>
+    <view class='agreement' bindtap="agreement">
+        <view class='imgCon {{isT?"active":""}}'></view>
+        <text>同意用户协议</text>
+    </view>
+</view>

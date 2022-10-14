@@ -1,0 +1,95 @@
+<!--pages/ganmeT/ganmeT.wxml-->
+<view class='gamecontainer' > 
+    <view class='out' bindtap='out'></view>
+    <view class='readyBtn btnCon' wx:if='{{!readyY}}'>
+        <view class='btn' bindtap='readyO'>准备</view>
+    </view>
+    <view class='top' wx:if='{{readyY}}'>
+        <view class='basescore'>
+            <text class='txt'>底分</text>
+            <text class='num'>200</text>
+        </view>
+        <view class='basehand'>
+            <image src='../../static/img/diamond10.png' mode="widthFix"></image>
+            <image src='../../static/img/club10.png' mode="widthFix"></image>
+            <image src='../../static/img/spade10.png' mode="widthFix"></image>
+        </view>
+        <view class='multiple'>
+            <text class='txt'>倍数</text>
+            <text class='num'>x{{multiple}}</text>
+        </view>
+    </view>
+    <view class='otherPeopleCon' wx:if='{{readyY}}'>
+        <view class='leftP'>
+            <view class='human'>
+                <view class='isR' style='background-image:url(../../static/img/golob.png)'></view>
+                <image src='../../static/img/civilianM.png' mode='widthFix'></image>
+                <view class='humanTxt'>
+                    <text class='txt'>李亮1234567</text>
+                    <text class='num'>6700</text>
+                </view>
+            </view>
+            <view class='brandShow'>
+                <image src='../../static/img/backside.png' mode='widthFix'></image>
+                <text class='num'>16</text>
+            </view>
+            <view class='clock'>
+                <image src='../../static/img/clock.png' mode='widthFix'></image>
+                <text class='num'>16</text>
+            </view>
+        </view>
+        <view class='leftM'>
+            <view class='brandA'>
+                <view class='brand' wx:for='{{brandListA}}' wx:key='index'><image src='../../static/img/{{item.name}}.png' mode='heightFix'></image></view>
+            </view>
+        </view>
+        <view class='leftR'>
+            <view class='human'>
+                <view class='isR' style='background-image:url(../../static/img/golob.png)'></view>
+                <image src='../../static/img/civilianW.png' mode='widthFix'></image>
+                <view class='humanTxt'>
+                    <text class='txt'>称霸麻将0</text>
+                    <text class='num'>2900</text>
+                </view>
+            </view>
+            <view class='brandShow'>
+                <image src='../../static/img/backside.png' mode='widthFix'></image>
+                <text class='num'>15</text>
+            </view>
+            <view class='clock'>
+                <image src='../../static/img/clock.png' mode='widthFix'></image>
+                <text class='num'>23</text>
+            </view>
+        </view>
+    </view>
+    <view class='peopleU' wx:if='{{readyY}}'>
+        <view class='human'>
+            <view class='isR' style='background-image:url(../../static/img/golob.png)'></view>
+            <image src='../../static/img/{{sex?"landlordM":"landlordW"}}.png' mode='widthFix'></image>
+            <view class='humanTxt'>
+                <text class='txt'>斗地主跑得快</text>
+                <text class='num'>2800</text>
+            </view>
+        </view>
+        <view class='brandShows'>
+            <view wx:for='{{brandList}}' wx:key='index' class="brand {{item.isS?'active':''}}" data-brand='{{item.name}}' >
+                <image bindtap='play' data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='z-index:{{index?index:0}}'></image>
+            </view>
+        </view>
+        <view class='btnCon' wx:if='{{!playZ && playO}}'>
+            <view class='cancel btn' bindtap='playC'>跳过</view>
+            <view class='sure btn' bindtap='playS'>出牌</view>
+        </view>
+        <view class='btnCon' wx:if='{{playZ}}'>
+            <view class='sure btn' bindtap='multipleD'>加倍</view>
+            <view class='cancel btn' bindtap='multipleS'>超级加倍</view>
+            <view class='sure btn' bindtap='multipleN'>不加倍</view>
+        </view>
+        <view class='clock' wx:if='{{!playZ && second && playO}}'>
+            <image src='../../static/img/clock.png' mode='widthFix'></image>
+            <text class='num'>{{second}}</text>
+        </view>
+    </view>
+    
+</view>
+

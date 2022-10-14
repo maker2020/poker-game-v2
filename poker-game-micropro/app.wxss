@@ -1,0 +1,55 @@
+/**app.wxss**/
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 200rpx 0;
+  box-sizing: border-box;
+} 
+image,text,view{
+    box-sizing: border-box;
+    padding:0px;
+    margin:0px;
+}
+.gamecontainer{
+    width:100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-position:center;
+    background-size:cover;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    padding:0px 60rpx;
+}
+.btnCon{
+    display:flex;
+    width:100%;
+    justify-content: center;
+    align-items: center;
+}
+.btnCon .btn{
+    padding:0px 5rpx;
+    text-align:center;
+    line-height:25rpx;
+    height:30rpx;
+    border-radius:10rpx;
+    background:#fff;
+    border:2px solid #fc6124;
+    color:#fc6124;
+    font-size:14rpx;
+    font-weight:bolder;
+    margin-right:10rpx;
+}
+.btnCon .online,
+.btnCon .invitation{
+    background:#fc6124;
+    color:#fff;
+}
+.btnCon .btn:last-of-type{
+    margin-right:0px;
+}
+
