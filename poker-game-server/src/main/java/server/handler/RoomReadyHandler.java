@@ -48,6 +48,7 @@ public class RoomReadyHandler extends SimpleChannelInboundHandler<RoomReadyDTO>{
             Map<String,Object> msg=new HashMap<>();
             msg.put("user", player.getName());
             msg.put("ready", true);
+            // bug记录：先准备的玩家channel陷入阻塞，将无法read消息，造成延迟显示数据
             group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
             //
             readyLatch.countDown();
