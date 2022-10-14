@@ -9,11 +9,13 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.extern.slf4j.Slf4j;
 import server.initializer.ServerInitializer;
 
 /**
  * 服务器开启入口类
  */
+@Slf4j
 class Server {
 
     private final EventLoopGroup group = new NioEventLoopGroup();
@@ -44,9 +46,11 @@ class Server {
     }
 
     public static void main(String[] args) {
+        int port=8888;
         final Server endpoint = new Server();
         ChannelFuture future = endpoint.start(
-                new InetSocketAddress(8888));
+                new InetSocketAddress(port));
+        log.info("Server is starting on port: "+port);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {

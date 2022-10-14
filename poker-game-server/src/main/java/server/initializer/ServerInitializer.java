@@ -17,19 +17,26 @@ import server.handler.http.HttpRequestHandler;
  */
 public class ServerInitializer extends ChannelInitializer<Channel> {
 
-    public ServerInitializer(){}
+    private RoomReadyHandler roomReadyHandler;
+    private GameReadyHandler gameReadyHandler;
+
+    public ServerInitializer(){
+        this.roomReadyHandler=new RoomReadyHandler();
+        this.gameReadyHandler=new GameReadyHandler();
+    }
 
     @Override
     protected void initChannel(Channel ch) throws Exception {
         ChannelPipeline pipeline=ch.pipeline();
         pipeline.addLast(new HttpServerCodec()); // http解码
         pipeline.addLast(new ChunkedWriteHandler()); // 解决粘包/拆包
-        pipeline.addLast(new HttpObjectAggregator(256 * 1024));
+        pipeline.addLast(new HttpObjectAggregator(256*1024));
         pipeline.addLast(new HttpRequestHandler("/ws"));
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws",true));
         pipeline.addLast(new TextWebSocketFrameHandler());
-        pipeline.addLast(new RoomReadyHandler());
-        pipeline.addLast(new GameReadyHandler());
+        // 以下handler单例共享
+        pipeline.addLast(roomReadyHandler);
+        pipeline.addLast(gameReadyHandler);
     }
     
 }

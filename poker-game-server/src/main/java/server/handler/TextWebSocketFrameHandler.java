@@ -7,7 +7,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
 
-import game.Game;
+import game.dto.GameStartDTO;
+import game.dto.RoomReadyDTO;
 import game.entity.Player;
 import game.entity.Room;
 import io.netty.channel.ChannelHandlerContext;
@@ -36,7 +37,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         String message = msg.text();
-        if (JSONValidator.from(message).validate())
+        if (!JSONValidator.from(message).validate())
             return;
         // 将message(json数据)转化为java对象，从而由不同Handler<Class>处理
         Class<?> clazz = dispatcher(message);
@@ -56,10 +57,10 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         String action = obj.getString("action");
         switch (action) {
             case "ready" -> {
-                return Room.class;
+                return RoomReadyDTO.class;
             }
             case "start" -> {
-                return Game.class;
+                return GameStartDTO.class;
             }
             default -> {
                 return Object.class;
@@ -72,8 +73,8 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         Map<String, Object> msg = new HashMap<>();
         Player player = (Player) (ctx.channel().attr(AttributeKey.valueOf("player")).get());
         Room room = (Room) (ctx.channel().attr(AttributeKey.valueOf("room")).get());
-        msg.put("player", player);
-        msg.put("room", room);
+        msg.put("user", player.getName());
+        msg.put("roomID", room.getId());
         TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JSON.toJSONString(msg));
         ChannelGroup group = RoomHolder.playerChannelGroup.get(player.getName());
         group.writeAndFlush(textWebSocketFrame);
