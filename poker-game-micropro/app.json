@@ -1,0 +1,20 @@
+{
+  "pages":[
+    "pages/ganmeP/ganmeP",
+    "pages/ganmeI/ganmeI",
+    "pages/ganmeT/ganmeT",
+    "pages/index/index",
+    "pages/logs/logs"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "Weixin",
+    "navigationBarTextStyle":"black",
+    "pageOrientation":"landscape",
+    "navigationStyle":"custom"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+  
+}
