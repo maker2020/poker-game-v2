@@ -13,6 +13,7 @@ import game.Game;
 import game.NormalGame;
 import game.dto.RoomReadyDTO;
 import game.entity.Player;
+import game.entity.Room;
 import game.enums.RoomStatusEnum;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -51,7 +52,8 @@ public class RoomReadyHandler extends SimpleChannelInboundHandler<RoomReadyDTO>{
             //
             readyLatch.countDown();
             readyLatch.await();
-            log.info("RoomID["+ctx.channel().attr(AttributeKey.valueOf("roomID")).get()+"]:ready to start");
+            Room room=(Room)(ctx.channel().attr(AttributeKey.valueOf("room")).get());
+            log.info("RoomID["+room.getId()+"]:ready to start");
             // 初始化游戏、准备发牌    
             game=initGame(group);
             // 发牌

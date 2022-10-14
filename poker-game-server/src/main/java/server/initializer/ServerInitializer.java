@@ -7,9 +7,11 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import server.handler.GameReadyHandler;
 import server.handler.RoomReadyHandler;
 import server.handler.TextWebSocketFrameHandler;
+import server.handler.heart.HeartHandler;
 import server.handler.http.HttpRequestHandler;
 
 /**
@@ -37,6 +39,8 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         // 以下handler单例共享
         pipeline.addLast(roomReadyHandler);
         pipeline.addLast(gameReadyHandler);
+        pipeline.addLast(new IdleStateHandler(120, 120, 120));
+        pipeline.addLast(new HeartHandler());
     }
     
 }
