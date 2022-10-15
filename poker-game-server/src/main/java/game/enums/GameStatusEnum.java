@@ -2,7 +2,8 @@ package game.enums;
 
 public enum GameStatusEnum {
     
-    START("start",0);
+    READY("ready",0),
+    START("start",1);
 
     private String status;
     private int code;

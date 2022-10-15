@@ -26,7 +26,7 @@ public class Room implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String id;
-    private RoomStatusEnum status;
+    private RoomStatusEnum status=RoomStatusEnum.READY;
     private List<Player> players=new CopyOnWriteArrayList<>();
     private Game game;
 
