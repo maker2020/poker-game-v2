@@ -67,8 +67,8 @@ public class NormalGame extends Game{
                 getPokerCollector().add(new Poker(PokerColorEnum.getByCode(j+1), PokerValueEnum.getByCode(i+1)));
             }    
         }
-        getPokerCollector().add(new Poker(PokerColorEnum.RED_HEART, PokerValueEnum.King));
-        getPokerCollector().add(new Poker(PokerColorEnum.BLACK_HEART, PokerValueEnum.Queen));
+        getPokerCollector().add(new Poker(PokerColorEnum.HEART, PokerValueEnum.King));
+        getPokerCollector().add(new Poker(PokerColorEnum.SPADE, PokerValueEnum.Queen));
         // 放List打乱顺序
         List<Poker> pokerList=new ArrayList<>();
         pokerList.addAll(getPokerCollector());

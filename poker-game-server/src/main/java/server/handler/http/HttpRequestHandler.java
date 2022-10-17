@@ -17,8 +17,10 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AttributeKey;
+import lombok.extern.slf4j.Slf4j;
 import server.handler.holder.RoomHolder;
 
+@Slf4j
 @SuppressWarnings({ "deprecation" })
 public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
@@ -87,6 +89,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             ChannelFuture future = ctx.channel().writeAndFlush(response);
             future.addListener(ChannelFutureListener.CLOSE);
         }
+        log.info("player["+username+"] log in");
         // 初次实例化玩家
         Player player=new Player(username);
         initPlayerData(username);

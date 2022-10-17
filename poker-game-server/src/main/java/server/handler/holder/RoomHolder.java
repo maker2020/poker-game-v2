@@ -48,7 +48,7 @@ public class RoomHolder {
             // 获取房间group并判断是否满足加入条件
             synchronized(RoomHolder.class){
                 ChannelGroup tempGroup = roomChannelGroup.get(room);
-                if (tempGroup != null && tempGroup.size() < 3) {
+                if (tempGroup != null && tempGroup.size() < 3 && room.getPlayers().size() < 3) {
                     group = tempGroup;
                     group.add(ctx.channel());
                     break;
@@ -64,7 +64,6 @@ public class RoomHolder {
             room = new Room();
             // 初始化状态
             room.setId(roomID);
-            room.addPlayer(player);
             // 设置游戏
             room.setGame(new NormalGame());
             
@@ -73,6 +72,8 @@ public class RoomHolder {
 
             group.add(ctx.channel());
         }
+        // 公共
+        room.addPlayer(player);
         room.getGame().addPlayer(player);
         // 将通道与房间绑定
         ctx.channel().attr(AttributeKey.valueOf("room")).set(room);

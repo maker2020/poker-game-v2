@@ -63,11 +63,11 @@ public class HappyGame extends Game{
         setPokerBossCollector(new ArrayList<>());
         for(int i=0;i<13;i++){
             for(int j=0;j<4;j++){
-                getPokerCollector().add(new Poker(PokerColorEnum.BLACK_HEART, PokerValueEnum.A));
+                getPokerCollector().add(new Poker(PokerColorEnum.SPADE, PokerValueEnum.A));
             }    
         }
-        getPokerCollector().add(new Poker(PokerColorEnum.RED_HEART, PokerValueEnum.King));
-        getPokerCollector().add(new Poker(PokerColorEnum.BLACK_HEART, PokerValueEnum.Queen));
+        getPokerCollector().add(new Poker(PokerColorEnum.HEART, PokerValueEnum.King));
+        getPokerCollector().add(new Poker(PokerColorEnum.SPADE, PokerValueEnum.Queen));
         // 放List打乱顺序
         List<Poker> pokerList=new ArrayList<>();
         pokerList.addAll(getPokerCollector());

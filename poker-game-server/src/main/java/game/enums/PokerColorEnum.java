@@ -5,8 +5,8 @@ package game.enums;
  */
 public enum PokerColorEnum {
     SQUARE("♦",1),
-    RED_HEART("♥",2),
-    BLACK_HEART("♠",3),
+    HEART("♥",2),
+    SPADE("♠",3),
     CLUB("♣",4);
 
     private String color;

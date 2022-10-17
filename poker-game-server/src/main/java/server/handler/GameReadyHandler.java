@@ -3,6 +3,7 @@ package server.handler;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 import com.alibaba.fastjson.JSON;
 
@@ -46,6 +47,8 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
         // 发牌至玩家(只有一个线程处理，所以需要分发group里的channel)
         // 注：这里嵌套循环数量级不大，并不影响性能，没必要在game实现类中建立维护hash结构存储变量提升性能。
         Iterator<Channel> it=group.iterator();
+        String[] userIDArr=new String[group.size()]; // 用于随机取索引
+        int index=0;
         while (it.hasNext()) {
             Channel ch=it.next();
             Player p=(Player)(ch.attr(AttributeKey.valueOf("player")).get());
@@ -54,11 +57,19 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
                     Map<String,Object> msg=new HashMap<>();
                     msg.put("user", player.getName());
                     msg.put("pokers", player.getPokers());
+                    userIDArr[index++]=player.getName();
                     ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
                     break;
                 }
             }
         }
+        // 随机选一名玩家作为第一个叫地主的
+        Map<String,Object> msg=new HashMap<>();
+        Random random=new Random(System.currentTimeMillis());
+        msg.put("user", userIDArr[random.nextInt(0, 2)]);
+        msg.put("action", "call");
+        group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
+        // 至此结束，其他业务由其他handler从头处理
         ctx.fireChannelRead(Unpooled.EMPTY_BUFFER);
     }
 
@@ -89,7 +100,7 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.warn("disconnected: "+ctx.channel().remoteAddress());  
+        log.warn("disconnected: "+ctx.channel().remoteAddress());
     }
     
 }

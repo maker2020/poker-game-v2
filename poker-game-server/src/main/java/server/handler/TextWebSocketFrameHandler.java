@@ -1,6 +1,7 @@
 package server.handler;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
@@ -75,6 +76,13 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         Room room = (Room) (ctx.channel().attr(AttributeKey.valueOf("room")).get());
         msg.put("user", player.getName());
         msg.put("roomID", room.getId());
+        
+        List<Player> playerList=room.getPlayers();
+        String[] playerNameArr=new String[playerList.size()];
+        for(int i=0;i<playerList.size();i++){
+            playerNameArr[i]=playerList.get(i).getName();
+        }
+        msg.put("players", playerNameArr);
         TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JSON.toJSONString(msg));
         ChannelGroup group = RoomHolder.playerChannelGroup.get(player.getName());
         group.writeAndFlush(textWebSocketFrame);
