@@ -38,7 +38,6 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
         if (!canStart(game))
             return;
         // 仅最后一个进入的线程处理发牌工作
-        Player player = ChannelHolder.attrPlayer(ctx.channel());
         ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
         // 游戏发牌阶段
         Room room = ChannelHolder.attrRoom(ctx.channel());
@@ -55,7 +54,7 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
             Player p = ChannelHolder.attrPlayer(ch);
             for (int i = 0; i < game.getPlayers().size(); i++) {
                 if (p.getName().equals(game.getPlayers().get(i).getName())) {
-                    Map<String, Object> msg = ResultVO.resultMap(player.getName(), player.getPokers());
+                    Map<String, Object> msg = ResultVO.resultMap(p.getName(), p.getPokers());
                     ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
                     break;
                 }
