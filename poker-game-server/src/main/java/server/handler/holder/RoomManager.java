@@ -18,16 +18,12 @@ import io.netty.util.concurrent.ImmediateEventExecutor;
 /**
  * 游戏房间持有对象
  */
-public class RoomHolder {
+public class RoomManager {
 
     /**
      * 房间->ChannelGroup 的映射
      */
-    public static Map<Room, ChannelGroup> roomChannelGroup = new ConcurrentHashMap<>();
-    /**
-     * 玩家ID->ChannelGroup 的映射
-     */
-    public static Map<String, ChannelGroup> playerChannelGroup = new ConcurrentHashMap<>();
+    private static Map<Room, ChannelGroup> roomChannelGroup = new ConcurrentHashMap<>();
 
     /**
      * 伪随机加入房间(默认按Map的key字符串字典排序)<p>
@@ -46,7 +42,7 @@ public class RoomHolder {
         while (it.hasNext()) {
             room = it.next();
             // 获取房间group并判断是否满足加入条件
-            synchronized(RoomHolder.class){
+            synchronized(RoomManager.class){
                 ChannelGroup tempGroup = roomChannelGroup.get(room);
                 if (tempGroup != null && tempGroup.size() < 3 && room.getPlayers().size() < 3) {
                     group = tempGroup;
@@ -77,9 +73,8 @@ public class RoomHolder {
         room.getGame().addPlayer(player);
         // 将通道与房间绑定
         ctx.channel().attr(AttributeKey.valueOf("room")).set(room);
-        // 绑定玩家ID和ChannelGroup
-        playerChannelGroup.put(player.getName(), group);
-
+        // 通道与group绑定
+        ChannelHolder.groupMap.put(ctx.channel(), group);
     }
 
 }

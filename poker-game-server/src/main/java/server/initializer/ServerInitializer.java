@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
+import server.handler.CallBossHandler;
 import server.handler.GameReadyHandler;
 import server.handler.RoomReadyHandler;
 import server.handler.TextWebSocketFrameHandler;
@@ -21,10 +22,12 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
 
     private RoomReadyHandler roomReadyHandler;
     private GameReadyHandler gameReadyHandler;
+    private CallBossHandler callBossHandler;
 
     public ServerInitializer(){
         this.roomReadyHandler=new RoomReadyHandler();
         this.gameReadyHandler=new GameReadyHandler();
+        this.callBossHandler=new CallBossHandler();
     }
 
     @Override
@@ -39,6 +42,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         // 以下handler单例共享
         pipeline.addLast(roomReadyHandler);
         pipeline.addLast(gameReadyHandler);
+        pipeline.addLast(callBossHandler);
         pipeline.addLast(new IdleStateHandler(120, 120, 120));
         pipeline.addLast(new HeartHandler());
     }

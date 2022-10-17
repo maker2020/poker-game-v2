@@ -18,7 +18,7 @@ import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
-import server.handler.holder.RoomHolder;
+import server.handler.holder.RoomManager;
 
 @Slf4j
 @SuppressWarnings({ "deprecation" })
@@ -27,8 +27,8 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     private final String wsUri;
 
     static{
+        // http连接后，若player重复(不唯一)则抛出异常。
         AttributeKey.newInstance("player");
-        AttributeKey.newInstance("roomID");
     }
 
     public HttpRequestHandler(String wsUri) {
@@ -97,7 +97,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         ctx.channel().attr(AttributeKey.valueOf("player")).set(player);
         
         // 将该玩家随机加入一个房间
-        RoomHolder.randomJoinRoom(ctx);
+        RoomManager.randomJoinRoom(ctx);
     }
 
     /**

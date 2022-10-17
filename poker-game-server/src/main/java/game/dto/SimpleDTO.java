@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 public class SimpleDTO {
     
     private String action;
-    private String tendency;
+    private boolean tendency;
 
 }

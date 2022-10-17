@@ -1,6 +1,6 @@
 package server.handler;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
@@ -10,8 +10,10 @@ import com.alibaba.fastjson.JSON;
 import game.Game;
 import game.entity.Player;
 import game.entity.Room;
+import game.enums.ActionEnum;
 import game.enums.GameStatusEnum;
 import game.enums.RoomStatusEnum;
+import game.vo.ResultVO;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,12 +21,12 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
-import server.handler.holder.RoomHolder;
+import server.handler.holder.ChannelHolder;
 
 /**
- * 游戏准备阶段:<p>
+ * 游戏准备阶段:
+ * <p>
  * 验证人数是否
  */
 @Sharable
@@ -32,63 +34,74 @@ import server.handler.holder.RoomHolder;
 public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx,Game game) throws Exception {
-        if(!canStart(game)) return;
+    protected void channelRead0(ChannelHandlerContext ctx, Game game) throws Exception {
+        if (!canStart(game))
+            return;
         // 仅最后一个进入的线程处理发牌工作
-        Player player=(Player)(ctx.channel().attr(AttributeKey.valueOf("player")).get());
-        ChannelGroup group=RoomHolder.playerChannelGroup.get(player.getName());
+        Player player = ChannelHolder.attrPlayer(ctx.channel());
+        ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
         // 游戏发牌阶段
-        Room room=(Room)(ctx.channel().attr(AttributeKey.valueOf("room")).get());
-        log.info("RoomID["+room.getId()+"]:ready to start");
+        Room room = ChannelHolder.attrRoom(ctx.channel());
+        log.info("RoomID[" + room.getId() + "]:ready to start");
         // 更新房间 (此更新操作是明确的，没有线程安全问题)
         room.setStatus(RoomStatusEnum.START);
-        // 初始化游戏、准备发牌    
-        game=initGame(game);
+        // 初始化游戏、准备发牌
+        game = initGame(game);
         // 发牌至玩家(只有一个线程处理，所以需要分发group里的channel)
         // 注：这里嵌套循环数量级不大，并不影响性能，没必要在game实现类中建立维护hash结构存储变量提升性能。
-        Iterator<Channel> it=group.iterator();
-        String[] userIDArr=new String[group.size()]; // 用于随机取索引
-        int index=0;
+        Iterator<Channel> it = group.iterator();
         while (it.hasNext()) {
-            Channel ch=it.next();
-            Player p=(Player)(ch.attr(AttributeKey.valueOf("player")).get());
-            for(int i=0;i<game.getPlayers().size();i++){
-                if(p.getName().equals(game.getPlayers().get(i).getName())){
-                    Map<String,Object> msg=new HashMap<>();
-                    msg.put("user", player.getName());
-                    msg.put("pokers", player.getPokers());
-                    userIDArr[index++]=player.getName();
+            Channel ch = it.next();
+            Player p = ChannelHolder.attrPlayer(ch);
+            for (int i = 0; i < game.getPlayers().size(); i++) {
+                if (p.getName().equals(game.getPlayers().get(i).getName())) {
+                    Map<String, Object> msg = ResultVO.resultMap(player.getName(), player.getPokers());
                     ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
                     break;
                 }
             }
         }
         // 随机选一名玩家作为第一个叫地主的
-        Map<String,Object> msg=new HashMap<>();
-        Random random=new Random(System.currentTimeMillis());
-        msg.put("user", userIDArr[random.nextInt(0, 2)]);
-        msg.put("action", "call");
+        Random random = new Random(System.currentTimeMillis());
+        Player randomPlayer = game.getPlayers().get(random.nextInt(0, 2));
+        Map<String, Object> msg = ResultVO.resultMap(ActionEnum.CALL, randomPlayer.getName(), null);
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
+
+        // 辅助变量：维护players出牌顺序
+        Collections.shuffle(room.getPlayers(), random); // 打乱players顺序
+
         // 至此结束，其他业务由其他handler从头处理
         ctx.fireChannelRead(Unpooled.EMPTY_BUFFER);
     }
 
-    private boolean canStart(Game game){
-        boolean can=true;
-        for(int i=0;i<game.getPlayers().size();i++){
-            if(!game.getPlayers().get(i).isReady()) can=false;
+    /**
+     * 任意玩家没准备，返回false
+     * <p>
+     * game.players是安全容器，这里不用关注线程安全
+     * 
+     * @param game
+     * @return
+     */
+    private boolean canStart(Game game) {
+        boolean can = true;
+        for (int i = 0; i < game.getPlayers().size(); i++) {
+            if (!game.getPlayers().get(i).isReady() || game.getPlayers().size() < 3)
+                can = false;
         }
         return can;
     }
 
     /**
      * 初始化游戏相关
+     * 
      * @param group
-     * @param game (deprecated 注释)不必担心jmm的工作内存无法刷新至主存。即使没有volatile，sync块内变量，在锁释放之前都会刷新到主存
+     * @param game  (deprecated
+     *              注释)不必担心jmm的工作内存无法刷新至主存。即使没有volatile，sync块内变量，在锁释放之前都会刷新到主存
      * @return
      */
-    private Game initGame(Game game){
-        if(game.getStatus()==GameStatusEnum.START) return game;
+    private Game initGame(Game game) {
+        if (game.getStatus() == GameStatusEnum.START)
+            return game;
         // 初始化游戏数据: 发牌、更新状态
         game.init();
         game.setStatus(GameStatusEnum.START);
@@ -100,7 +113,7 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.warn("disconnected: "+ctx.channel().remoteAddress());
+        log.warn("disconnected: " + ctx.channel().remoteAddress());
     }
-    
+
 }

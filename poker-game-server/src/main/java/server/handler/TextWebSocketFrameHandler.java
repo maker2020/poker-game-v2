@@ -1,6 +1,5 @@
 package server.handler;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,17 +7,18 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
 
-import game.dto.GameStartDTO;
+import game.dto.AskBossDTO;
+import game.dto.CallBossDTO;
 import game.dto.RoomReadyDTO;
 import game.entity.Player;
 import game.entity.Room;
+import game.vo.ResultVO;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
-import io.netty.util.AttributeKey;
-import server.handler.holder.RoomHolder;
+import server.handler.holder.ChannelHolder;
 import server.handler.http.HttpRequestHandler;
 
 @SuppressWarnings("deprecation")
@@ -60,8 +60,11 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
             case "ready" -> {
                 return RoomReadyDTO.class;
             }
-            case "start" -> {
-                return GameStartDTO.class;
+            case "call" -> {
+                return CallBossDTO.class;
+            }
+            case "ask" -> {
+                return AskBossDTO.class;
             }
             default -> {
                 return Object.class;
@@ -70,21 +73,18 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     }
 
     private void onJoined(ChannelHandlerContext ctx) {
-        // result
-        Map<String, Object> msg = new HashMap<>();
-        Player player = (Player) (ctx.channel().attr(AttributeKey.valueOf("player")).get());
-        Room room = (Room) (ctx.channel().attr(AttributeKey.valueOf("room")).get());
-        msg.put("user", player.getName());
-        msg.put("roomID", room.getId());
-        
+        Player player = ChannelHolder.attrPlayer(ctx.channel());
+        Room room = ChannelHolder.attrRoom(ctx.channel());
+
         List<Player> playerList=room.getPlayers();
         String[] playerNameArr=new String[playerList.size()];
         for(int i=0;i<playerList.size();i++){
             playerNameArr[i]=playerList.get(i).getName();
         }
-        msg.put("players", playerNameArr);
+
+        Map<String,Object> msg=ResultVO.resultMap(player.getName(), room.getId(), playerNameArr);
         TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JSON.toJSONString(msg));
-        ChannelGroup group = RoomHolder.playerChannelGroup.get(player.getName());
+        ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
         group.writeAndFlush(textWebSocketFrame);
     }
 

@@ -71,10 +71,22 @@
         }
         let msg={
             action:'ready',
-            tendency:'Y'
+            tendency:true
         }
         ws.send(JSON.stringify(msg));
         console.log("已发送:" + JSON.stringify(msg))
+    }
+
+    function call(){
+        if(ws==undefined){
+            alert('未连接');
+            return;
+        }
+        let msg={
+            action:'call',
+            tendency:true
+        }
+        ws.send(JSON.stringify(msg));
     }
 
 </script>

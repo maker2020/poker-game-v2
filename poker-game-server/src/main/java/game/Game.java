@@ -1,9 +1,9 @@
 package game;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import game.entity.Player;
 import game.entity.Poker;
@@ -22,7 +22,7 @@ public abstract class Game implements Serializable {
 
     private Collection<Poker> pokerCollector;
     private Collection<Poker> pokerBossCollector;
-    private List<Player> players=new ArrayList<>();
+    private List<Player> players=new CopyOnWriteArrayList<>();
     private GameStatusEnum status=GameStatusEnum.READY;
     private boolean handOut=false;
     private boolean over=false;
