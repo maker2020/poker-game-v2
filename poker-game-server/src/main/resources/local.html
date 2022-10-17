@@ -19,8 +19,10 @@
             <button onclick="connect()">连接</button>
         </div>
         <div>
-            <button onclick="pass()">pass</button>
-            <button onclick="call()">ask</button>
+            <button onclick="uncall()">uncall</button>
+            <button onclick="call()">call</button>
+            <button onclick="ask()">ask</button>
+            <button onclick="unask()">unask</button>
         </div>
     </div>
     <div style="float:left">
@@ -85,6 +87,42 @@
         let msg={
             action:'call',
             tendency:true
+        }
+        ws.send(JSON.stringify(msg));
+    }
+
+    function uncall(){
+        if(ws==undefined){
+            alert('未连接');
+            return;
+        }
+        let msg={
+            action:'call',
+            tendency:false
+        }
+        ws.send(JSON.stringify(msg));
+    }
+
+    function ask(){
+        if(ws==undefined){
+            alert('未连接');
+            return;
+        }
+        let msg={
+            action:'ask',
+            tendency:true
+        }
+        ws.send(JSON.stringify(msg));
+    }
+
+    function unask(){
+        if(ws==undefined){
+            alert('未连接');
+            return;
+        }
+        let msg={
+            action:'ask',
+            tendency:false
         }
         ws.send(JSON.stringify(msg));
     }

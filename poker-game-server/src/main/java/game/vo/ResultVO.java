@@ -13,6 +13,17 @@ import game.enums.ActionEnum;
 public class ResultVO {
     
     /**
+     * 返回叫地主结果
+     * @param boss 地主用户唯一标识(name/id)
+     * @return
+     */
+    public static Map<String,Object> resultMap(String boss){
+        Map<String,Object> map=new HashMap<>();
+        map.put("boss", boss);
+        return map;
+    }
+
+    /**
      * 
      * @param user 用户唯一标识(name/id)
      * @param players 用户唯一标识数组
