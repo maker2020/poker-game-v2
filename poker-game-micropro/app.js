@@ -13,7 +13,25 @@ App({
       }
     })
   },
+  watch:function(method){
+    var obj = this.globalData;
+    Object.defineProperty(this,'globalData',{//这里的globalData对应上面globalData
+      configurable:true,
+      enumerable:true,
+      set:function(value){//动态赋值，传递对象，为globalData中对应变量赋值
+        obj.pokers = value.pokers;
+        method(value);      
+      },
+      get:function(){//获取全局变量值，直接返回全部
+        return obj
+      }
+    })
+  },
   globalData: {
-    userInfo: null
+    userInfo: null,
+    roomID:null,
+    players:[],
+    pokers:null,
+    test:''
   }
 })

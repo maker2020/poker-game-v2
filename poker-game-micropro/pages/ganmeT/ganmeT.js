@@ -1,4 +1,5 @@
 // pages/ganmeT/ganmeT.js
+const app = getApp()
 Page({
 
     /**
@@ -6,90 +7,90 @@ Page({
      */
     data: {
         brandList:[
-            {
-                name:'spade2',
-                isS:false
-            },
-            {
-                name:'club2',
-                isS:false
-            },
-            {
-                name:'heart2',
-                isS:false
-            },
-            {
-                name:'diamond2',
-                isS:false
-            },
-            {
-                name:'X',
-                isS:false
-            },
-            {
-                name:'Y',
-                isS:false
-            },
-            {
-                name:'spadeA',
-                isS:false
-            },
-            {
-                name:'heartA',
-                isS:false
-            },
-            {
-                name:'diamondA',
-                isS:false
-            },
-            {
-                name:'clubA',
-                isS:false
-            },
-            {
-                name:'heart3',
-                isS:false
-            },
-            {
-                name:'heart4',
-                isS:false
-            },
-            {
-                name:'heart5',
-                isS:false
-            },
-            {
-                name:'heart6',
-                isS:false
-            },
-            {
-                name:'heart7',
-                isS:false
-            },
-            {
-                name:'heart8',
-                isS:false
-            },
-            {
-                name:'heart9',
-                isS:false
-            },
-            {
-                name:'heart10',
-                isS:false
-            },
-            {
-                name:'heartJ',
-                isS:false
-            },
-            {
-                name:'heartQ',
-                isS:false
-            },
-            {
-                name:'heartK',
-                isS:false
-            }
+            // {
+            //     name:'spade2',
+            //     isS:false
+            // },
+            // {
+            //     name:'club2',
+            //     isS:false
+            // },
+            // {
+            //     name:'heart2',
+            //     isS:false
+            // },
+            // {
+            //     name:'diamond2',
+            //     isS:false
+            // },
+            // {
+            //     name:'X',
+            //     isS:false
+            // },
+            // {
+            //     name:'Y',
+            //     isS:false
+            // },
+            // {
+            //     name:'spadeA',
+            //     isS:false
+            // },
+            // {
+            //     name:'heartA',
+            //     isS:false
+            // },
+            // {
+            //     name:'diamondA',
+            //     isS:false
+            // },
+            // {
+            //     name:'clubA',
+            //     isS:false
+            // },
+            // {
+            //     name:'heart3',
+            //     isS:false
+            // },
+            // {
+            //     name:'heart4',
+            //     isS:false
+            // },
+            // {
+            //     name:'heart5',
+            //     isS:false
+            // },
+            // {
+            //     name:'heart6',
+            //     isS:false
+            // },
+            // {
+            //     name:'heart7',
+            //     isS:false
+            // },
+            // {
+            //     name:'heart8',
+            //     isS:false
+            // },
+            // {
+            //     name:'heart9',
+            //     isS:false
+            // },
+            // {
+            //     name:'heart10',
+            //     isS:false
+            // },
+            // {
+            //     name:'heartJ',
+            //     isS:false
+            // },
+            // {
+            //     name:'heartQ',
+            //     isS:false
+            // },
+            // {
+            //     name:'heartK',
+            //     isS:false
+            // }
         ],
         brandListA:[],
         second:60,
@@ -97,18 +98,28 @@ Page({
         readyY:false,
         playZ:true,
         multiple:2,
-        sex:1
+        sex:1,
+        roomID:app.globalData.roomID,
+        players:app.globalData.players,
+        pokers:app.globalData.pokers
     },
 
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad(options) {
-        // this.setData({
-        //     brandListV:this.data.brandList
-        // })
+    onLoad(options) {    
+        this.setData({
+            roomID:app.globalData.roomID,
+            players:app.globalData.players,
+        })
+        app.watch(this.watchBack)
+        this.readyO();
+        console.log(app.globalData.players,this.data.players);
     },
-
+    //app监听回调方法
+    watchBack(value){//这里的value就是app.js中watch方法中的set,globalData
+     this.getB(value.pokers)
+    },
     /**
      * 生命周期函数--监听页面初次渲染完成
      */
@@ -134,10 +145,44 @@ Page({
           url: '/pages/ganmeI/ganmeI',
         })
     },
+    // getS(){
+    //   var that=this;
+    //   return new Promise((resolve, reject) => { //订单类型
+    //     that.ready()
+    //       .then(res => {
+    //         resolve(function(){
+    //           console.log(res);
+    //         })
+    //       })
+    //       .catch((e) => {
+    //         reject(e)
+    //       })
+    //   })
+    // },
     readyO(){
-        this.setData({
+      var param={
+        "action":'ready',
+        "tendency":true
+      }
+      wx.sendSocketMessage({
+        data: JSON.stringify(param)
+      })
+    },
+    getB(pokers){
+      var that=this;
+      var brandList=[];
+      if(pokers && pokers.length){
+        pokers.forEach(function(item,i){
+          brandList.push({
+            name:item.colorEnum +'_' + item.valueEnum,
+            isS:false
+          })
+          that.setData({
+            pokers:brandList,
             readyY:true
+          })
         })
+      }
     },
     multipleD(){
         this.setData({

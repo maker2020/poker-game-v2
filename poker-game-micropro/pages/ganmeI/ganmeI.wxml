@@ -4,6 +4,6 @@
     <view class='btnCon'>
         <!-- <view class='alone btn' bindtap="aloneGame" wx:if="{{!gameMode}}">单机游戏</view> -->
         <view class='online btn' bindtap="onlineGame" wx:if="{{!gameMode}}">联机游戏</view>
-        <view class='invitation btn' bindtap="invitation" wx:if="{{gameMode}}">邀请</view>
+        <view class='invitation btn' bindtap="invitation" wx:if="{{gameMode}}">随机匹配</view>
     </view>
 </view>

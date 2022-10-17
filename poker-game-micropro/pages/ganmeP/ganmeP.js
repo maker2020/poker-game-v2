@@ -37,6 +37,7 @@ Page({
                 success: (res) => {
                     if(res){
                         app.globalData.userInfo=res.userInfo
+                        console.log(app.globalData.userInfo);
                         wx.redirectTo({
                             url: '/pages/ganmeI/ganmeI',
                         })
