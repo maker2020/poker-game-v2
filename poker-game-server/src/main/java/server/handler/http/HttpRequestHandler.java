@@ -79,7 +79,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
      * @param ctx
      * @param request
      */
-    private void handleParams(ChannelHandlerContext ctx, FullHttpRequest request) {
+    private void handleParams(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
         String username = decoder.parameters().get("username").get(0);
         if (username == null || "".equals(username) || !request.decoderResult().isSuccess()

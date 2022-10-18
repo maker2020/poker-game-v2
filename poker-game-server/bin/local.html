@@ -24,6 +24,9 @@
             <button onclick="ask()">ask</button>
             <button onclick="unask()">unask</button>
         </div>
+        <div>
+            <p><button onclick="put()">put</button></p>
+        </div>
     </div>
     <div style="float:left">
         <p>ws://localhost:8888/ws</p>
@@ -127,6 +130,27 @@
         ws.send(JSON.stringify(msg));
     }
 
+    function put(){
+        if(ws==undefined){
+            alert('未连接');
+            return;
+        }
+        let msg={
+            action:'put',
+            tendency:true,
+            putPokers:[
+                {
+                    colorEnum:'CLUB',
+                    valueEnum:'A'
+                },
+                {
+                    colorEnum:'SQUARE',
+                    valueEnum:'A'
+                }
+            ]
+        }
+        ws.send(JSON.stringify(msg));
+    }
 </script>
 
 </html>

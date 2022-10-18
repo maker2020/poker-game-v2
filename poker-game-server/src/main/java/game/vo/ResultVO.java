@@ -78,6 +78,23 @@ public class ResultVO {
     }
 
     /**
+     * 出牌VO
+     * @param action
+     * @param turn
+     * @param notification
+     * @param putPokers
+     * @return
+     */
+    public static Map<String,Object> resultMap(ActionEnum action,String turn,Notification notification,List<Poker> putPokers){
+        Map<String,Object> map=new HashMap<>();
+        map.put("action", action.getAction());
+        map.put("turn", turn);
+        map.put("notification", notification);
+        map.put("putPokers", putPokers);
+        return map;
+    }
+
+    /**
      * 更新vo对象的notification
      * @param resultVO
      * @param notification

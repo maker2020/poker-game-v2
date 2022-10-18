@@ -9,6 +9,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import server.handler.GameReadyHandler;
+import server.handler.PutPokerHandler;
 import server.handler.ReqBossHandler;
 import server.handler.RoomReadyHandler;
 import server.handler.TextWebSocketFrameHandler;
@@ -23,11 +24,13 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     private RoomReadyHandler roomReadyHandler;
     private GameReadyHandler gameReadyHandler;
     private ReqBossHandler reqBossHandler;
+    private PutPokerHandler putPokerHandler;
 
     public ServerInitializer(){
         this.roomReadyHandler=new RoomReadyHandler();
         this.gameReadyHandler=new GameReadyHandler();
         this.reqBossHandler=new ReqBossHandler();
+        this.putPokerHandler=new PutPokerHandler();
     }
 
     @Override
@@ -43,6 +46,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(roomReadyHandler);
         pipeline.addLast(gameReadyHandler);
         pipeline.addLast(reqBossHandler);
+        pipeline.addLast(putPokerHandler);
         pipeline.addLast(new IdleStateHandler(120, 120, 120));
         pipeline.addLast(new HeartHandler());
     }

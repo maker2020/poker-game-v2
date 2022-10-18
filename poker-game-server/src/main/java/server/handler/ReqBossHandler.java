@@ -11,7 +11,6 @@ import game.entity.Room;
 import game.enums.ActionEnum;
 import game.vo.Notification;
 import game.vo.ResultVO;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -79,7 +78,6 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
                 ResultVO.updateResultMap(result, ActionEnum.PUT, boss.getName());
 
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
-                ctx.fireChannelRead(Unpooled.EMPTY_BUFFER);
                 return;
             } else { // 自此说明需要最后一次询问
                      // do nothing
