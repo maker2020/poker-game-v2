@@ -77,4 +77,14 @@ public class ResultVO {
         return map;
     }
 
+    /**
+     * 更新vo对象的notification
+     * @param resultVO
+     * @param notification
+     */
+    public static void updateResultMap(Map<String,Object> resultVO,ActionEnum action,String turn){
+        resultVO.put("action", action.getAction());
+        resultVO.put("turn", turn);
+    }
+
 }

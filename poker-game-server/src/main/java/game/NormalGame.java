@@ -35,24 +35,31 @@ public class NormalGame extends Game{
 
     /**
      * if return null,it means that over one player called Boss
-     * thread safe,the field {@code count} is shared.
+     * thread safe,the field {@code count} is shared.<p>
+     * <p>
+     * 这里v2版本逻辑修改了，将player的refuse加入了判断逻辑中
      * @return
      */
     public Player getBossInstantly(){
         Player player=null;
         int most=0;
         for(Player p:getPlayers()){
-            most=Math.max(most, p.getReqTimes());
+            if(p.isRefuseBoss()){
+                most=Math.max(most, 0);
+            }else{
+                most=Math.max(most, p.getReqTimes());
+            }
         }
         // 栈内不共享，因此不担心原子操作和线程安全
         int count=0;
         for(Player p:getPlayers()){
-            if(most==p.getReqTimes()) {
+            if(most==p.getReqTimes() && !p.isRefuseBoss()) {
                 count++;
                 player=p;
             }
             if(count>1) return null;
         }
+        if(player!=null) player.setBoss(true);
         return player;
     }
 
@@ -85,6 +92,5 @@ public class NormalGame extends Game{
             PokerUtil.sort(p.getPokers());
         }
     }
-
     
 }

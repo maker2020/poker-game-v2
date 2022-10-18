@@ -27,6 +27,10 @@ public class Player implements Serializable{
      * 是否拒绝过当地主
      */
     private boolean refuseBoss=false;
+    /**
+     * v1的辅助变量，现在已不使用，先保留<p>
+     * 标识第一个叫地主
+     */
     private boolean firstCall=false;
     private boolean boss=false;
     private boolean pass;

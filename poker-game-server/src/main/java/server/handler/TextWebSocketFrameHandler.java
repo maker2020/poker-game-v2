@@ -7,8 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
 
-import game.dto.AskBossDTO;
-import game.dto.CallBossDTO;
+import game.dto.ReqBossDTO;
 import game.dto.RoomReadyDTO;
 import game.entity.Player;
 import game.entity.Room;
@@ -61,10 +60,10 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
                 return RoomReadyDTO.class;
             }
             case "call" -> {
-                return CallBossDTO.class;
+                return ReqBossDTO.class;
             }
             case "ask" -> {
-                return AskBossDTO.class;
+                return ReqBossDTO.class;
             }
             default -> {
                 return Object.class;
