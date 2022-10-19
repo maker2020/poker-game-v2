@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 扑克牌类(DTO)
+ * 扑克牌类(POJO)
  */
 @Data
 @NoArgsConstructor

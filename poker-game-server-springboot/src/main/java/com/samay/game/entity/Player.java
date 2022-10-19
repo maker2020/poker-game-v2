@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * 玩家类(DTO)
+ * 玩家类(BO：游戏业务对象)
  */
 @Data
 @NoArgsConstructor

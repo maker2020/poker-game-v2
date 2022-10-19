@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * 房间类(DTO)<p>
+ * 房间类(BO：游戏业务对象)<p>
  * 完全重构了该类，包含游戏，用户，辅助变量等基础属性。<p>
  * 而以往的设计比较复杂，包含很多共享状态变量、辅助变量。<p>
  * @since poker-game-v2
