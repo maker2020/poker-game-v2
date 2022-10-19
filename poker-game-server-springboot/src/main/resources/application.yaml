@@ -1,0 +1,15 @@
+server:
+    port: 8080
+
+logging:
+    level:
+        root: info
+
+# management endpoints shutdown
+
+netty:
+    websocket:
+        port: 8888
+        ip: 172.16.58.88
+        max-frame-size: 10240
+        path: /ws
