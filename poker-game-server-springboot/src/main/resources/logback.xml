@@ -14,4 +14,7 @@
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
+
+    <!-- 屏蔽mq日志-->
+    <logger name="org.springframework.amqp.rabbit" level="OFF"> </logger>
 </configuration>
