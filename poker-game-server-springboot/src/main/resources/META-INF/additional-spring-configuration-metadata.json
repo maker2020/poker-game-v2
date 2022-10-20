@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "netty.websocket.port",
+    "type": "java.lang.Integer",
+    "description": "netty的websocket服务端口"
+  },
+  {
+    "name": "netty.websocket.max-frame-size",
+    "type": "java.lang.Integer",
+    "description": "消息帧最大字节"
+  },
+  {
+    "name": "netty.websocket.ip",
+    "type": "java.lang.String",
+    "description": "绑定的网卡(服务器ip)"
+  },
+  {
+    "name": "netty.websocket.path",
+    "type": "java.lang.String",
+    "description": "websocket路径，如:'/ws'"
+  }
+]}

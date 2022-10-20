@@ -94,11 +94,16 @@ Page({
         ],
         brandListA:[],
         second:60,
-        playO:true,
+        playO:false,
         readyY:false,
-        playZ:true,
+        playJ:false,
+        playL:false,
+        playD:false,
+        playZ:false,
         multiple:2,
         sex:1,
+        boss:' ',
+        play:' ',
         roomID:app.globalData.roomID,
         players:app.globalData.players,
         pokers:app.globalData.pokers
@@ -113,12 +118,86 @@ Page({
             players:app.globalData.players,
         })
         app.watch(this.watchBack)
-        this.readyO();
-        console.log(app.globalData.players,this.data.players);
+        // this.readyO();
     },
     //app监听回调方法
     watchBack(value){//这里的value就是app.js中watch方法中的set,globalData
-     this.getB(value.pokers)
+        if(value.pokers){
+            this.getB(value.pokers)
+        }
+        if(value.playL){
+            this.setData({
+                playL:value.playL
+            })
+        }
+        if(value.playJ){
+            this.setData({
+                playJ:value.playJ
+            })
+        }
+        if(value.play){
+            this.setData({
+                play:value.play
+            })
+        }
+        if(value.boss){
+            this.setData({
+                boss:value.boss
+            })
+        }
+     console.log(value,"playL");
+    },
+    //叫地主
+    playJ(){
+        var param={
+        "action":'call',
+        "tendency":true
+        }
+        wx.sendSocketMessage({
+        data: JSON.stringify(param)
+        })
+        this.setData({
+            playJ:false
+        })
+    },
+    //不叫地主
+    playNj(){
+        var param={
+        "action":'call',
+        "tendency":false
+        }
+        wx.sendSocketMessage({
+        data: JSON.stringify(param)
+        })
+        this.setData({
+            playJ:false
+        })
+    },
+    //抢地主
+    playL(){
+        var param={
+        "action":'ask',
+        "tendency":true
+        }
+        wx.sendSocketMessage({
+        data: JSON.stringify(param)
+        })
+        this.setData({
+            playL:false
+        })
+    },
+    //不抢地主
+    playNl(){
+        var param={
+        "action":'ask',
+        "tendency":false
+        }
+        wx.sendSocketMessage({
+        data: JSON.stringify(param)
+        })
+        this.setData({
+            playL:false
+        })
     },
     /**
      * 生命周期函数--监听页面初次渲染完成
@@ -186,19 +265,19 @@ Page({
     },
     multipleD(){
         this.setData({
-            playZ:false,
+            playD:false,
             multiple:this.data.multiple * 2
         })
     },
     multipleS(){
         this.setData({
-            playZ:false,
+            playD:false,
             multiple:this.data.multiple * 4
         })
     },
     multipleN(){
         this.setData({
-            playZ:false
+            playD:false
         })
     },
     play(e){

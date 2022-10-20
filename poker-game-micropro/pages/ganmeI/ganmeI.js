@@ -74,10 +74,36 @@ Page({
               })
             }
             if(data.pokers && data.user == app.globalData.userInfo.nickName){
-              that.newpokers(data.pokers)
+            //   that.newpokers(data.pokers)
               app.globalData={
                 pokers:data.pokers
               }
+            }
+            if(data.action == 'call' && data.turn){
+                app.globalData={
+                    play:data.turn
+                }
+                if(data.turn == app.globalData.userInfo.nickName){
+                    app.globalData={
+                        playJ:true
+                    }
+                }
+            }
+            if(data.action == 'ask' && data.turn){
+                app.globalData={
+                    play:data.turn
+                }
+                if(data.turn == app.globalData.userInfo.nickName){
+                    app.globalData={
+                        playL:true
+                    }
+                }
+            }
+           
+            if(data.boss){
+                app.globalData={
+                    boss:data.boss
+                }
             }
             console.log(res);
         })
@@ -85,32 +111,51 @@ Page({
     //玩家信息赋值
     plays(players){
       var username=app.globalData.userInfo.nickName
-      var peopleList=[];
+      var peopleList=[
+          {
+            name:'',
+            sex:'',
+            brandNum:0
+          }
+      ];
       for (var i=0; i < players.length; i++) {
         if(players[i]!=username){
-          peopleList.push(
-            {
-              name:players[i],
-              sex:1,
-              brandNum:17
+            peopleList[i]={
+                            name:players[i],
+                            sex:'M',
+                            brandNum:17
+                        }
             }
-          )
-        }
       }
-      peopleList.push({
-        name:username,
-        sex:1,
-        brandNum:17
-      })
+      peopleList[2]={
+            name:username,
+            sex:'M',
+            brandNum:17
+      }
       this.setData({
         peopleList:peopleList
       })
       app.globalData.players=peopleList
-      console.log( username,peopleList,app.globalData.players,'测试');
     },
-    newpokers(pokers){
-      app.globalData.pokers=pokers
-    },
+    // //地主
+    // plays_landlord(boss){
+    //     var players=app.globalData.players;
+    //     console.log(players,app.globalData.players,'测试2');
+    //     var peopleList=[]
+    //     for (var i=0; i < players.length; i++) {
+    //         peopleList.push({
+    //             name:players[i].name,
+    //             sex:players[i].sex,
+    //             islandlord:players[i].name==boss ? true : players[i].islandlord,
+    //             brandNum:players[i].brandNum
+    //         })
+    //     }
+    //     this.setData({
+    //       peopleList:peopleList
+    //     })
+    //     app.globalData.players=peopleList
+    //     console.log(app.globalData.players,'测试1');
+    //   },
     //app监听回调方法
     watchBack(value){//这里的value就是app.js中watch方法中的set,globalData
       console.log(value,'监听');

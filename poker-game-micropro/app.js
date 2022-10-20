@@ -20,6 +20,12 @@ App({
       enumerable:true,
       set:function(value){//动态赋值，传递对象，为globalData中对应变量赋值
         obj.pokers = value.pokers;
+        obj.players = value.players;
+        obj.playJ = value.playJ;
+        obj.playL = value.playL;
+        obj.boss = value.boss;
+        obj.play = value.play;
+        
         method(value);      
       },
       get:function(){//获取全局变量值，直接返回全部
@@ -32,6 +38,10 @@ App({
     roomID:null,
     players:[],
     pokers:null,
-    test:''
+    test:'',
+    playJ:false,
+    playL:false,
+    boss:null,
+    play:null
   }
 })
