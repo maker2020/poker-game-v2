@@ -16,10 +16,11 @@ netty:
         max-frame-size: 10240
         path: /ws
 
-# rabbitmq
 spring:
     application:
-        name: rabbitmq-spring-boot
+        name: poker-game-v2
+    
+    # rabbitmq
     rabbitmq:
         host: 172.16.88.58
         port: 5672
@@ -44,3 +45,14 @@ spring:
         #         max-concurrency: 10
         #         retry:
         #             enabled: true
+
+    # datasoucre
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: root
+        password: 123456
+        url: jdbc:mysql://172.16.88.58:3306/poker_game?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+
+mybatis:
+  mapper-locations: classpath:/mybatis/*.xml
+  type-aliases-package: com.samay.game.entity

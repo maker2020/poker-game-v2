@@ -1,21 +1,33 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : cloud
+ Source Server         : poker-game-v2
  Source Server Type    : MySQL
  Source Server Version : 80028
- Source Host           : localhost:3306
+ Source Host           : 172.16.88.58:3306
  Source Schema         : poker_game
 
  Target Server Type    : MySQL
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 20/10/2022 14:27:38
+ Date: 20/10/2022 16:18:12
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for item
+-- ----------------------------
+DROP TABLE IF EXISTS `item`;
+CREATE TABLE `item`  (
+  `userid` int(0) NOT NULL COMMENT '用户唯一主键',
+  `name` enum('POKER_COUNTER','SUPER_DOUBLED') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '道具名称/类别',
+  `count` int(0) NULL DEFAULT NULL COMMENT '道具数量',
+  PRIMARY KEY (`userid`, `name`) USING BTREE,
+  CONSTRAINT `item_clear` FOREIGN KEY (`userid`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for user
@@ -32,17 +44,6 @@ CREATE TABLE `user`  (
   `loseCount` bigint(0) NULL DEFAULT NULL COMMENT '玩家普通游戏败场',
   `exp` bigint(0) NULL DEFAULT NULL COMMENT '玩家经验值',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for user_item
--- ----------------------------
-DROP TABLE IF EXISTS `user_item`;
-CREATE TABLE `user_item`  (
-  `userid` int(0) NOT NULL COMMENT '用户唯一主键',
-  `name` enum('POKER_COUNTER','SUPER_DOUBLED') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '道具名称/类别',
-  `count` int(0) NULL DEFAULT NULL COMMENT '道具数量',
-  PRIMARY KEY (`userid`, `name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
