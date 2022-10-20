@@ -1,0 +1,30 @@
+
+# management endpoints shutdown
+
+# netty
+netty:
+    websocket:
+        port: 8888
+        ip: 192.168.0.118
+        max-frame-size: 10240
+        path: /ws
+
+spring:
+    # rabbitmq
+    rabbitmq:
+        host: 192.168.0.118
+        port: 5672
+        username: guest
+        password: guest
+        virtual-host: /
+
+        # ack
+        publisher-confirm-type: correlated # 确认发送到exchange
+        publisher-returns: true # 确认发送到queue
+
+    # datasoucre
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: root
+        password: Samay520...
+        url: jdbc:mysql://localhost:3306/poker_game?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true

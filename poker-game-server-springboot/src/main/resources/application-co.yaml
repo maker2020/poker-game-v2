@@ -1,0 +1,44 @@
+
+# management endpoints shutdown
+
+# netty
+netty:
+    websocket:
+        port: 8888
+        ip: 172.16.58.88
+        max-frame-size: 10240
+        path: /ws
+
+spring:
+    # rabbitmq
+    rabbitmq:
+        host: 172.16.88.58
+        port: 5672
+        username: samay
+        password: samay
+        virtual-host: /test
+
+        # ack
+        publisher-confirm-type: correlated # 确认发送到exchange
+        publisher-returns: true # 确认发送到queue
+
+        # 这些配置在Java中通过bean配置了
+        # # consumer
+        # listener:
+        #     direct:
+        #         acknowledge-mode: manual # 手动ack
+        #         retry: # 启用发布重试
+        #             enabled: true
+        #     simple:
+        #         acknowledge-mode: manual
+        #         concurrency: 5
+        #         max-concurrency: 10
+        #         retry:
+        #             enabled: true
+
+    # datasoucre
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: root
+        password: 123456
+        url: jdbc:mysql://172.16.88.58:3306/poker_game?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
