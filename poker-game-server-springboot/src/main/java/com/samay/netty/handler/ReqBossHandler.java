@@ -40,7 +40,7 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         Game game = room.getGame();
 
         // 维护player请求序号
-        player.setReqIndex(room.getTurnCallIndex().get());
+        // player.setReqIndex(room.getTurnCallIndex().get());
         room.getTurnCallIndex().incrementAndGet();
 
         Map<String, Object> result=null;

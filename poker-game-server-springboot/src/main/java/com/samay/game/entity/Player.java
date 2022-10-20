@@ -17,24 +17,42 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(of="name")
 public class Player implements Serializable{
+    /**
+     * 玩家唯一标识(name/id等)
+     */
     private String name;
+    /**
+     * 玩家展示的昵称
+     */
+    private String nickName;
+    /**
+     * 0:未设置，1:男，2:女
+     */
+    private char sex='0';
     private List<Poker> pokers=new ArrayList<>();
-    private Long restMillions;
-    private Long money;
+    private boolean boss=false;
+    private boolean ready;
+
+    /**
+     * 辅助变量：用于判断出地主
+     */
     private int reqTimes=0;
-    private int reqIndex=0;
+   
     /**
      * 是否拒绝过当地主
      */
     private boolean refuseBoss=false;
+
     /**
-     * v1的辅助变量，现在已不使用，先保留<p>
-     * 标识第一个叫地主
+     * 以下为v1的辅助变量，现在已不使用，先保留<p>
+     * 标识第一个叫地主、请求索引、是否pass
      */
+    @Deprecated
     private boolean firstCall=false;
-    private boolean boss=false;
+    @Deprecated
+    private int reqIndex=0;
+    @Deprecated
     private boolean pass;
-    private boolean ready;
 
     public Player(String name){
         this.name=name;
@@ -58,6 +76,6 @@ public class Player implements Serializable{
 
     @Override
     public String toString(){
-        return "name:"+name+" money:"+money;
+        return "player[name:"+name+"]";
     }
 }
