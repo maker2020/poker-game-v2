@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelId;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.util.AttributeKey;
 
@@ -18,6 +19,12 @@ public class ChannelHolder {
      * 通道->group的映射
      */
     public static Map<Channel,ChannelGroup> groupMap=new ConcurrentHashMap<>();
+
+    /**
+     * <b>玩家唯一标识->ChannelID映射</b>
+     * 维护目的：快速从group定位玩家channel
+     */
+    public static Map<String,ChannelId> uid_chidMap=new ConcurrentHashMap<>();
 
     /**
      * 获取通道绑定的玩家。<p>
