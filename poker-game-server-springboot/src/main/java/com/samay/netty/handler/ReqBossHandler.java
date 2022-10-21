@@ -11,9 +11,11 @@ import com.samay.game.dto.ReqBossDTO;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
+import com.samay.game.utils.PokerUtil;
 import com.samay.game.vo.Notification;
 import com.samay.game.vo.ResultVO;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.group.ChannelGroup;
@@ -75,6 +77,17 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             if (boss != null) {
                 Map<String, Object> result2 = ResultVO.resultMap(boss.getName());
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result2)));
+
+                // 广播地主牌
+                Map<String,Object> bossPokersResult=ResultVO.resultMap(game.getPokerBossCollector());
+                group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(bossPokersResult)));
+                
+                // 给地主整理新加入的牌并单独发送给地主
+                boss.addAllPoker(game.getPokerBossCollector());
+                PokerUtil.sort(boss.getPokers());
+                Map<String,Object> resortBossPokers=ResultVO.resultMap(boss.getName(), boss.getPokers());
+                ChannelId chID=ChannelHolder.uid_chidMap.get(boss.getName());
+                group.find(chID).writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resortBossPokers)));
 
                 // 地主既然得出，action的应更新为put，而非turn下一个玩家ask。
                 // 更新result的action

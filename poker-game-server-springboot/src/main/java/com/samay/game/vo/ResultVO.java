@@ -1,5 +1,6 @@
 package com.samay.game.vo;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,17 @@ public class ResultVO {
     public static Map<String,Object> resultMap(String boss){
         Map<String,Object> map=new HashMap<>();
         map.put("boss", boss);
+        return map;
+    }
+
+    /**
+     * 返回牌
+     * @param pokers
+     * @return
+     */
+    public static Map<String,Object> resultMap(Collection<Poker> pokers){
+        Map<String,Object> map=new HashMap<>();
+        map.put("extraPokers",pokers);
         return map;
     }
 

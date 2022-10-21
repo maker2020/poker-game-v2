@@ -6,11 +6,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelId;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.util.AttributeKey;
 
 /**
- * 通道全局持久访问类
+ * <b>通道全局持久访问类</b>(内存管理/回收的重点类对象)<p>
+ * 包含通道相关的快速访问以及相关属性
  */
 public class ChannelHolder {
     
@@ -18,6 +20,12 @@ public class ChannelHolder {
      * 通道->group的映射
      */
     public static Map<Channel,ChannelGroup> groupMap=new ConcurrentHashMap<>();
+
+    /**
+     * <b>玩家唯一标识->ChannelID映射</b><p>
+     * 维护目的：快速从group定位玩家channel
+     */
+    public static Map<String,ChannelId> uid_chidMap=new ConcurrentHashMap<>();
 
     /**
      * 获取通道绑定的玩家。<p>

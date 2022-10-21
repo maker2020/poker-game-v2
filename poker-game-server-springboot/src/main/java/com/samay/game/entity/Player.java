@@ -2,6 +2,7 @@ package com.samay.game.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -62,7 +63,7 @@ public class Player implements Serializable{
         pokers.add(poker);
     }
 
-    public void addAllPoker(List<Poker> listPoker){
+    public void addAllPoker(Collection<Poker> listPoker){
         pokers.addAll(listPoker);
     }
 

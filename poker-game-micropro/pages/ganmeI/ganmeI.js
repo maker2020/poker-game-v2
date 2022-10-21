@@ -15,6 +15,7 @@ Page({
      */
     onLoad(options) {
       app.watch(this.watchBack)
+      console.log(app.globalData.userInfo)
     },
 
     /**
@@ -74,11 +75,15 @@ Page({
               })
             }
             if(data.pokers && data.user == app.globalData.userInfo.nickName){
-            //   that.newpokers(data.pokers)
               app.globalData={
                 pokers:data.pokers
               }
             }
+            if(data.extraPokers){
+                app.globalData={
+                    extraPokers:data.extraPokers
+                }
+              }
             if(data.action == 'call' && data.turn){
                 app.globalData={
                     play:data.turn
@@ -111,31 +116,42 @@ Page({
     //玩家信息赋值
     plays(players){
       var username=app.globalData.userInfo.nickName
-      var peopleList=[
-          {
-            name:'',
-            sex:'',
-            brandNum:0
+      var peopleList=[];
+      for(var i=0;i<3;i++){
+          if(players[i]){
+              if(players[i]!=username){
+                peopleList.push({
+                    name:players[i],
+                    sex:'M',
+                    brandNum:17
+                })
+              }
           }
-      ];
-      for (var i=0; i < players.length; i++) {
-        if(players[i]!=username){
-            peopleList[i]={
-                            name:players[i],
-                            sex:'M',
-                            brandNum:17
-                        }
-            }
+          else{
+            peopleList.push({
+                name:'',
+                sex:'',
+                brandNum:17
+            })
+          }
       }
       peopleList[2]={
-            name:username,
-            sex:'M',
+        name:username,
+        sex:'M',
+        brandNum:17
+      }  
+      var len = 2 - players.lengh + 1;
+      for (var j=0; j < len ; j++) {
+        peopleList.unshift({
+            name:'',
+            sex:'',
             brandNum:17
+        })
       }
-      this.setData({
-        peopleList:peopleList
-      })
-      app.globalData.players=peopleList
+      app.globalData={
+        players:peopleList
+      }
+      console.log(app.globalData.userInfo,peopleList,username);
     },
     // //地主
     // plays_landlord(boss){
