@@ -18,7 +18,8 @@ import io.netty.util.concurrent.ImmediateEventExecutor;
 import com.samay.netty.exception.OverLoadException;
 
 /**
- * 游戏房间管理器
+ * <b>游戏房间管理器</b> (内存管理/回收的重点类对象)<p>
+ * 包含玩家加入房间、初始化的相关参数绑定
  */
 public class RoomManager {
 
@@ -30,7 +31,7 @@ public class RoomManager {
     /**
      * 房间Set->ChannelGroup 的映射
      */
-    public static Map<String, ChannelGroup> roomIDMapChannelGroup = new ConcurrentHashMap<>();
+    private static Map<String, ChannelGroup> roomIDMapChannelGroup = new ConcurrentHashMap<>();
 
     /**
      * 服务器的房间数最大容量
@@ -98,6 +99,10 @@ public class RoomManager {
         // 公共
         room.addPlayer(player);
         room.getGame().addPlayer(player);
+
+
+        // 通道范围 的绑定
+
         // 将通道与房间绑定
         ctx.channel().attr(AttributeKey.valueOf("room")).set(room);
         // 通道与group绑定
