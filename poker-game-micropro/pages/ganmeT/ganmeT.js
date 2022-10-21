@@ -104,9 +104,9 @@ Page({
         sex:1,
         boss:' ',
         play:' ',
-        roomID:app.globalData.roomID,
-        players:app.globalData.players,
-        pokers:app.globalData.pokers
+        roomID:'',
+        players:[],
+        pokers:[]
     },
 
     /**
@@ -119,9 +119,15 @@ Page({
         })
         app.watch(this.watchBack)
         // this.readyO();
+        console.log("players",app.globalData.players);
     },
     //app监听回调方法
     watchBack(value){//这里的value就是app.js中watch方法中的set,globalData
+        if(value.players){
+            this.setData({
+                players:value.players
+            })
+        }
         if(value.pokers){
             this.getB(value.pokers)
         }

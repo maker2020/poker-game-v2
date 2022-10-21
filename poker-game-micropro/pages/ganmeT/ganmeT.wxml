@@ -47,7 +47,7 @@
         <view class='leftR'>
             <view class='human'>
                 <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{players[1].name==boss}}"></view>
-                <image src='../../static/img/{{players[1].name==boss?"landlord":"civilian"}}{{players[1].sex?players[0].sex:""}}.png' mode='widthFix'></image>
+                <image src='../../static/img/{{players[1].name==boss?"landlord":"civilian"}}{{players[1].sex?players[1].sex:""}}.png' mode='widthFix'></image>
                 <view class='humanTxt'>
                     <text class='txt'>{{players[1].name}}</text>
                     <text class='num'>2900</text>
@@ -66,9 +66,9 @@
     <view class='peopleU'>
         <view class='human'>
             <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{players[2].name==boss}}"></view>
-            <image src='../../static/img/{{players[2].name==boss?"landlord":"civilian"}}{{players[2].sex?players[0].sex:""}}.png' mode='widthFix'></image>
+            <image src='../../static/img/{{players[2].name==boss?"landlord":"civilian"}}{{!players[2].sex?"":players[2].sex}}.png' mode='widthFix'></image>
             <view class='humanTxt'>
-                <text class='txt'>{{players[2].name}}</text>
+                <text class='txt'>{{players[2].name}}{{players[2].sex}}</text>
                 <text class='num'>2800</text>
             </view>
         </view>

@@ -15,6 +15,7 @@ Page({
      */
     onLoad(options) {
       app.watch(this.watchBack)
+      console.log(app.globalData.userInfo)
     },
 
     /**
@@ -111,31 +112,54 @@ Page({
     //玩家信息赋值
     plays(players){
       var username=app.globalData.userInfo.nickName
-      var peopleList=[
-          {
-            name:'',
-            sex:'',
-            brandNum:0
-          }
-      ];
-      for (var i=0; i < players.length; i++) {
-        if(players[i]!=username){
-            peopleList[i]={
-                            name:players[i],
-                            sex:'M',
-                            brandNum:17
-                        }
+      var peopleList=[];
+      for(var i=0;i<3;i++){
+        if(i!=2){
+            if(players[i] && players[i]!=username){
+                peopleList.push({
+                    name:players[i],
+                    sex:'M',
+                    brandNum:17
+                })
             }
+            else{
+                peopleList.push({
+                    name:'',
+                    sex:'',
+                    brandNum:17
+                }) 
+            }
+        }
+        else{
+            peopleList.push({
+                name:username,
+                sex:'M',
+                brandNum:17
+            })
+        }
       }
-      peopleList[2]={
-            name:username,
-            sex:'M',
-            brandNum:17
+    //   for(var i=0;i<players.length;i++){
+    //       if(players[i]!=username){
+    //         peopleList.push({
+    //             name:players[i],
+    //             sex:'M',
+    //             brandNum:17
+    //         })
+    //       }
+    //   }
+    //   var len = 2 - players.lengh + 1;
+    //   for (var i=0; i < len ; i++) {
+    //     peopleList.push({
+    //         name:'',
+    //         sex:'',
+    //         brandNum:17
+    //     })
+    //   }
+    
+      app.globalData={
+        players:peopleList
       }
-      this.setData({
-        peopleList:peopleList
-      })
-      app.globalData.players=peopleList
+      console.log(app.globalData.userInfo,peopleList,username);
     },
     // //地主
     // plays_landlord(boss){
