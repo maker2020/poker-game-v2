@@ -11,9 +11,9 @@
             <text class='num'>200</text>
         </view>
         <view class='basehand' wx:if='{{readyY}}'>
-            <image src='../../static/img/SPADE_TEN.png' mode="widthFix"></image>
-            <image src='../../static/img/SQUARE_TEN.png' mode="widthFix"></image>
-            <image src='../../static/img/CLUB_TEN.png' mode="widthFix"></image>
+            <image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' wx:key='index' mode="widthFix" wx:for='{{extraPokers}}'></image>
+            <!-- <image src='../../static/img/SQUARE_TEN.png' mode="widthFix"></image>
+            <image src='../../static/img/CLUB_TEN.png' mode="widthFix"></image> -->
         </view>
         <view class='multiple' wx:if='{{readyY}}'>
             <text class='txt'>倍数</text>
@@ -96,7 +96,7 @@
         </view>
         <view class='clock' wx:if='{{play==players[2].name}}'>
             <image src='../../static/img/clock.png' mode='widthFix'></image>
-            <text class='num'>{{second}}{{play}}</text>
+            <text class='num'>{{second}}</text>
         </view>
     </view>
     

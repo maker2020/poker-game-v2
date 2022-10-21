@@ -6,92 +6,7 @@ Page({
      * 页面的初始数据
      */
     data: {
-        brandList:[
-            // {
-            //     name:'spade2',
-            //     isS:false
-            // },
-            // {
-            //     name:'club2',
-            //     isS:false
-            // },
-            // {
-            //     name:'heart2',
-            //     isS:false
-            // },
-            // {
-            //     name:'diamond2',
-            //     isS:false
-            // },
-            // {
-            //     name:'X',
-            //     isS:false
-            // },
-            // {
-            //     name:'Y',
-            //     isS:false
-            // },
-            // {
-            //     name:'spadeA',
-            //     isS:false
-            // },
-            // {
-            //     name:'heartA',
-            //     isS:false
-            // },
-            // {
-            //     name:'diamondA',
-            //     isS:false
-            // },
-            // {
-            //     name:'clubA',
-            //     isS:false
-            // },
-            // {
-            //     name:'heart3',
-            //     isS:false
-            // },
-            // {
-            //     name:'heart4',
-            //     isS:false
-            // },
-            // {
-            //     name:'heart5',
-            //     isS:false
-            // },
-            // {
-            //     name:'heart6',
-            //     isS:false
-            // },
-            // {
-            //     name:'heart7',
-            //     isS:false
-            // },
-            // {
-            //     name:'heart8',
-            //     isS:false
-            // },
-            // {
-            //     name:'heart9',
-            //     isS:false
-            // },
-            // {
-            //     name:'heart10',
-            //     isS:false
-            // },
-            // {
-            //     name:'heartJ',
-            //     isS:false
-            // },
-            // {
-            //     name:'heartQ',
-            //     isS:false
-            // },
-            // {
-            //     name:'heartK',
-            //     isS:false
-            // }
-        ],
+        brandList:[],
         brandListA:[],
         second:60,
         playO:false,
@@ -106,7 +21,8 @@ Page({
         play:' ',
         roomID:'',
         players:[],
-        pokers:[]
+        pokers:[],
+        extraPokers:[]
     },
 
     /**
@@ -143,12 +59,20 @@ Page({
         }
         if(value.play){
             this.setData({
+                second:60,
                 play:value.play
             })
+            this.countDown()
         }
         if(value.boss){
             this.setData({
-                boss:value.boss
+                boss:value.boss,
+                playO:true
+            })
+        }
+        if(value.extraPokers){
+            this.setData({
+                extraPokers:value.extraPokers
             })
         }
      console.log(value,"playL");
@@ -287,37 +211,62 @@ Page({
         })
     },
     play(e){
-        this.data.brandList[e.target.dataset.index].isS=!this.data.brandList[e.target.dataset.index].isS;
+        this.data.pokers[e.target.dataset.index].isS=!this.data.pokers[e.target.dataset.index].isS;
         this.setData({
-            brandList:this.data.brandList
+            pokers:this.data.pokers
         })
     },
     playS(){
         let brandListA = [];
         let brandList=[]
-        this.data.brandList.forEach(function(item,i){
+        var putPokers=[]
+        this.data.pokers.forEach(function(item,i){
             if(item.isS){
                 brandListA.push(item)
+                putPokers.push({
+                    "colorEnum":item.name.split('_')[0],
+                    "valueEnum":item.name.split('_')[1]
+                })
             }
             else{
                 brandList.push(item)
             }
         })
         this.setData({
-            brandList:brandList,
+            pokers:brandList,
             brandListA:brandListA,
             playO:false,
             second:60
         })
+        console.log(brandListA,putPokers);
+        var param={
+            "action":'put',
+            "tendency":true,
+            "putPokers":putPokers
+            }
+            wx.sendSocketMessage({
+            data: JSON.stringify(param)
+            })
+            // this.setData({
+            //     playL:false
+            // })
     },
     playC(){
+        let brandListA = [];
+        this.data.pokers.forEach(function(item,i){
+            item.isS=false
+        })
         this.setData({
+            pokers:this.data.pokers,
+            brandListA:brandListA,
             playO:false,
             second:60
         })
+        console.log(brandListA,this.data.pokers);
     },
     countDown(){
         var that=this;
+        clearInterval(time)
         var time=setInterval(function(){
             if(that.data.second){
                 that.setData({

@@ -75,11 +75,15 @@ Page({
               })
             }
             if(data.pokers && data.user == app.globalData.userInfo.nickName){
-            //   that.newpokers(data.pokers)
               app.globalData={
                 pokers:data.pokers
               }
             }
+            if(data.extraPokers){
+                app.globalData={
+                    extraPokers:data.extraPokers
+                }
+              }
             if(data.action == 'call' && data.turn){
                 app.globalData={
                     play:data.turn
@@ -114,48 +118,36 @@ Page({
       var username=app.globalData.userInfo.nickName
       var peopleList=[];
       for(var i=0;i<3;i++){
-        if(i!=2){
-            if(players[i] && players[i]!=username){
+          if(players[i]){
+              if(players[i]!=username){
                 peopleList.push({
                     name:players[i],
                     sex:'M',
                     brandNum:17
                 })
-            }
-            else{
-                peopleList.push({
-                    name:'',
-                    sex:'',
-                    brandNum:17
-                }) 
-            }
-        }
-        else{
+              }
+          }
+          else{
             peopleList.push({
-                name:username,
-                sex:'M',
+                name:'',
+                sex:'',
                 brandNum:17
             })
-        }
+          }
       }
-    //   for(var i=0;i<players.length;i++){
-    //       if(players[i]!=username){
-    //         peopleList.push({
-    //             name:players[i],
-    //             sex:'M',
-    //             brandNum:17
-    //         })
-    //       }
-    //   }
-    //   var len = 2 - players.lengh + 1;
-    //   for (var i=0; i < len ; i++) {
-    //     peopleList.push({
-    //         name:'',
-    //         sex:'',
-    //         brandNum:17
-    //     })
-    //   }
-    
+      peopleList[2]={
+        name:username,
+        sex:'M',
+        brandNum:17
+      }  
+      var len = 2 - players.lengh + 1;
+      for (var j=0; j < len ; j++) {
+        peopleList.unshift({
+            name:'',
+            sex:'',
+            brandNum:17
+        })
+      }
       app.globalData={
         players:peopleList
       }
