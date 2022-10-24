@@ -89,7 +89,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             ChannelFuture future = ctx.channel().writeAndFlush(response);
             future.addListener(ChannelFutureListener.CLOSE);
         }
-        log.info("player[***]@+"+username+"+ log in");
+        log.info("player[***]@"+username+"+ log in");
         // 初次实例化玩家
         Player player=new Player(username);
         initPlayerData(username);
