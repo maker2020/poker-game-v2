@@ -82,7 +82,6 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     }
 
     private void onJoined(ChannelHandlerContext ctx) {
-        Player player = ChannelHolder.attrPlayer(ctx.channel());
         Room room = ChannelHolder.attrRoom(ctx.channel());
 
         List<Player> playerList=room.getPlayers();
@@ -91,7 +90,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
             playerNameArr[i]=playerList.get(i).getName();
         }
 
-        Map<String,Object> msg=ResultVO.resultMap(player.getName(), room.getId(), playerNameArr);
+        Map<String,Object> msg=ResultVO.resultMap(room);
         TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JSON.toJSONString(msg));
         ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
         group.writeAndFlush(textWebSocketFrame);

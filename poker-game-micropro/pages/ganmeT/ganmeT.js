@@ -11,7 +11,7 @@ Page({
         second:60,
         playO:false,
         readyY:false,
-        playJ:false,
+        playJ:false, // 叫地主
         playL:false,
         playD:false,
         playZ:false,
@@ -22,7 +22,8 @@ Page({
         roomID:'',
         players:[],
         pokers:[],
-        extraPokers:[]
+        extraPokers:[],
+        start:false
     },
 
     /**
@@ -46,6 +47,9 @@ Page({
         }
         if(value.pokers){
             this.getB(value.pokers)
+            this.setData({
+                start:true
+            })
         }
         if(value.playL){
             this.setData({
@@ -154,21 +158,11 @@ Page({
           url: '/pages/ganmeI/ganmeI',
         })
     },
-    // getS(){
-    //   var that=this;
-    //   return new Promise((resolve, reject) => { //订单类型
-    //     that.ready()
-    //       .then(res => {
-    //         resolve(function(){
-    //           console.log(res);
-    //         })
-    //       })
-    //       .catch((e) => {
-    //         reject(e)
-    //       })
-    //   })
-    // },
+    
     readyO(){
+      this.setData({
+          readyY: true
+      })
       var param={
         "action":'ready',
         "tendency":true
@@ -177,6 +171,7 @@ Page({
         data: JSON.stringify(param)
       })
     },
+
     getB(pokers){
       var that=this;
       var brandList=[];

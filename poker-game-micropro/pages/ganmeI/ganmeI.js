@@ -65,25 +65,32 @@ Page({
         })      
         wx.onSocketMessage(function(res) {
             var data =JSON.parse(res.data);
-            if(data.roomID){
-              app.globalData.roomID=data.roomID
+            // 玩家入房更新，并跳转
+            if(data.players && data.user && data.roomID){
+                // 更新房间信息管理
+                // 房间id的渲染
+                app.globalData.roomID=data.roomID
+                // 房间玩家信息的更新
+                that.plays(data.players)
+                wx.redirectTo({
+                  url: '/pages/ganmeT/ganmeT',
+                })
             }
-            if(data.players){
-              that.plays(data.players)
-              wx.redirectTo({
-                url: '/pages/ganmeT/ganmeT',
-              })
-            }
+
+            // 接收玩家手牌的渲染
             if(data.pokers && data.user == app.globalData.userInfo.nickName){
+              // 全局保存玩家的手牌，更新渲染
               app.globalData={
                 pokers:data.pokers
               }
             }
+            // 接收到地主三张牌
             if(data.extraPokers){
                 app.globalData={
                     extraPokers:data.extraPokers
                 }
-              }
+            }
+            // 接收到  <轮到turn存放值的玩家叫地主>
             if(data.action == 'call' && data.turn){
                 app.globalData={
                     play:data.turn
@@ -94,6 +101,8 @@ Page({
                     }
                 }
             }
+
+            // 接收到 <轮到turn存放值的玩家抢地主>
             if(data.action == 'ask' && data.turn){
                 app.globalData={
                     play:data.turn
@@ -105,6 +114,7 @@ Page({
                 }
             }
            
+            // 接受到 地主是谁，并渲染
             if(data.boss){
                 app.globalData={
                     boss:data.boss
