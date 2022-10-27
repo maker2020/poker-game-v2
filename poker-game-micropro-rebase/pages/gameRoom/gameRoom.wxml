@@ -3,19 +3,19 @@
     <view class='out' bindtap='out'></view>
     <view class='room'>房间号：{{roomID}}</view>
     <view class='readyBtn btnCon' wx:if='{{!readyY}}'>
-        <view class='btn' bindtap='readyO'>准备</view>
+        <view class='btn' bindtap='ready'>准备</view>
     </view>
     <view class='top'>
-        <view class='basescore' wx:if='{{start}}'>
+        <view class='basescore' wx:if='{{status=='start'}}'>
             <text class='txt'>底分</text>
             <text class='num'>200</text>
         </view>
-        <view class='basehand' wx:if='{{start}}'>
-            <image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' wx:key='index' mode="widthFix" wx:for='{{extraPokers}}'></image>
+        <view class='basehand' wx:if='{{status=='start'}}'>
+            <image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' wx:key='index' mode="widthFix" wx:for='{{bossPokers}}'></image>
             <!-- <image src='../../static/img/SQUARE_TEN.png' mode="widthFix"></image>
             <image src='../../static/img/CLUB_TEN.png' mode="widthFix"></image> -->
         </view>
-        <view class='multiple' wx:if='{{start}}'>
+        <view class='multiple' wx:if='{{status=='start'}}'>
             <text class='txt'>倍数</text>
             <text class='num'>x{{multiple}}</text>
         </view>
@@ -24,40 +24,36 @@
         <view class='leftP'>
             <view class='human'>
                 <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{players[0].name==boss}}"></view>
-                <image src='../../static/img/{{players[0].name==boss?"landlord":"civilian"}}{{players[0].sex?players[0].sex:""}}.png' mode='widthFix'></image>
+                <image src='../../static/img/{{playerList[0].playerID==boss?"landlord":"civilian"}}{{playerList[0].sex?players[0].sex:""}}.png' mode='widthFix'></image>
                 <view class='humanTxt'>
-                    <text class='txt'>{{players[0].name}}</text>
+                    <text class='txt'>{{playerList[0].nickName}}</text>
                     <text class='num'>6700</text>
                 </view>
             </view>
-            <view class='brandShow' wx:if='{{start}}'>
+            <view class='brandShow' wx:if='{{status=='start'}}'>
                 <image src='../../static/img/backside.png' mode='widthFix'></image>
-                <text class='num'>{{players[0].brandNum}}</text>
+                <text class='num'>17</text>
             </view>
-            <view class='clock'  wx:if='{{play==players[0].name}}'>
+            <view class='clock'  wx:if='{{turn==playerList[0].playerID}}'>
                 <image src='../../static/img/clock.png' mode='widthFix'></image>
                 <text class='num'>16</text>
             </view>
         </view>
-        <view class='leftM'  wx:if='{{start}}'>
-            <view class='brandA'>
-                <view class='brand' wx:for='{{brandListA}}' wx:key='index'><image src='../../static/img/{{item.name}}.png' mode='heightFix'></image></view>
-            </view>
-        </view>
+        
         <view class='leftR'>
             <view class='human'>
-                <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{players[1].name==boss}}"></view>
-                <image src='../../static/img/{{players[1].name==boss?"landlord":"civilian"}}{{players[1].sex?players[1].sex:""}}.png' mode='widthFix'></image>
+                <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{playerList[1].playerID==boss}}"></view>
+                <image src='../../static/img/{{playerList[1].playerID==boss?"landlord":"civilian"}}{{playerList[1].sex?playerList[1].sex:""}}.png' mode='widthFix'></image>
                 <view class='humanTxt'>
-                    <text class='txt'>{{players[1].name}}</text>
+                    <text class='txt'>{{playerList[1].nickName}}</text>
                     <text class='num'>2900</text>
                 </view>
             </view>
-            <view class='brandShow' wx:if='{{start}}'>
+            <view class='brandShow' wx:if='{{status=='start'}}'>
                 <image src='../../static/img/backside.png' mode='widthFix'></image>
-                <text class='num'>{{players[1].brandNum}}</text>
+                <text class='num'>17</text>
             </view>
-            <view class='clock'  wx:if='{{play==players[1].name}}'>
+            <view class='clock'  wx:if='{{turn==playerList[1].playerID}}'>
                 <image src='../../static/img/clock.png' mode='widthFix'></image>
                 <text class='num'>23</text>
             </view>
@@ -65,36 +61,36 @@
     </view>
     <view class='peopleU'>
         <view class='human'>
-            <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{players[2].name==boss}}"></view>
-            <image src='../../static/img/{{players[2].name==boss?"landlord":"civilian"}}{{!players[2].sex?"":players[2].sex}}.png' mode='widthFix'></image>
+            <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{playerList[2].playerID==boss}}"></view>
+            <image src='../../static/img/{{playerList[2].playerID==boss?"landlord":"civilian"}}{{!playerList[2].sex?"":playerList[2].sex}}.png' mode='widthFix'></image>
             <view class='humanTxt'>
-                <text class='txt'>{{players[2].name}}{{players[2].sex}}</text>
-                <text class='num'>2800</text>
+                <text class='txt'>{{playerList[2].nickName}}{{playerList[2].sex}}</text>
+                <text class='num'>3000</text>
             </view>
         </view>
-        <view class='brandShows'  wx:if='{{start}}'>
-            <view wx:for='{{pokers}}' wx:key='index' class="brand {{item.isS?'active':''}}" data-brand='{{item.name}}' >
-                <image bindtap='play' data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='z-index:{{index?index:0}}'></image>
+        <view class='brandShows'  wx:if='{{status='start'}}'>
+            <view wx:for='{{myPokers}}' wx:key='index' class="brand {{item.selected?'active':''}}" data-brand='{{item.name}}' >
+                <image bindtap='tapPoker' data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='z-index:{{index?index:0}}'></image>
             </view>
         </view>
-        <view class='btnCon' wx:if='{{ playO && start}}'>
+        <view class='btnCon' wx:if='{{ turn==playerList[2].playerID && action=='put'}}'>
             <view class='cancel btn' bindtap='playC'>跳过</view>
             <view class='sure btn' bindtap='playS'>出牌</view>
         </view>
-        <view class='btnCon' wx:if='{{playJ && start}}'>
+        <view class='btnCon' wx:if='{{turn==playerList[2].playerID && action=='call'}}'>
             <view class='cancel btn' bindtap='playJ'>叫地主</view>
             <view class='sure btn' bindtap='playNj'>不叫</view>
         </view>
-        <view class='btnCon' wx:if='{{playL && start}}'>
+        <view class='btnCon' wx:if='{{turn==playerList[2].playerID && action=='ask'}}'>
             <view class='cancel btn' bindtap='playL'>抢地主</view>
             <view class='sure btn' bindtap='playNl'>不抢</view>
         </view>
-        <view class='btnCon' wx:if='{{playD && start}}'>
+        <view class='btnCon' wx:if='{{turn==playerList[2].playerID && action=='multiple'}}'>
             <view class='sure btn' bindtap='multipleD'>加倍</view>
             <view class='cancel btn' bindtap='multipleS'>超级加倍</view>
             <view class='sure btn' bindtap='multipleN'>不加倍</view>
         </view>
-        <view class='clock' wx:if='{{play==players[2].name}}'>
+        <view class='clock' wx:if='{{turn==playerList[2].playerID}}'>
             <image src='../../static/img/clock.png' mode='widthFix'></image>
             <text class='num'>{{second}}</text>
         </view>
