@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of="name")
 public class Player implements Serializable{
     /**
-     * 玩家唯一标识(name/id等)
+     * 玩家唯一标识(name/id等)，而非玩家昵称
      */
     private String name;
     /**
@@ -29,7 +29,7 @@ public class Player implements Serializable{
     /**
      * 0:未设置，1:男，2:女
      */
-    private char sex='0';
+    private char sex='1';
     private List<Poker> pokers=new ArrayList<>();
     private boolean boss=false;
     private boolean ready;
@@ -55,6 +55,10 @@ public class Player implements Serializable{
     @Deprecated
     private boolean pass;
 
+    /**
+     * 按照玩家唯一标识(cloudID/id等)
+     * @param name 唯一标识
+     */
     public Player(String name){
         this.name=name;
     }

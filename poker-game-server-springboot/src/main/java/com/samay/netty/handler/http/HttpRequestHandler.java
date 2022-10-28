@@ -81,18 +81,20 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
      */
     private void handleParams(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
-        String username = decoder.parameters().get("username").get(0);
-        if (username == null || "".equals(username) || !request.decoderResult().isSuccess()
+        String cloudID = decoder.parameters().get("cloudID").get(0);
+        String nickName = decoder.parameters().get("nickName").get(0);
+        if (cloudID == null || "".equals(cloudID) || !request.decoderResult().isSuccess()
                 || !"websocket".equals(request.headers().get("Upgrade"))) {
             FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                     HttpResponseStatus.BAD_REQUEST);
             ChannelFuture future = ctx.channel().writeAndFlush(response);
             future.addListener(ChannelFutureListener.CLOSE);
         }
-        log.info("player[***]@"+username+" log in");
+        log.info("player["+nickName+"]@"+cloudID+" log in");
         // 初次实例化玩家
-        Player player=new Player(username);
-        initPlayerData(username);
+        Player player=new Player(cloudID);
+        player.setNickName(nickName);
+        initPlayerData(cloudID);
         // 将通道与玩家绑定
         ctx.channel().attr(AttributeKey.valueOf("player")).set(player);
         

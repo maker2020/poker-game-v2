@@ -18,7 +18,7 @@ public class ResultVO {
     
     /**
      * 返回叫地主结果
-     * @param boss 地主用户唯一标识(name/id)
+     * @param boss 地主玩家唯一标识(name/id)
      * @return
      */
     public static Map<String,Object> resultMap(String boss){
@@ -28,28 +28,13 @@ public class ResultVO {
     }
 
     /**
-     * 返回牌
+     * 返回地主三分牌
      * @param pokers
      * @return
      */
     public static Map<String,Object> resultMap(Collection<Poker> pokers){
         Map<String,Object> map=new HashMap<>();
-        map.put("extraPokers",pokers);
-        return map;
-    }
-
-    /**
-     * 
-     * @param user 用户唯一标识(name/id)
-     * @param players 用户唯一标识数组
-     * @param roomID
-     * @return
-     */
-    public static Map<String,Object> resultMap(String user,String roomID,String[] players){
-        Map<String,Object> map=new HashMap<>();
-        map.put("user", user);
-        map.put("roomID", roomID);
-        map.put("players",players);
+        map.put("bossPokers",pokers);
         return map;
     }
 
@@ -63,9 +48,12 @@ public class ResultVO {
         List<Map<String,Object>> playerStatusList=new ArrayList<>();
         for(int i=0;i<room.getPlayers().size();i++){
             Player p=room.getPlayers().get(i);
+            // 玩家座位信息（即玩家个人信息）...
             Map<String,Object> playerStatusMap=new HashMap<>();
-            playerStatusMap.put("player", p.getName());
+            playerStatusMap.put("playerID", p.getName());
             playerStatusMap.put("ready", p.isReady());
+            playerStatusMap.put("sex", p.getSex());
+            playerStatusMap.put("nickName", p.getNickName());
             playerStatusList.add(playerStatusMap);
         }
         map.put("playerStatus", playerStatusList);
@@ -74,25 +62,25 @@ public class ResultVO {
     }
 
     /**
-     * @param user 用户唯一标识(name/id)
+     * @param user 玩家唯一标识(playerID)
      * @param ready
      * @return
      */
     public static Map<String,Object> resultMap(String user,boolean ready){
         Map<String,Object> map=new HashMap<>();
-        map.put("user", user);
+        map.put("playerID", user);
         map.put("ready", ready);
         return map;
     }
 
     /**
-     * @param user 用户唯一标识(name/id)
+     * @param user 玩家唯一标识(playerID)
      * @param pokers
      * @return
      */
     public static Map<String,Object> resultMap(String user,List<Poker> pokers){
         Map<String,Object> map=new HashMap<>();
-        map.put("user", user);
+        map.put("playerID", user);
         map.put("pokers", pokers);
         return map;
     }
@@ -100,7 +88,7 @@ public class ResultVO {
     /**
      * 
      * @param action 标识下一个行为
-     * @param turn 下一个轮到谁
+     * @param turn 下一个轮到谁:玩家唯一标识(playerID)
      * @param notification 广播通知
      * @return
      */
@@ -115,7 +103,7 @@ public class ResultVO {
     /**
      * 出牌VO
      * @param action
-     * @param turn
+     * @param turn 玩家唯一标识(playerID)
      * @param notification
      * @param putPokers
      * @return
@@ -131,6 +119,7 @@ public class ResultVO {
 
     /**
      * 更新vo对象的notification
+     * @param turn 玩家唯一标识(playerID)
      * @param resultVO
      * @param notification
      */

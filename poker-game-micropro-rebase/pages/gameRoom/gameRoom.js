@@ -7,6 +7,7 @@ Page({
      */
     data: {
         // 房间内的各个变量
+        // [2]为当前玩家,[0]为左边、[1]为右边
         playerList: [], // 房间内的玩家(玩家包含各个信息：nickName、sex、id、是否准备等)
         roomID: '', // 房间ID
         myPokers: [], // 我的手牌(此处应该是被处理过的js对象，封装了用于渲染的额外属性)
@@ -25,8 +26,10 @@ Page({
     onLoad(options) {
         // 发送用户个人信息等参数，向服务器的请求连接
         var cloudID = encodeURI(app.globalData.userInfo.cloudID);
+        var nickName = encodeURI(app.globalData.userInfo.nickName);
+        var context = this;
         wx.connectSocket({
-            url: 'ws://localhost:8888/ws?cloudID=' + cloudID,
+            url: 'ws://localhost:8888/ws?cloudID=' + cloudID + '&nickName=' + nickName,
             header: {
                 'content-type': 'application/json'
             },
@@ -36,36 +39,65 @@ Page({
             complete: (res) => {}
         })
         wx.onSocketMessage((result) => {
-            var data = result.data;
+            var data = JSON.parse(result.data);
             // 此处逻辑大多为监听服务器的数据（以及过滤），并更新该页面的状态变量，从而更新页面渲染（双向绑定）
             if (data.roomID && data.playerStatus) {
                 // 该方法块主要是负责绑定： 某玩家进入房间后其座位的相关信息
                 // playerStatus包含玩家状态：是否准备、玩家id、玩家性别、玩家游戏币等信息。（不尽全)
-                updateRoom(data)
+                context.updateRoom(data)
+            }
+            // 收到玩家id为xxx的准备
+            if (data.ready && data.playerID) {
+                context.updateReady(data)
             }
             // 收到玩家id为xxx(自己)的手牌
             if (data.pokers && data.playerID == app.globalData.userInfo.cloudID) {
-                updateMyPokers(data)
+                context.updateMyPokers(data)
             }
             // 收到地主的三张牌
             if (data.bossPokers) {
-                updateBossPokers(data)
+                context.updateBossPokers(data)
             }
             // 收到 turn ID为XX的玩家 叫地主 或  收到 turn ID为XX的玩家 抢地主
             if ((data.action == 'call' || data.action == 'ask') && data.turn) {
-                updateOpeatorStatus(data)
+                context.updateOpeatorStatus(data)
             }
             // 收到 地主是谁的结果
             if (data.boss) {
-                updateBoss(data)
+                context.updateBoss(data)
             }
         })
     },
 
     updateRoom(data) {
+        // 处理并绑定wxml页面三个玩家渲染的数据。
+        var playerStatus = data.playerStatus
+        var playerList = [{},{},{}]
+        for(var i=0;i<playerStatus.length;i++){
+            if(playerStatus[i].playerID==app.globalData.userInfo.cloudID){
+                playerList[2]=playerStatus[i]
+            }else{
+                if(playerList[0].playerID==undefined){
+                    playerList[0]=playerStatus[i]
+                }else if(playerList[1].playerID==undefined){
+                    playerList[1]=playerStatus[i]
+                }
+            }
+        }
         this.setData({
             roomID: data.roomID,
-            playerList: data.playerStatus
+            playerList: playerList
+        })
+    },
+    updateReady(data){
+        var playerList=this.data.playerList;
+        for(var i=0;i<playerList.length;i++){
+            if(playerList[i].playerID==data.playerID){
+                playerList[i].ready=data.ready
+            }
+        }
+        this.setData({
+            playerList:playerList
         })
     },
     updateMyPokers(data) {
@@ -108,7 +140,7 @@ Page({
         this.data.myPokers[e.target.dataset.index].selected = !this.data.myPokers[e.target.dataset.index].selected
         // setData与直接赋值区别：前者可以渲染到页面(即可以双向绑定)
         this.setData({
-            myPokers:this.data.myPokers
+            myPokers: this.data.myPokers
         })
     },
 
