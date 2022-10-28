@@ -15,6 +15,7 @@ Page({
         playL:false,
         playD:false,
         playZ:false,
+        readyR:false,
         multiple:2,
         sex:1,
         boss:' ',
@@ -22,7 +23,9 @@ Page({
         roomID:'',
         players:[],
         pokers:[],
-        extraPokers:[]
+        extraPokers:[],
+        playname:'',
+        putPokers:[]
     },
 
     /**
@@ -32,10 +35,11 @@ Page({
         this.setData({
             roomID:app.globalData.roomID,
             players:app.globalData.players,
+            playname:app.globalData.userInfo.nickName
         })
         app.watch(this.watchBack)
         // this.readyO();
-        console.log("players",app.globalData.players);
+        console.log("players",app.globalData.userInfo.nickName);
     },
     //app监听回调方法
     watchBack(value){//这里的value就是app.js中watch方法中的set,globalData
@@ -46,6 +50,9 @@ Page({
         }
         if(value.pokers){
             this.getB(value.pokers)
+            this.setData({
+                readyR:true
+            })
         }
         if(value.playL){
             this.setData({
@@ -60,19 +67,30 @@ Page({
         if(value.play){
             this.setData({
                 second:60,
-                play:value.play
+                play:value.play,
+                playO:value.play==this.data.playname
             })
             this.countDown()
+        }
+        if(value.multiple){
+            this.setData({
+                multiple:value.multiple
+            })
         }
         if(value.boss){
             this.setData({
                 boss:value.boss,
-                playO:true
+                playB:true
             })
         }
         if(value.extraPokers){
             this.setData({
                 extraPokers:value.extraPokers
+            })
+        }
+        if(value.putPokers){
+            this.setData({
+                putPokers:value.putPokers
             })
         }
      console.log(value,"playL");
@@ -169,12 +187,17 @@ Page({
     //   })
     // },
     readyO(){
+      var that=this;
       var param={
         "action":'ready',
         "tendency":true
       }
       wx.sendSocketMessage({
         data: JSON.stringify(param)
+      })
+      this.setData({
+        readyY:true,
+
       })
     },
     getB(pokers){
@@ -187,8 +210,7 @@ Page({
             isS:false
           })
           that.setData({
-            pokers:brandList,
-            readyY:true
+            pokers:brandList
           })
         })
       }
@@ -261,6 +283,13 @@ Page({
             brandListA:brandListA,
             playO:false,
             second:60
+        })
+        var param={
+            "action":'put',
+            "tendency":false
+        }
+        wx.sendSocketMessage({
+        data: JSON.stringify(param)
         })
         console.log(brandListA,this.data.pokers);
     },

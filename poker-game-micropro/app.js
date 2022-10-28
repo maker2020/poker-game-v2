@@ -25,7 +25,9 @@ App({
         obj.playL = value.playL;
         obj.boss = value.boss;
         obj.play = value.play;
+        obj.multiple = value.multiple;
         obj.extraPokers = value.extraPokers;
+        obj.putPokers = value.putPokers;
         method(value);      
       },
       get:function(){//获取全局变量值，直接返回全部
@@ -43,6 +45,8 @@ App({
     playL:false,
     boss:null,
     play:null,
-    extraPokers:[]
+    multiple:2,
+    extraPokers:[],
+    brandListA:[]
   }
 })
