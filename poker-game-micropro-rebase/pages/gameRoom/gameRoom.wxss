@@ -261,24 +261,26 @@
 .operationStatus{
     width: 85rpx;
     height: 24rpx;
+    border-radius: 10px;
+    text-align: center;
+    color: rgb(0, 0, 0);
+    background-color: rgb(240, 240, 240, 35%);
+    font-size: 17px;
+    font-weight: 600;
+    position: absolute;
 }
 
 .peopleU .operationStatus{
-    position: absolute;
     right: 43%;
     top: -5%;
-    text-align: center;
-    color: rgb(0, 0, 0);
-    background-color: #fff;
-    font-size: 17px;
 }
 
 .otherPeopleCon .leftP .operationStatus{
-    right:-140rpx;
-    left:auto;
+    left: 90rpx;
+    top: 20rpx;
 }
 
 .otherPeopleCon .leftR .operationStatus{
-    right:-140rpx;
-    left:auto;
+    right:90rpx;
+    top:20rpx;
 }

@@ -38,14 +38,14 @@
 
             <!--操作状态的显示-->
             <!--叫/抢地主轮询操作状态的显示-->
-            <view class='operationStatus' wx:if="{{playerNotice[0].playerID!=undefined}}">
-                <view wx:if="{{playerNotice[0].type=='CALL'}}">
-                    <text wx:if="{{playerNotice[0].choice}}">叫地主</text>
-                    <text wx:if="{{!playerNotice[0].choice}}">不叫</text>
+            <view class='operationStatus' wx:if="{{playerListNotice[0]!=undefined && turnFlag!=playerList[0].playerID && boss==''}}">
+                <view wx:if="{{playerListNotice[0].type=='CALL'}}">
+                    <text wx:if="{{playerListNotice[0].choice}}">叫地主</text>
+                    <text wx:if="{{!playerListNotice[0].choice}}">不叫</text>
                 </view>
-                <view wx:if="{{playerNotice[0].type=='ASK'}}">
-                    <text wx:if="{{playerNotice[0].choice}}">抢地主</text>
-                    <text wx:if="{{!playerNotice[0].choice}}">不抢</text>
+                <view wx:if="{{playerListNotice[0].type=='ASK'}}">
+                    <text wx:if="{{playerListNotice[0].choice}}">抢地主</text>
+                    <text wx:if="{{!playerListNotice[0].choice}}">不抢</text>
                 </view>
             </view>
 
@@ -72,14 +72,14 @@
 
             <!--操作状态的显示-->
             <!--叫/抢地主轮询操作状态的显示-->
-            <view class='operationStatus' wx:if="{{playerNotice[1].playerID!=undefined}}">
-                <view wx:if="{{playerNotice[1].type=='CALL'}}">
-                    <text wx:if="{{playerNotice[1].choice}}">叫地主</text>
-                    <text wx:if="{{!playerNotice[1].choice}}">不叫</text>
+            <view class='operationStatus' wx:if="{{playerListNotice[1]!=undefined && turnFlag!=playerList[1].playerID && boss==''}}">
+                <view wx:if="{{playerListNotice[1].type=='CALL'}}">
+                    <text wx:if="{{playerListNotice[1].choice}}">叫地主</text>
+                    <text wx:if="{{!playerListNotice[1].choice}}">不叫</text>
                 </view>
-                <view wx:if="{{playerNotice[1].type=='ASK'}}">
-                    <text wx:if="{{playerNotice[1].choice}}">抢地主</text>
-                    <text wx:if="{{!playerNotice[1].choice}}">不抢</text>
+                <view wx:if="{{playerListNotice[1].type=='ASK'}}">
+                    <text wx:if="{{playerListNotice[1].choice}}">抢地主</text>
+                    <text wx:if="{{!playerListNotice[1].choice}}">不抢</text>
                 </view>
             </view>
 
@@ -107,14 +107,14 @@
 
         <!--操作状态的显示-->
         <!--叫/抢地主轮询操作状态的显示-->
-        <view class='operationStatus' >
-            <view wx:if="{{playerNotice[2].type=='CALL'}}">
-                <text wx:if="{{playerNotice[2].choice}}">叫地主</text>
-                <text wx:if="{{!playerNotice[2].choice}}">不叫</text>
+        <view class='operationStatus' wx:if="{{playerListNotice[2]!=undefined && turnFlag!=playerList[2].playerID && boss==''}}">
+            <view wx:if="{{playerListNotice[2].type=='CALL'}}">
+                <text wx:if="{{playerListNotice[2].choice}}">叫地主</text>
+                <text wx:if="{{!playerListNotice[2].choice}}">不叫</text>
             </view>
-            <view >
-                <text >抢地主</text>
-
+            <view wx:if="{{playerListNotice[2].type=='ASK'}}">
+                <text wx:if="{{playerListNotice[2].choice}}">抢地主</text>
+                <text wx:if="{{!playerListNotice[2].choice}}">不抢</text>
             </view>
         </view>
 

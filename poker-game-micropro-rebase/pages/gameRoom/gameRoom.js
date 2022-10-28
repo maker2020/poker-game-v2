@@ -9,7 +9,7 @@ Page({
         // 房间内的各个变量
         // [2]为当前玩家,[0]为左边、[1]为右边
         playerList: [], // 房间内的玩家(玩家包含各个信息：nickName、sex、id、是否准备等)
-        playerListNotice:[], // 房间内的玩家 的操作行为
+        playerListNotice: [], // 房间内的玩家 的操作行为
         roomID: '', // 房间ID
         myPokers: [], // 我的手牌(此处应该是被处理过的js对象，封装了用于渲染的额外属性)
         bossPokers: [], // 地主的牌(三只牌)
@@ -61,11 +61,11 @@ Page({
                 context.updateBossPokers(data)
             }
             // 收到 turn ID为XX的玩家 叫地主 或  收到 turn ID为XX的玩家 抢地主
-            if ((data.action == 'call' || data.action == 'ask') && data.turn) {
+            if ((data.action == 'call' || data.action == 'ask' || data.action == 'put') && data.turn) {
                 context.updateOpeatorStatus(data)
             }
             // 收到 id为xx的玩家 的操作行为
-            if(data.notification){
+            if (data.notification) {
                 context.updateNotification(data)
             }
             // 收到 地主是谁的结果
@@ -78,15 +78,15 @@ Page({
     updateRoom(data) {
         // 处理并绑定wxml页面三个玩家渲染的数据。
         var playerStatus = data.playerStatus
-        var playerList = [{},{},{}]
-        for(var i=0;i<playerStatus.length;i++){
-            if(playerStatus[i].playerID==app.globalData.userInfo.cloudID){
-                playerList[2]=playerStatus[i]
-            }else{
-                if(playerList[0].playerID==undefined){
-                    playerList[0]=playerStatus[i]
-                }else if(playerList[1].playerID==undefined){
-                    playerList[1]=playerStatus[i]
+        var playerList = [{}, {}, {}]
+        for (var i = 0; i < playerStatus.length; i++) {
+            if (playerStatus[i].playerID == app.globalData.userInfo.cloudID) {
+                playerList[2] = playerStatus[i]
+            } else {
+                if (playerList[0].playerID == undefined) {
+                    playerList[0] = playerStatus[i]
+                } else if (playerList[1].playerID == undefined) {
+                    playerList[1] = playerStatus[i]
                 }
             }
         }
@@ -95,15 +95,15 @@ Page({
             playerList: playerList
         })
     },
-    updateReady(data){
-        var playerList=this.data.playerList;
-        for(var i=0;i<playerList.length;i++){
-            if(playerList[i].playerID==data.playerID){
-                playerList[i].ready=data.ready
+    updateReady(data) {
+        var playerList = this.data.playerList;
+        for (var i = 0; i < playerList.length; i++) {
+            if (playerList[i].playerID == data.playerID) {
+                playerList[i].ready = data.ready
             }
         }
         this.setData({
-            playerList:playerList
+            playerList: playerList
         })
     },
     updateMyPokers(data) {
@@ -119,7 +119,7 @@ Page({
         this.setData({
             myPokers: myPokers,
             // 也意味着status=start
-            status:'start'
+            status: 'start'
         })
     },
     updateBossPokers(data) {
@@ -138,19 +138,19 @@ Page({
             boss: data.boss
         })
     },
-    updateNotification(data){
+    updateNotification(data) {
         // type='call | ask',choice=true | false,playerID='xxx'
-        var notification=data.notification
-        var playerList=this.data.playerList
-        var playerListNotice=this.data.playerListNotice
-        for(var i=0;i<playerList.length;i++){
-            if(playerList[i].playerID==notification.playerID){
+        var notification = data.notification
+        var playerList = this.data.playerList
+        var playerListNotice = this.data.playerListNotice
+        for (var i = 0; i < playerList.length; i++) {
+            if (playerList[i].playerID == notification.playerID) {
                 // 该通知是关于 玩家playerList[i]的。
-                playerListNotice[i]=notification
+                playerListNotice[i] = notification
             }
         }
         this.setData({
-            playerListNotice:playerListNotice
+            playerListNotice: playerListNotice
         })
     },
 
