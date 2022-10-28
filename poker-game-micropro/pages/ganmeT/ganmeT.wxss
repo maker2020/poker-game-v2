@@ -88,6 +88,17 @@
     top:0px;
     background-size:cover;
 }
+.human .isL{
+    width:auto;
+    padding:4rpx;
+    background:rgba(0,0,0,0.5);
+    border-radius:5rpx;
+    color:#fff;
+    position:absolute;
+    top:0px;
+    right:0px;
+    font-size:12px;
+}
 .leftP .human .isR,
 .peopleU .human .isR{
     right:auto;
@@ -96,6 +107,15 @@
 .leftR .human .isR{
     left:auto;
     right:0px;
+}
+.leftP .human .isL,
+.peopleU .human .isL{
+    right:0px;
+    left:auto;
+}
+.leftR .human .isL{
+    left:0px;
+    right:auto;
 }
 .leftM{
     width:calc(100% - 300rpx);

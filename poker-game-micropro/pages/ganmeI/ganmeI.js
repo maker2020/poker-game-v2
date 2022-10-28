@@ -76,8 +76,14 @@ Page({
                   url: '/pages/ganmeT/ganmeT',
                 })
             }
+<<<<<<< HEAD
+            if(data.ready && data.user){
+                that.playR(data.user)
+            }
+=======
 
             // 接收玩家手牌的渲染
+>>>>>>> 11cb11fbc12624481f1ccad9ca062365ce8a7003
             if(data.pokers && data.user == app.globalData.userInfo.nickName){
               // 全局保存玩家的手牌，更新渲染
               app.globalData={
@@ -105,7 +111,8 @@ Page({
             // 接收到 <轮到turn存放值的玩家抢地主>
             if(data.action == 'ask' && data.turn){
                 app.globalData={
-                    play:data.turn
+                    play:data.turn,
+                    multiple:app.globalData.multiple * 2
                 }
                 if(data.turn == app.globalData.userInfo.nickName){
                     app.globalData={
@@ -118,6 +125,16 @@ Page({
             if(data.boss){
                 app.globalData={
                     boss:data.boss
+                }
+            }
+            if(data.putPokers){
+                app.globalData={
+                    putPokers:data.putPokers
+                }
+            }
+            if(data.action == 'put' && data.turn){
+                app.globalData={
+                    play:data.turn
                 }
             }
             console.log(res);
@@ -133,7 +150,8 @@ Page({
                 peopleList.push({
                     name:players[i],
                     sex:'M',
-                    brandNum:17
+                    brandNum:17,
+                    ready:false
                 })
               }
           }
@@ -141,14 +159,16 @@ Page({
             peopleList.push({
                 name:'',
                 sex:'',
-                brandNum:17
+                brandNum:17,
+                ready:false
             })
           }
       }
       peopleList[2]={
         name:username,
         sex:'M',
-        brandNum:17
+        brandNum:17,
+        ready:false
       }  
       var len = 2 - players.lengh + 1;
       for (var j=0; j < len ; j++) {
@@ -162,6 +182,17 @@ Page({
         players:peopleList
       }
       console.log(app.globalData.userInfo,peopleList,username);
+    },
+    playR(user){
+      var players=app.globalData.players;
+      players.forEach(function(item){
+          if(item.name==user){
+              item.ready=true
+          }
+      })
+      app.globalData={
+        players:players
+      }
     },
     // //地主
     // plays_landlord(boss){

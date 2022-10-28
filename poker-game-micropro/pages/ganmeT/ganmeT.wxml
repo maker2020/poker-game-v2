@@ -12,8 +12,6 @@
         </view>
         <view class='basehand' wx:if='{{start}}'>
             <image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' wx:key='index' mode="widthFix" wx:for='{{extraPokers}}'></image>
-            <!-- <image src='../../static/img/SQUARE_TEN.png' mode="widthFix"></image>
-            <image src='../../static/img/CLUB_TEN.png' mode="widthFix"></image> -->
         </view>
         <view class='multiple' wx:if='{{start}}'>
             <text class='txt'>倍数</text>
@@ -24,6 +22,7 @@
         <view class='leftP'>
             <view class='human'>
                 <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{players[0].name==boss}}"></view>
+                <view class='isL' wx:if='{{players[0].ready&&!readyR}}'>已准备...</view>
                 <image src='../../static/img/{{players[0].name==boss?"landlord":"civilian"}}{{players[0].sex?players[0].sex:""}}.png' mode='widthFix'></image>
                 <view class='humanTxt'>
                     <text class='txt'>{{players[0].name}}</text>
@@ -41,12 +40,13 @@
         </view>
         <view class='leftM'  wx:if='{{start}}'>
             <view class='brandA'>
-                <view class='brand' wx:for='{{brandListA}}' wx:key='index'><image src='../../static/img/{{item.name}}.png' mode='heightFix'></image></view>
+                <view class='brand' wx:for='{{putPokers}}' wx:key='index'><image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' mode='heightFix'></image></view>
             </view>
         </view>
         <view class='leftR'>
             <view class='human'>
                 <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{players[1].name==boss}}"></view>
+                <view class='isL' wx:if='{{players[1].ready&&!readyR}}'>已准备...</view>
                 <image src='../../static/img/{{players[1].name==boss?"landlord":"civilian"}}{{players[1].sex?players[1].sex:""}}.png' mode='widthFix'></image>
                 <view class='humanTxt'>
                     <text class='txt'>{{players[1].name}}</text>
@@ -66,6 +66,7 @@
     <view class='peopleU'>
         <view class='human'>
             <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{players[2].name==boss}}"></view>
+            <view class='isL' wx:if='{{players[2].ready&&!readyR}}'>已准备...</view>
             <image src='../../static/img/{{players[2].name==boss?"landlord":"civilian"}}{{!players[2].sex?"":players[2].sex}}.png' mode='widthFix'></image>
             <view class='humanTxt'>
                 <text class='txt'>{{players[2].name}}{{players[2].sex}}</text>
@@ -77,7 +78,11 @@
                 <image bindtap='play' data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='z-index:{{index?index:0}}'></image>
             </view>
         </view>
+<<<<<<< HEAD
+        <view class='btnCon' wx:if='{{playO && readyY && playB}}'>
+=======
         <view class='btnCon' wx:if='{{ playO && start}}'>
+>>>>>>> 11cb11fbc12624481f1ccad9ca062365ce8a7003
             <view class='cancel btn' bindtap='playC'>跳过</view>
             <view class='sure btn' bindtap='playS'>出牌</view>
         </view>

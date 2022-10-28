@@ -15,6 +15,7 @@ Page({
         playL:false,
         playD:false,
         playZ:false,
+        readyR:false,
         multiple:2,
         sex:1,
         boss:' ',
@@ -23,7 +24,12 @@ Page({
         players:[],
         pokers:[],
         extraPokers:[],
+<<<<<<< HEAD
+        playname:'',
+        putPokers:[]
+=======
         start:false
+>>>>>>> 11cb11fbc12624481f1ccad9ca062365ce8a7003
     },
 
     /**
@@ -33,10 +39,11 @@ Page({
         this.setData({
             roomID:app.globalData.roomID,
             players:app.globalData.players,
+            playname:app.globalData.userInfo.nickName
         })
         app.watch(this.watchBack)
         // this.readyO();
-        console.log("players",app.globalData.players);
+        console.log("players",app.globalData.userInfo.nickName);
     },
     //app监听回调方法
     watchBack(value){//这里的value就是app.js中watch方法中的set,globalData
@@ -48,7 +55,11 @@ Page({
         if(value.pokers){
             this.getB(value.pokers)
             this.setData({
+<<<<<<< HEAD
+                readyR:true
+=======
                 start:true
+>>>>>>> 11cb11fbc12624481f1ccad9ca062365ce8a7003
             })
         }
         if(value.playL){
@@ -64,19 +75,30 @@ Page({
         if(value.play){
             this.setData({
                 second:60,
-                play:value.play
+                play:value.play,
+                playO:value.play==this.data.playname
             })
             this.countDown()
+        }
+        if(value.multiple){
+            this.setData({
+                multiple:value.multiple
+            })
         }
         if(value.boss){
             this.setData({
                 boss:value.boss,
-                playO:true
+                playB:true
             })
         }
         if(value.extraPokers){
             this.setData({
                 extraPokers:value.extraPokers
+            })
+        }
+        if(value.putPokers){
+            this.setData({
+                putPokers:value.putPokers
             })
         }
      console.log(value,"playL");
@@ -160,15 +182,23 @@ Page({
     },
     
     readyO(){
+<<<<<<< HEAD
+      var that=this;
+=======
       this.setData({
           readyY: true
       })
+>>>>>>> 11cb11fbc12624481f1ccad9ca062365ce8a7003
       var param={
         "action":'ready',
         "tendency":true
       }
       wx.sendSocketMessage({
         data: JSON.stringify(param)
+      })
+      this.setData({
+        readyY:true,
+
       })
     },
 
@@ -182,8 +212,7 @@ Page({
             isS:false
           })
           that.setData({
-            pokers:brandList,
-            readyY:true
+            pokers:brandList
           })
         })
       }
@@ -256,6 +285,13 @@ Page({
             brandListA:brandListA,
             playO:false,
             second:60
+        })
+        var param={
+            "action":'put',
+            "tendency":false
+        }
+        wx.sendSocketMessage({
+        data: JSON.stringify(param)
         })
         console.log(brandListA,this.data.pokers);
     },
