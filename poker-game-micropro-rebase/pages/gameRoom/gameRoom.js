@@ -9,11 +9,13 @@ Page({
         // 房间内的各个变量
         // [2]为当前玩家,[0]为左边、[1]为右边
         playerList: [], // 房间内的玩家(玩家包含各个信息：nickName、sex、id、是否准备等)
+        playerListNotice:[], // 房间内的玩家 的操作行为
         roomID: '', // 房间ID
         myPokers: [], // 我的手牌(此处应该是被处理过的js对象，封装了用于渲染的额外属性)
         bossPokers: [], // 地主的牌(三只牌)
         turnFlag: '', // 轮到id为xxx的玩家操作
         action: 'ready', // 当前操作行为类型(默认是准备)
+        second: 30, // 剩余操作时间
         status: 'ready', // 房间状态(默认ready，待玩家全部准备变为开始状态)
         boss: '', // 房间内地主玩家的唯一标识(即id)
         multiple: 2 // 房间内倍数
@@ -61,6 +63,10 @@ Page({
             // 收到 turn ID为XX的玩家 叫地主 或  收到 turn ID为XX的玩家 抢地主
             if ((data.action == 'call' || data.action == 'ask') && data.turn) {
                 context.updateOpeatorStatus(data)
+            }
+            // 收到 id为xx的玩家 的操作行为
+            if(data.notification){
+                context.updateNotification(data)
             }
             // 收到 地主是谁的结果
             if (data.boss) {
@@ -111,8 +117,9 @@ Page({
             })
         })
         this.setData({
-            myPokers: myPokers
-            // 其实也意味着status=start
+            myPokers: myPokers,
+            // 也意味着status=start
+            status:'start'
         })
     },
     updateBossPokers(data) {
@@ -129,6 +136,21 @@ Page({
     updateBoss(data) {
         this.setData({
             boss: data.boss
+        })
+    },
+    updateNotification(data){
+        // type='call | ask',choice=true | false,playerID='xxx'
+        var notification=data.notification
+        var playerList=this.data.playerList
+        var playerListNotice=this.data.playerListNotice
+        for(var i=0;i<playerList.length;i++){
+            if(playerList[i].playerID==notification.playerID){
+                // 该通知是关于 玩家playerList[i]的。
+                playerListNotice[i]=notification
+            }
+        }
+        this.setData({
+            playerListNotice:playerListNotice
         })
     },
 
@@ -153,7 +175,6 @@ Page({
         wx.sendSocketMessage({
             data: JSON.stringify(params),
         })
-        // 按钮状态更新
     },
 
     // 不叫
@@ -165,7 +186,6 @@ Page({
         wx.sendSocketMessage({
             data: JSON.stringify(params),
         })
-        // 按钮状态更新
     },
 
     // 抢地主
@@ -177,7 +197,6 @@ Page({
         wx.sendSocketMessage({
             data: JSON.stringify(params),
         })
-        // 按钮状态更新
     },
 
     // 不抢
@@ -189,7 +208,6 @@ Page({
         wx.sendSocketMessage({
             data: JSON.stringify(params),
         })
-        // 按钮状态更新
     },
 
     // 准备
@@ -201,7 +219,6 @@ Page({
         wx.sendSocketMessage({
             data: JSON.stringify(params),
         })
-        // 按钮状态更新
     },
 
     out() {

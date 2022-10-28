@@ -18,6 +18,6 @@ public class Notification{
     /**
      * user唯一标识(可以是username、id等)
      */
-    private String user;
+    private String playerID;
 
 }
