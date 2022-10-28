@@ -6,14 +6,14 @@
         <view class='btn' bindtap='readyO'>准备</view>
     </view>
     <view class='top'>
-        <view class='basescore' wx:if='{{readyY}}'>
+        <view class='basescore' wx:if='{{start}}'>
             <text class='txt'>底分</text>
             <text class='num'>200</text>
         </view>
-        <view class='basehand' wx:if='{{readyY}}'>
+        <view class='basehand' wx:if='{{start}}'>
             <image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' wx:key='index' mode="widthFix" wx:for='{{extraPokers}}'></image>
         </view>
-        <view class='multiple' wx:if='{{readyY}}'>
+        <view class='multiple' wx:if='{{start}}'>
             <text class='txt'>倍数</text>
             <text class='num'>x{{multiple}}</text>
         </view>
@@ -29,7 +29,7 @@
                     <text class='num'>6700</text>
                 </view>
             </view>
-            <view class='brandShow' wx:if='{{readyY}}'>
+            <view class='brandShow' wx:if='{{start}}'>
                 <image src='../../static/img/backside.png' mode='widthFix'></image>
                 <text class='num'>{{players[0].brandNum}}</text>
             </view>
@@ -38,7 +38,7 @@
                 <text class='num'>16</text>
             </view>
         </view>
-        <view class='leftM'  wx:if='{{readyY}}'>
+        <view class='leftM'  wx:if='{{start}}'>
             <view class='brandA'>
                 <view class='brand' wx:for='{{putPokers}}' wx:key='index'><image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' mode='heightFix'></image></view>
             </view>
@@ -53,7 +53,7 @@
                     <text class='num'>2900</text>
                 </view>
             </view>
-            <view class='brandShow' wx:if='{{readyY}}'>
+            <view class='brandShow' wx:if='{{start}}'>
                 <image src='../../static/img/backside.png' mode='widthFix'></image>
                 <text class='num'>{{players[1].brandNum}}</text>
             </view>
@@ -73,24 +73,28 @@
                 <text class='num'>2800</text>
             </view>
         </view>
-        <view class='brandShows'  wx:if='{{readyY}}'>
+        <view class='brandShows'  wx:if='{{start}}'>
             <view wx:for='{{pokers}}' wx:key='index' class="brand {{item.isS?'active':''}}" data-brand='{{item.name}}' >
                 <image bindtap='play' data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='z-index:{{index?index:0}}'></image>
             </view>
         </view>
+<<<<<<< HEAD
         <view class='btnCon' wx:if='{{playO && readyY && playB}}'>
+=======
+        <view class='btnCon' wx:if='{{ playO && start}}'>
+>>>>>>> 11cb11fbc12624481f1ccad9ca062365ce8a7003
             <view class='cancel btn' bindtap='playC'>跳过</view>
             <view class='sure btn' bindtap='playS'>出牌</view>
         </view>
-        <view class='btnCon' wx:if='{{playJ && readyY}}'>
+        <view class='btnCon' wx:if='{{playJ && start}}'>
             <view class='cancel btn' bindtap='playJ'>叫地主</view>
             <view class='sure btn' bindtap='playNj'>不叫</view>
         </view>
-        <view class='btnCon' wx:if='{{playL && readyY}}'>
+        <view class='btnCon' wx:if='{{playL && start}}'>
             <view class='cancel btn' bindtap='playL'>抢地主</view>
             <view class='sure btn' bindtap='playNl'>不抢</view>
         </view>
-        <view class='btnCon' wx:if='{{playD && readyY}}'>
+        <view class='btnCon' wx:if='{{playD && start}}'>
             <view class='sure btn' bindtap='multipleD'>加倍</view>
             <view class='cancel btn' bindtap='multipleS'>超级加倍</view>
             <view class='sure btn' bindtap='multipleN'>不加倍</view>

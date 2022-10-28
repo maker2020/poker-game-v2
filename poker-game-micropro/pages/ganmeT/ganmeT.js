@@ -11,7 +11,7 @@ Page({
         second:60,
         playO:false,
         readyY:false,
-        playJ:false,
+        playJ:false, // 叫地主
         playL:false,
         playD:false,
         playZ:false,
@@ -24,8 +24,12 @@ Page({
         players:[],
         pokers:[],
         extraPokers:[],
+<<<<<<< HEAD
         playname:'',
         putPokers:[]
+=======
+        start:false
+>>>>>>> 11cb11fbc12624481f1ccad9ca062365ce8a7003
     },
 
     /**
@@ -51,7 +55,11 @@ Page({
         if(value.pokers){
             this.getB(value.pokers)
             this.setData({
+<<<<<<< HEAD
                 readyR:true
+=======
+                start:true
+>>>>>>> 11cb11fbc12624481f1ccad9ca062365ce8a7003
             })
         }
         if(value.playL){
@@ -172,22 +180,15 @@ Page({
           url: '/pages/ganmeI/ganmeI',
         })
     },
-    // getS(){
-    //   var that=this;
-    //   return new Promise((resolve, reject) => { //订单类型
-    //     that.ready()
-    //       .then(res => {
-    //         resolve(function(){
-    //           console.log(res);
-    //         })
-    //       })
-    //       .catch((e) => {
-    //         reject(e)
-    //       })
-    //   })
-    // },
+    
     readyO(){
+<<<<<<< HEAD
       var that=this;
+=======
+      this.setData({
+          readyY: true
+      })
+>>>>>>> 11cb11fbc12624481f1ccad9ca062365ce8a7003
       var param={
         "action":'ready',
         "tendency":true
@@ -200,6 +201,7 @@ Page({
 
       })
     },
+
     getB(pokers){
       var that=this;
       var brandList=[];

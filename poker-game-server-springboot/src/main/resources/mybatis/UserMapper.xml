@@ -6,4 +6,8 @@
         insert into user values(#{id},#{phone},#{nickname},#{sex},#{freeMoney},#{payMoney},#{winCount},#{loseCount},#{exp})
     </insert>
 
+    <select id="findUserByID">
+        select * from user where id=#{id}
+    </select>
+
 </mapper>

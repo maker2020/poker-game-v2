@@ -32,6 +32,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
+            // 基于http发送的ws协议请求完成连接后，即可移除处理http请求的handler，之后专门处理游戏内消息。
             ctx.pipeline().remove(HttpRequestHandler.class);
             // 完成握手后的获取用户、房间相关信息
             onJoined(ctx);
@@ -81,7 +82,6 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     }
 
     private void onJoined(ChannelHandlerContext ctx) {
-        Player player = ChannelHolder.attrPlayer(ctx.channel());
         Room room = ChannelHolder.attrRoom(ctx.channel());
 
         List<Player> playerList=room.getPlayers();
@@ -90,7 +90,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
             playerNameArr[i]=playerList.get(i).getName();
         }
 
-        Map<String,Object> msg=ResultVO.resultMap(player.getName(), room.getId(), playerNameArr);
+        Map<String,Object> msg=ResultVO.resultMap(room);
         TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JSON.toJSONString(msg));
         ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
         group.writeAndFlush(textWebSocketFrame);

@@ -5,14 +5,14 @@
 netty:
     websocket:
         port: 8888
-        ip: 192.168.0.118
+        ip: 192.168.31.178
         max-frame-size: 10240
         path: /ws
 
 spring:
     # rabbitmq
     rabbitmq:
-        host: 192.168.0.118
+        host: 192.168.31.178
         port: 5672
         username: guest
         password: guest

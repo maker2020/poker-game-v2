@@ -21,8 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 import com.samay.netty.handler.holder.RoomManager;
 
 /**
- * <b>Http处理类</b><p>
- * 不共享实例
+ * <b>Http处理类</b>(不共享实例)<p>
+ * 该类是netty框架中定义的http处理类，仅用于过滤基于http的ws协议。
+ * 也就是说channelRead()中仅仅会对ws连接握手的请求进行处理（玩家加入游戏房间）。<p>
+ * <b>这意味着：</b>游戏房间外部的业务内容将由SpringBoot提供的web服务来处理。
  */
 @Slf4j
 @SuppressWarnings({ "deprecation" })
@@ -42,7 +44,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     @Override
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         if (request.uri().startsWith(wsUri)) {
-            // 初始化和游戏相关的请求
+            // 游戏（连接房间）的用户于玩家信息的初始化。
             handleParams(ctx, request);
             ctx.fireChannelRead(request.retain());
         } else { // 非ws请求的处理
@@ -66,20 +68,14 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         }
     }
 
-    private static void send100Continue(ChannelHandlerContext ctx) {
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE);
-        ctx.writeAndFlush(response);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
-        ctx.close();
-    }
-
     /**
-     * 处理用户(含初始化参数)的请求。<p>
-     * <b>初始化玩家信息。并随机加入一个房间:ChannelGroup</b>
+     * 处理用户于玩家加入游戏(含初始化参数)的请求。<p>
+     * <b>初始化信息。并随机加入一个房间:ChannelGroup</b><p>
+     * 具体参数包含：
+     * <ul>
+     *  <li>(必须)用户唯一标识,即name/id等)</li>
+     *  <li>用户于玩家昵称</li>
+     * </ul>
      * @param ctx
      * @param request
      */
@@ -93,7 +89,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             ChannelFuture future = ctx.channel().writeAndFlush(response);
             future.addListener(ChannelFutureListener.CLOSE);
         }
-        log.info("player["+username+"] log in");
+        log.info("player[***]@"+username+" log in");
         // 初次实例化玩家
         Player player=new Player(username);
         initPlayerData(username);
@@ -110,6 +106,17 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
      */
     private void initPlayerData(String playerID){
 
+    }
+
+    private static void send100Continue(ChannelHandlerContext ctx) {
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE);
+        ctx.writeAndFlush(response);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
     }
 
 }

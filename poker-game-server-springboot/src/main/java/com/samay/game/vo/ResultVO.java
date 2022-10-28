@@ -1,11 +1,14 @@
 package com.samay.game.vo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
+import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 
 /**
@@ -47,6 +50,26 @@ public class ResultVO {
         map.put("user", user);
         map.put("roomID", roomID);
         map.put("players",players);
+        return map;
+    }
+
+    /**
+     * 返回房间信息
+     * @param room
+     * @return
+     */
+    public static Map<String,Object> resultMap(Room room){
+        Map<String,Object> map=new HashMap<>();
+        List<Map<String,Object>> playerStatusList=new ArrayList<>();
+        for(int i=0;i<room.getPlayers().size();i++){
+            Player p=room.getPlayers().get(i);
+            Map<String,Object> playerStatusMap=new HashMap<>();
+            playerStatusMap.put("player", p.getName());
+            playerStatusMap.put("ready", p.isReady());
+            playerStatusList.add(playerStatusMap);
+        }
+        map.put("playerStatus", playerStatusList);
+        map.put("roomID", room.getId());
         return map;
     }
 

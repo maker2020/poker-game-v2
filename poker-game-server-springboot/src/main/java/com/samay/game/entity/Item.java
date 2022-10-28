@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"userid","name"})
-public class Items {
+public class Item {
     
     private String userid;
     private GameItems name;
