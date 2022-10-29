@@ -101,7 +101,7 @@
         </view>
         <view class='brandShows'  wx:if='{{status=="start"}}'>
             <view wx:for='{{myPokers}}' wx:key='index' class="brand {{item.selected?'active':''}}" data-brand='{{item.name}}' >
-                <image bindtap='tapPoker' data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='z-index:{{index?index:0}}'></image>
+                <image bindtap='tapPoker' data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='transform:translateZ({{index?index:0}})'></image>
             </view>
         </view>
 

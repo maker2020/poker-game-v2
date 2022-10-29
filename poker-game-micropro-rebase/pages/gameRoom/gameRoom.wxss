@@ -248,6 +248,7 @@
 .peopleU .brandShows .brand{
     width:calc(100% / 21);
     height:70%;
+    transform-style: preserve-3d;
 }
 .peopleU .brandShows .brand.active{
     transform:translateY(-10%);
