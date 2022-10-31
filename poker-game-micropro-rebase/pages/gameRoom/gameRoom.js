@@ -10,6 +10,7 @@ Page({
         // [2]为当前玩家,[0]为左边、[1]为右边
         playerList: [], // 房间内的玩家(玩家包含各个信息：nickName、sex、id、是否准备等)
         playerListNotice: [], // 房间内的玩家 的操作行为
+        playerListPut: [], // 房间内的玩家 打出的牌
         roomID: '', // 房间ID
         myPokers: [], // 我的手牌(此处应该是被处理过的js对象，封装了用于渲染的额外属性)
         bossPokers: [], // 地主的牌(三只牌)
@@ -67,6 +68,10 @@ Page({
             // 收到 id为xx的玩家 的操作行为
             if (data.notification) {
                 context.updateNotification(data)
+            }
+            // 收到 id为xx的玩家 打出的牌
+            if (data.putPokers) {
+                context.updatePutStatus(data)
             }
             // 收到 地主是谁的结果
             if (data.boss) {
@@ -138,6 +143,7 @@ Page({
             boss: data.boss
         })
     },
+
     updateNotification(data) {
         // type='call | ask',choice=true | false,playerID='xxx'
         var notification = data.notification
@@ -151,6 +157,21 @@ Page({
         }
         this.setData({
             playerListNotice: playerListNotice
+        })
+    },
+
+    updatePutStatus(data) {
+        var putPokers = data.putPokers
+        var notification = data.notification
+        var playerList = this.data.playerList
+        var playerListPut = this.data.playerListPut
+        for (var i = 0; i < playerList.length; i++) {
+            if (playerList[i].playerID == notification.playerID) {
+                playerListPut[i] = putPokers;
+            }
+        }
+        this.setData({
+            playerListPut: playerListPut
         })
     },
 
@@ -223,25 +244,25 @@ Page({
 
     // 出牌
     put() {
-        var putPokers=[] // 用于存取出的牌(用于逻辑判断、发送服务器)
-        var myPokers=[]; // 用于更新手牌
-        this.data.myPokers.forEach(function(item,i){
-            if(item.selected){
+        var putPokers = [] // 用于存取出的牌(用于逻辑判断、发送服务器)
+        var myPokers = []; // 用于更新手牌
+        this.data.myPokers.forEach(function (item, i) {
+            if (item.selected) {
                 putPokers.push({
-                    "colorEnum":item.name.split('_')[0],
-                    "valueEnum":item.name.split('_')[1]
+                    "colorEnum": item.name.split('_')[0],
+                    "valueEnum": item.name.split('_')[1]
                 })
-            }else{
+            } else {
                 myPokers.push(item)
             }
         });
         this.setData({
-            myPokers:myPokers
+            myPokers: myPokers
         })
         var params = {
             "action": "put",
             "tendency": true,
-            "putPokers":putPokers
+            "putPokers": putPokers
         }
         wx.sendSocketMessage({
             data: JSON.stringify(params),

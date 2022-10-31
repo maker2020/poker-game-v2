@@ -117,11 +117,11 @@
     left:0px;
     right:auto;
 }
-.leftM{
+.putStatus{
     width:calc(100% - 300rpx);
     height:100%;
 }
-.leftM .brandA{
+.putStatus .brandA{
     width:100%;
     height:100%;
     display:flex;
@@ -241,7 +241,7 @@
     margin-left:20rpx;
     align-items:flex-end;
 }
-.leftM .brandA .brand{
+.putStatus .brandA .brand{
     width:calc(100% / 31);
     height:54%;
 }
@@ -254,7 +254,7 @@
     transform:translateY(-10%);
 }
 .peopleU .brandShows .brand image,
-.leftM .brandA .brand image{
+.putStatus .brandA .brand image{
     width:0px;
     height:100%;
 }
@@ -284,4 +284,22 @@
 .otherPeopleCon .leftR .operationStatus{
     right:90rpx;
     top:20rpx;
+}
+
+.peopleU .putStatus{
+    right: 30%;
+    top: -55%;
+    position: absolute;
+}
+
+.leftR .putStatus{
+    position:absolute;
+    top:-10%;
+    right: 230%;
+}
+
+.leftP .putStatus{
+    position: absolute;
+    top:-10%;
+    right: -65%;
 }
