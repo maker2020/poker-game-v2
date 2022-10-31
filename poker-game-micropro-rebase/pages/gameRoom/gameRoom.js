@@ -221,6 +221,36 @@ Page({
         })
     },
 
+    // 出牌
+    put() {
+        var putPokers=[] // 用于存取出的牌(用于逻辑判断、发送服务器)
+        var myPokers=[]; // 用于更新手牌
+        this.data.myPokers.forEach(function(item,i){
+            if(item.selected){
+                putPokers.push({
+                    "colorEnum":item.name.split('_')[0],
+                    "valueEnum":item.name.split('_')[1]
+                })
+            }else{
+                myPokers.push(item)
+            }
+        });
+        this.setData({
+            myPokers:myPokers
+        })
+        var params = {
+            "action": "put",
+            "tendency": true,
+            "putPokers":putPokers
+        }
+        wx.sendSocketMessage({
+            data: JSON.stringify(params),
+        })
+    },
+    pass() {
+
+    },
+
     out() {
         wx.redirectTo({
             url: '/pages/gameMenu/gameMenu',
