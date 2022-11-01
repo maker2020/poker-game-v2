@@ -58,6 +58,7 @@
     height:calc((100% - 80rpx)/2);
     display:flex;
     margin-bottom:10rpx;
+    /* align-items:flex-end; */
     justify-content: space-between;
 }
 .peopleU{
@@ -68,14 +69,43 @@
 .otherPeopleCon .leftR{
     width:80rpx;
     position:relative;
+    display:flex;
+    align-items: flex-end;
 }
-
+.otherPeopleCon .brandCon{
+    width:calc(100% - 220rpx);
+    background:transparent;
+    display:flex;
+    position:relative;
+    height:100%;
+    z-index:0;
+}
+.otherPeopleCon .brandCon .putStatus{
+    margin:0px;
+    position:absolute;
+    width:39% !important;
+}
+.otherPeopleCon .brandCon .putStatus.left{
+    top:0px;
+    left:0px;
+    right:auto;
+}
+.otherPeopleCon .brandCon .putStatus.right{
+    top:0px;
+    right:0px;
+    left:auto;
+}
 .otherPeopleCon .human{
     width:100%;
     position:relative;
 }
-.peopleU .human{
+.peopleU .humanCon{
     width:80rpx;
+    display: flex;
+    align-items: flex-end;
+}
+.peopleU .human{
+    width:100%;
     position:relative;
 }
 .human image{
@@ -158,23 +188,23 @@
     width:26rpx;
     height:auto;
     position:absolute;
-    bottom:20%;
+    bottom:10%;
 }
 
 .otherPeopleCon .leftP .brandShow{
-    right:-50%;
+    right:-36%;
     left:auto;
 }
 .otherPeopleCon .leftR .brandShow{
     right:auto;
-    left:-50%;
+    left:-36%;
 }
 .otherPeopleCon .leftP .clock,
 .otherPeopleCon .leftR .clock,
 .peopleU .clock{
     width:40rpx;
     height:40rpx;
-    bottom:30%;
+    bottom:60%;
 }
 .peopleU .clock{
     right:auto;
@@ -195,6 +225,7 @@
 .readyBtn{
     top:50%;
     left:50%;
+    z-index:2;
     transform:translate(-50%,-50%)
 }
 
@@ -203,11 +234,12 @@
     color:#fff;
 }
 .otherPeopleCon .leftP .clock{
-    right:-140rpx;
+    right:-45%;
     left:auto;
 }
 .otherPeopleCon .leftR .clock{
-    left:-140rpx;
+    left:-45%; 
+    /* -190rpx */
     right:auto;
 }
 .otherPeopleCon .brandShow image,
@@ -262,10 +294,9 @@
 .operationStatus{
     width: 85rpx;
     height: 24rpx;
-    border-radius: 10px;
     text-align: center;
-    color: rgb(0, 0, 0);
-    background-color: rgb(240, 240, 240, 35%);
+    color: gold;
+    text-shadow: 0 0 5px #dad9bf, 0 0 5px #000000;
     font-size: 17px;
     font-weight: 600;
     position: absolute;
@@ -288,7 +319,7 @@
 
 .peopleU .putStatus{
     right: 30%;
-    top: -55%;
+    top: -50%;
     position: absolute;
 }
 
@@ -302,4 +333,28 @@
     position: absolute;
     top:-10%;
     right: -65%;
+}
+
+.otherPeopleCon .leftP .putStatus{
+    right: -215%;
+    width:max-content;
+}
+.otherPeopleCon .putStatus .brandA .brand{
+    margin-right:5px;
+}
+
+.otherPeopleCon .leftR .putStatus{
+    right: 218%;
+    width:max-content;
+}
+
+.otherPeopleCon .brandCon .putStatus .brandA{
+    flex-wrap:wrap;
+}
+.otherPeopleCon .brandCon .putStatus.left .brandA{
+    justify-content: flex-start;
+}
+.otherPeopleCon .brandCon .putStatus.right .brandA{
+    justify-content: flex-end;
+    transform: translateX(-27%);
 }

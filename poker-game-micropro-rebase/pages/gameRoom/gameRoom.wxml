@@ -51,18 +51,27 @@
 
             <!--出牌状态的显示-->
             <!--打出的牌-->
-            <view class='putStatus'  wx:if='{{playerListPut[0]!=undefined && turnFlag!=playerList[0].playerID}}'>
-                <view class='brandA'>
-                    <view class='brand' wx:for='{{playerListPut[0]}}' wx:key='index'><image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' mode='heightFix'></image></view>
-                </view>
-            </view>
+            
 
             <view class='clock'  wx:if='{{turnFlag==playerList[0].playerID}}'>
                 <image src='../../static/img/clock.png' mode='widthFix'></image>
                 <text class='num'>16</text>
             </view>
         </view>
-        
+        <view class='brandCon'>
+            <!--打出的牌-左-->
+            <view class='putStatus left'  wx:if='{{playerListPut[0]!=undefined && turnFlag!=playerList[0].playerID}}'>
+                <view class='brandA'>
+                    <view class='brand' wx:for='{{playerListPut[0]}}' wx:key='index'><image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' mode='heightFix'></image></view>
+                </view>
+            </view>
+            <!--打出的牌-右-->
+            <view class='putStatus right'  wx:if='{{playerListPut[1]!=undefined && turnFlag!=playerList[1].playerID}}'>
+                <view class='brandA'>
+                    <view class='brand' wx:for='{{playerListPut[1]}}' wx:key='index'><image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' mode='heightFix'></image></view>
+                </view>
+            </view>
+        </view>
         <view class='leftR' wx:if='{{playerList[1].playerID!=undefined}}'>
             <view class='human'>
                 <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{playerList[1].playerID==boss}}"></view>
@@ -92,12 +101,7 @@
             </view>
 
         <!--出牌状态的显示-->
-        <!--打出的牌-->
-        <view class='putStatus'  wx:if='{{playerListPut[1]!=undefined && turnFlag!=playerList[1].playerID}}'>
-            <view class='brandA'>
-                <view class='brand' wx:for='{{playerListPut[1]}}' wx:key='index'><image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' mode='heightFix'></image></view>
-            </view>
-        </view>
+        
 
             <view class='clock'  wx:if='{{turnFlag==playerList[1].playerID}}'>
                 <image src='../../static/img/clock.png' mode='widthFix'></image>
@@ -106,15 +110,18 @@
         </view>
     </view>
     <view class='peopleU' wx:if='{{playerList[2].playerID!=undefined}}'>
-        <view class='human'>
-            <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{playerList[2].playerID==boss}}"></view>
-            <view class='isL' wx:if='{{playerList[2].ready && status=="ready"}}'>已准备</view>
-            <image src='../../static/img/{{playerList[2].playerID==boss?"landlord":"civilian"}}{{playerList[2].sex?playerList[2].sex:"1"}}.png' mode='widthFix'></image>
-            <view class='humanTxt'>
-                <text class='txt'>{{playerList[2].nickName}}</text>
-                <text class='num'>3000</text>
+        <view class='humanCon'>
+            <view class='human'>
+                <view class='isR' style='background-image:url(../../static/img/golob.png)' wx:if="{{playerList[2].playerID==boss}}"></view>
+                <view class='isL' wx:if='{{playerList[2].ready && status=="ready"}}'>已准备</view>
+                <image src='../../static/img/{{playerList[2].playerID==boss?"landlord":"civilian"}}{{playerList[2].sex?playerList[2].sex:"1"}}.png' mode='widthFix'></image>
+                <view class='humanTxt'>
+                    <text class='txt'>{{playerList[2].nickName}}</text>
+                    <text class='num'>3000</text>
+                </view>
             </view>
         </view>
+        
         <view class='brandShows'  wx:if='{{status=="start"}}'>
             <view wx:for='{{myPokers}}' wx:key='index' class="brand {{item.selected?'active':''}}" data-brand='{{item.name}}' >
                 <image bindtap='tapPoker' data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='transform:translateZ({{index?index:0}})'></image>

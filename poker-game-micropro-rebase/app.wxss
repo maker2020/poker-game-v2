@@ -23,7 +23,7 @@ image,text,view{
     background-size:cover;
     justify-content: flex-start;
     box-sizing: border-box;
-    padding:0px 60rpx;
+    padding:0px 40rpx;
 }
 .btnCon{
     display:flex;
