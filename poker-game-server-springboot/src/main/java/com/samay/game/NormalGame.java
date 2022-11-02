@@ -57,9 +57,25 @@ public class NormalGame extends Game{
                 count++;
                 player=p;
             }
-            if(count>1) return null;
+            if(count>1) player=null;
         }
         if(player!=null) player.setBoss(true);
+        else{
+            if(getTurnCallIndex().get()>3){ // 意味着最后决定已经做出，可以得出地主
+                int resIndex=0;
+                for(Player p:getPlayers()){
+                    if(p.isFirstCall()){
+                        // 只有第一个叫的人才可以进入该判断，地主是该玩家的上一个人
+                        resIndex=p.getReqIndex()-1;                 
+                    }
+                }
+                for(Player p:getPlayers()){
+                    if(p.getReqIndex()==resIndex){
+                        return p;
+                    }
+                }
+            }
+        }
         return player;
     }
 

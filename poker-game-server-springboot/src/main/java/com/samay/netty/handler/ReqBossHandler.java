@@ -43,12 +43,14 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
 
         // 维护player请求序号
         // player.setReqIndex(room.getTurnCallIndex().get());
-        room.getTurnCallIndex().incrementAndGet();
+        game.getTurnCallIndex().incrementAndGet();
+        player.setReqIndex(game.getTurnCallIndex().get());
 
         Map<String, Object> result=null;
         if (msg.isTendency()) {
             player.reqBoss();
             if("call".equals(msg.getAction())){
+                player.setFirstCall(true);
                 result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player).getName(),
                 new Notification(ActionEnum.CALL, true, player.getName()));
             }else if("ask".equals(msg.getAction())){
@@ -70,8 +72,16 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         if(result==null) throw new Exception("ReqBossDTO msg 消息异常");
 
         // 叫地主/抢地主最终结果：
-        // 判断轮询次数是否满足最低次数
-        if (room.getTurnCallIndex().get() > 2) {
+        // 判断轮询次数是否满足最低次数(每位玩家已做出一轮选择)
+        if (game.getTurnCallIndex().get() > 2) { // 3
+            // 判断是否重发
+            for(Player p:game.getPlayers()){
+                if(!p.isRefuseBoss()) break;
+                else{
+                    
+                    return;
+                }
+            }
             // 判断地主是否可以直接得出
             Player boss = game.getBossInstantly();
             if (boss != null) {

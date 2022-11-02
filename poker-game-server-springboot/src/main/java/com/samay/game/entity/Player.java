@@ -34,8 +34,9 @@ public class Player implements Serializable{
     private boolean boss=false;
     private boolean ready;
 
+    // 辅助变量
     /**
-     * 辅助变量：用于判断出地主
+     * 用于判断出地主
      */
     private int reqTimes=0;
    
@@ -45,13 +46,20 @@ public class Player implements Serializable{
     private boolean refuseBoss=false;
 
     /**
-     * 以下为v1的辅助变量，现在已不使用，先保留<p>
-     * 标识第一个叫地主、请求索引、是否pass
+     * 请求的索引
      */
-    @Deprecated
-    private boolean firstCall=false;
-    @Deprecated
     private int reqIndex=0;
+
+    /**
+     * 是否是叫地主的/第一个叫
+     */
+    private boolean firstCall=false;
+
+    
+    /**
+     * 以下为v1的辅助变量，现在已不使用，先保留<p>
+     * 是否pass
+     */
     @Deprecated
     private boolean pass;
 

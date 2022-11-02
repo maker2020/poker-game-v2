@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
@@ -31,6 +32,10 @@ public abstract class Game implements Serializable {
     private GameStatusEnum status=GameStatusEnum.READY;
     private boolean handOut=false;
     private boolean over=false;
+    /**
+     * 地主请求轮询的序号
+     */
+    private final AtomicInteger turnCallIndex=new AtomicInteger(0);
 
     public abstract void init();
     protected abstract void handOutPokers();

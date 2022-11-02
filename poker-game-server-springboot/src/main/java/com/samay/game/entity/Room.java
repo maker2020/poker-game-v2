@@ -3,7 +3,6 @@ package com.samay.game.entity;
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.samay.game.Game;
 import com.samay.game.enums.RoomStatusEnum;
@@ -32,11 +31,6 @@ public class Room implements Serializable {
     private Game game;
 
     // 辅助<叫地主逻辑>的变量
-    
-    /**
-     * 地主请求轮询的序号
-     */
-    private final AtomicInteger turnCallIndex=new AtomicInteger(0);
 
 
     public void addPlayer(Player player){
@@ -59,7 +53,27 @@ public class Room implements Serializable {
         }
         if(pos==-1) throw new Exception();
         pos=pos==players.size()-1?0:pos+1;
-        return players.get(pos);
+        if(existBoss()){
+            // 意味着出牌阶段的轮询
+            return players.get(pos);
+        }else{
+            // 意味着叫/抢地主的轮询
+            while (players.get(pos).isRefuseBoss()) {
+                pos=pos==players.size()-1?0:pos+1;
+            }
+            return players.get(pos);
+        }
+    }
+
+    /**
+     * 是否已选出boss
+     * @return
+     */
+    public boolean existBoss(){
+        for(Player p:players){
+            if(p.isBoss()) return true;
+        }
+        return false;
     }
 
 }
