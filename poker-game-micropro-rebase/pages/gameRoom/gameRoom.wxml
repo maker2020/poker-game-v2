@@ -38,7 +38,7 @@
 
             <!--操作状态的显示-->
             <!--叫/抢地主轮询操作状态的显示-->
-            <view class='operationStatus' wx:if="{{playerListNotice[0]!=undefined && turnFlag!=playerList[0].playerID && boss==''}}">
+            <view class='operationStatus' wx:if="{{playerListNotice[0]!=undefined && turnFlag!=playerList[0].playerID}}">
                 <view wx:if="{{playerListNotice[0].type=='CALL'}}">
                     <text wx:if="{{playerListNotice[0].choice}}">叫地主</text>
                     <text wx:if="{{!playerListNotice[0].choice}}">不叫</text>
@@ -47,10 +47,10 @@
                     <text wx:if="{{playerListNotice[0].choice}}">抢地主</text>
                     <text wx:if="{{!playerListNotice[0].choice}}">不抢</text>
                 </view>
+                <view wx:if="{{playerListNotice[0].type=='PUT'}}">
+                    <text wx:if="{{!playerListNotice[0].choice}}">不要</text>
+                </view>
             </view>
-
-            <!--出牌状态的显示-->
-            <!--打出的牌-->
             
 
             <view class='clock'  wx:if='{{turnFlag==playerList[0].playerID}}'>
@@ -89,7 +89,7 @@
 
             <!--操作状态的显示-->
             <!--叫/抢地主轮询操作状态的显示-->
-            <view class='operationStatus' wx:if="{{playerListNotice[1]!=undefined && turnFlag!=playerList[1].playerID && boss==''}}">
+            <view class='operationStatus' wx:if="{{playerListNotice[1]!=undefined && turnFlag!=playerList[1].playerID}}">
                 <view wx:if="{{playerListNotice[1].type=='CALL'}}">
                     <text wx:if="{{playerListNotice[1].choice}}">叫地主</text>
                     <text wx:if="{{!playerListNotice[1].choice}}">不叫</text>
@@ -98,10 +98,11 @@
                     <text wx:if="{{playerListNotice[1].choice}}">抢地主</text>
                     <text wx:if="{{!playerListNotice[1].choice}}">不抢</text>
                 </view>
+                <view wx:if="{{playerListNotice[1].type=='PUT'}}">
+                    <text wx:if="{{!playerListNotice[1].choice}}">不要</text>
+                </view>
             </view>
 
-        <!--出牌状态的显示-->
-        
 
             <view class='clock'  wx:if='{{turnFlag==playerList[1].playerID}}'>
                 <image src='../../static/img/clock.png' mode='widthFix'></image>
@@ -130,7 +131,7 @@
 
         <!--操作状态的显示-->
         <!--叫/抢地主轮询操作状态的显示-->
-        <view class='operationStatus' wx:if="{{playerListNotice[2]!=undefined && turnFlag!=playerList[2].playerID && boss==''}}">
+        <view class='operationStatus' wx:if="{{playerListNotice[2]!=undefined && turnFlag!=playerList[2].playerID}}">
             <view wx:if="{{playerListNotice[2].type=='CALL'}}">
                 <text wx:if="{{playerListNotice[2].choice}}">叫地主</text>
                 <text wx:if="{{!playerListNotice[2].choice}}">不叫</text>
@@ -138,6 +139,9 @@
             <view wx:if="{{playerListNotice[2].type=='ASK'}}">
                 <text wx:if="{{playerListNotice[2].choice}}">抢地主</text>
                 <text wx:if="{{!playerListNotice[2].choice}}">不抢</text>
+            </view>
+            <view wx:if="{{playerListNotice[2].type=='PUT'}}">
+                <text wx:if="{{!playerListNotice[2].choice}}">不要</text>
             </view>
         </view>
 

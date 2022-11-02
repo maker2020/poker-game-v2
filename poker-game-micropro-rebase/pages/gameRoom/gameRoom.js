@@ -11,6 +11,7 @@ Page({
         playerList: [], // 房间内的玩家(玩家包含各个信息：nickName、sex、id、是否准备等)
         playerListNotice: [], // 房间内的玩家 的操作行为
         playerListPut: [], // 房间内的玩家 打出的牌
+        lastPut: [], // 最近一次玩家打出的手牌
         roomID: '', // 房间ID
         myPokers: [], // 我的手牌(此处应该是被处理过的js对象，封装了用于渲染的额外属性)
         bossPokers: [], // 地主的牌(三只牌)
@@ -162,6 +163,7 @@ Page({
 
     updatePutStatus(data) {
         var putPokers = data.putPokers
+        var lastPut = putPokers
         var notification = data.notification
         var playerList = this.data.playerList
         var playerListPut = this.data.playerListPut
@@ -171,7 +173,8 @@ Page({
             }
         }
         this.setData({
-            playerListPut: playerListPut
+            playerListPut: playerListPut,
+            lastPut: lastPut
         })
     },
 
@@ -246,6 +249,7 @@ Page({
     put() {
         var putPokers = [] // 用于存取出的牌(用于逻辑判断、发送服务器)
         var myPokers = []; // 用于更新手牌
+        var lastPut = this.data.lastPut
         this.data.myPokers.forEach(function (item, i) {
             if (item.selected) {
                 putPokers.push({
@@ -256,6 +260,24 @@ Page({
                 myPokers.push(item)
             }
         });
+        // 前端校验出牌合法
+        if(!this.valid(lastPut,putPokers)){
+            // 还原选中态
+            var myPokers=this.data.myPokers
+            myPokers.forEach(function(item,i){
+                item.selected=false
+            })
+            this.setData({
+                myPokers:myPokers
+            })
+            // 弹出短暂的提示
+            wx.showToast({
+              title: '您出牌不合规范！',
+              icon:'none',
+              duration: 1500
+            })
+            return
+        }
         this.setData({
             myPokers: myPokers
         })
@@ -268,8 +290,33 @@ Page({
             data: JSON.stringify(params),
         })
     },
-    pass() {
 
+    pass() {
+        var lastPut = this.data.lastPut
+        if(this.valid(lastPut))
+        var params = {
+            "action": "put",
+            "tendency": false,
+            // putPokers空着
+        }
+        wx.sendSocketMessage({
+          data: JSON.stringify(params),
+        })
+    },
+
+    valid(lastPut,putPokers){
+        // 出牌合法 && 比较合法
+        return this.inputValid(putPokers) && this.compareValid(lastPut,putPokers)
+    },
+
+    inputValid(putPokers){
+        return true
+    },
+
+    compareValid(lastPut,putPokers){
+        if(lastPut.length==0) return true;
+        // 比较逻辑...
+        return true
     },
 
     out() {
