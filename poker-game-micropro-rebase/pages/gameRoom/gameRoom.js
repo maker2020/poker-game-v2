@@ -20,7 +20,10 @@ Page({
         second: 30, // 剩余操作时间
         status: 'ready', // 房间状态(默认ready，待玩家全部准备变为开始状态)
         boss: '', // 房间内地主玩家的唯一标识(即id)
-        multiple: 2 // 房间内倍数
+        multiple: 2, // 房间内倍数
+
+        // UI体验相关辅助变量
+        touchStartPos:{},
     },
 
     /**
@@ -179,14 +182,77 @@ Page({
     },
 
     /**
+     * 被滑动包含
      * 点击牌事件
      * @param {*} e 牌的dom元素 
      */
-    tapPoker(e) {
-        this.data.myPokers[e.target.dataset.index].selected = !this.data.myPokers[e.target.dataset.index].selected
-        // setData与直接赋值区别：前者可以渲染到页面(即可以双向绑定)
+    // tapPoker(e) {
+    //     this.data.myPokers[e.target.dataset.index].selected = !this.data.myPokers[e.target.dataset.index].selected
+    //     // setData与直接赋值区别：前者可以渲染到页面(即可以双向绑定)
+    //     this.setData({
+    //         myPokers: this.data.myPokers
+    //     })
+    // },
+
+    touchStartPoker(e){
+        // 记录点击的牌的位置
+        var x=e.touches[0].pageX
+        var y=e.touches[0].pageY
+        var touchStartPos={
+            x:x,
+            y:y
+        }
         this.setData({
-            myPokers: this.data.myPokers
+            touchStartPos:touchStartPos
+        })
+    },
+
+    touchEndPoker(e){
+        var startPos=this.data.touchStartPos
+        var endPos={
+            x:e.changedTouches[0].pageX,
+            y:e.changedTouches[0].pageY
+        }
+        var leftPos=startPos.x<endPos.x?startPos:endPos
+        var rightPos=startPos.x>endPos.x?startPos:endPos
+        var myPokers=this.data.myPokers
+        // 全部遍历完成后处理
+        this.touchCalculate().then((resultList)=>{
+            var targetPokersDomIndex=[]
+            // 获取两张牌重叠宽度
+            var diff=resultList[1].left-resultList[0].left
+            for(var i=0;i<resultList.length;i++){
+                // right:x,top:y
+                if(resultList[i].right-resultList[i].width<rightPos.x && resultList[i].left+diff>leftPos.x
+                        && (rightPos.y<resultList[i].bottom && rightPos.y>resultList[i].top
+                        && leftPos.y<resultList[i].bottom && leftPos.y>resultList[i].top) 
+                        )
+                // 以上条件的牌dom，突出、选中状态
+                targetPokersDomIndex.push(i)
+            }
+            for(var i=0;i<targetPokersDomIndex.length;i++){
+                myPokers[targetPokersDomIndex[i]].selected=!myPokers[targetPokersDomIndex[i]].selected
+            }
+            this.setData({
+                myPokers:myPokers
+            })
+        })
+    },
+
+    touchCalculate(){
+        return new Promise((resolve,reject)=>{
+            // 利用选择器遍历图片元素，得出牌图片边界，看文档注意只返回第一个匹配的节点，所以循环
+            var myPokers=this.data.myPokers
+            var resultList=[]
+            var count=myPokers.length
+            var query=wx.createSelectorQuery();
+            for(var i=0;i<myPokers.length;i++){
+                query.select('#myPokerImage_'+i).boundingClientRect(function(res){
+                    resultList.push(res)
+                    if(count==resultList.length) resolve(resultList)
+                })
+            }
+            query.exec()
         })
     },
 

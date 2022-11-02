@@ -39,11 +39,11 @@
             <!--操作状态的显示-->
             <!--叫/抢地主轮询操作状态的显示-->
             <view class='operationStatus' wx:if="{{playerListNotice[0]!=undefined && turnFlag!=playerList[0].playerID}}">
-                <view wx:if="{{playerListNotice[0].type=='CALL'}}">
+                <view wx:if="{{playerListNotice[0].type=='CALL' && boss==''}}">
                     <text wx:if="{{playerListNotice[0].choice}}">叫地主</text>
                     <text wx:if="{{!playerListNotice[0].choice}}">不叫</text>
                 </view>
-                <view wx:if="{{playerListNotice[0].type=='ASK'}}">
+                <view wx:if="{{playerListNotice[0].type=='ASK' && boss==''}}">
                     <text wx:if="{{playerListNotice[0].choice}}">抢地主</text>
                     <text wx:if="{{!playerListNotice[0].choice}}">不抢</text>
                 </view>
@@ -90,11 +90,11 @@
             <!--操作状态的显示-->
             <!--叫/抢地主轮询操作状态的显示-->
             <view class='operationStatus' wx:if="{{playerListNotice[1]!=undefined && turnFlag!=playerList[1].playerID}}">
-                <view wx:if="{{playerListNotice[1].type=='CALL'}}">
+                <view wx:if="{{playerListNotice[1].type=='CALL' && boss==''}}">
                     <text wx:if="{{playerListNotice[1].choice}}">叫地主</text>
                     <text wx:if="{{!playerListNotice[1].choice}}">不叫</text>
                 </view>
-                <view wx:if="{{playerListNotice[1].type=='ASK'}}">
+                <view wx:if="{{playerListNotice[1].type=='ASK' && boss==''}}">
                     <text wx:if="{{playerListNotice[1].choice}}">抢地主</text>
                     <text wx:if="{{!playerListNotice[1].choice}}">不抢</text>
                 </view>
@@ -125,18 +125,18 @@
         
         <view class='brandShows'  wx:if='{{status=="start"}}'>
             <view wx:for='{{myPokers}}' wx:key='index' class="brand {{item.selected?'active':''}}" data-brand='{{item.name}}' >
-                <image bindtap='tapPoker' data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='transform:translateZ({{index?index:0}})'></image>
+                <image id="myPokerImage_{{index}}" bindtouchstart="touchStartPoker" bindtouchend="touchEndPoker" data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='transform:translateZ({{index?index:0}})'></image>
             </view>
         </view>
 
         <!--操作状态的显示-->
         <!--叫/抢地主轮询操作状态的显示-->
         <view class='operationStatus' wx:if="{{playerListNotice[2]!=undefined && turnFlag!=playerList[2].playerID}}">
-            <view wx:if="{{playerListNotice[2].type=='CALL'}}">
+            <view wx:if="{{playerListNotice[2].type=='CALL' && boss==''}}">
                 <text wx:if="{{playerListNotice[2].choice}}">叫地主</text>
                 <text wx:if="{{!playerListNotice[2].choice}}">不叫</text>
             </view>
-            <view wx:if="{{playerListNotice[2].type=='ASK'}}">
+            <view wx:if="{{playerListNotice[2].type=='ASK' && boss==''}}">
                 <text wx:if="{{playerListNotice[2].choice}}">抢地主</text>
                 <text wx:if="{{!playerListNotice[2].choice}}">不抢</text>
             </view>
