@@ -7,14 +7,17 @@ import java.util.Comparator;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * 扑克牌类(POJO)
+ * <b>扑克牌类(POJO)</b>
+ * equals重写规则: color+value (对比v1不同，v1为了多种排序规则，仅将value作为equals判断要素)
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = {"colorEnum","valueEnum"})
 public class Poker implements Serializable{
     private PokerColorEnum colorEnum;
     private PokerValueEnum valueEnum;
@@ -47,24 +50,9 @@ public class Poker implements Serializable{
         }
     }
 
-    /**
-     * 重写Poker的equals目的为了Map使用，但业务逻辑局限导致hash冲突，暂无可避免。
-     */
-    @Override
-    public boolean equals(Object p){
-        if(p instanceof Poker poker){
-            return poker.valueEnum==this.valueEnum;
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode(){
-        return valueEnum.getCode();
-    }
-
     @Override
     public String toString(){
         return colorEnum.toString()+valueEnum.toString();
     }
+
 }

@@ -19,6 +19,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+
 import com.samay.netty.handler.holder.ChannelHolder;
 
 /**
@@ -39,6 +40,12 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO>{
         
         Map<String,Object> result=ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player), new Notification(ActionEnum.PUT,choice,player.getName()), putPokers);
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
+        if(putPokers!=null) {
+            player.removeAllPoker(putPokers);
+            if(player.getPokers().size()==0){
+                
+            }
+        }
     }
     
 }

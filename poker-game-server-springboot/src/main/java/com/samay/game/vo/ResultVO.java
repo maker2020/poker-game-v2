@@ -128,4 +128,8 @@ public class ResultVO {
         resultVO.put("turn", turn);
     }
 
+    public static void gameOver(){
+        
+    }
+
 }

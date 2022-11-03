@@ -24,6 +24,7 @@ Page({
 
         // UI体验相关辅助变量
         touchStartPos:{},
+        pokerDiff:''
     },
 
     /**
@@ -228,7 +229,13 @@ Page({
         this.touchCalculate().then((resultList)=>{
             var targetPokersDomIndex=[]
             // 获取两张牌重叠宽度
-            var diff=resultList[1].left-resultList[0].left
+            var diff=this.data.pokerDiff
+            if(diff==''){
+                diff=resultList[1].left-resultList[0].left
+                this.setData({
+                    pokerDiff:diff
+                })
+            }
             for(var i=0;i<resultList.length;i++){
                 // right:x,top:y
                 if(resultList[i].right-resultList[i].width<rightPos.x && resultList[i].left+diff>leftPos.x

@@ -79,6 +79,14 @@ public class Player implements Serializable{
         pokers.addAll(listPoker);
     }
 
+    public void removePoker(Poker poker){
+        pokers.remove(poker);
+    }
+
+    public void removeAllPoker(Collection<Poker> listPoker){
+        pokers.removeAll(listPoker);
+    }
+
     public void reqBoss(){
         reqTimes++;
     }

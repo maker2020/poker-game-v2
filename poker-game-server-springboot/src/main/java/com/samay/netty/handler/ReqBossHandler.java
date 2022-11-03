@@ -75,13 +75,14 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         // 判断轮询次数是否满足最低次数(每位玩家已做出一轮选择)
         if (game.getTurnCallIndex().get() > 2) { // 3
             // 判断是否重发
+            boolean reHandout=true;
             for(Player p:game.getPlayers()){
-                if(!p.isRefuseBoss()) break;
-                else{
-                    game.restart();
-                    GameReadyHandler.gameStart(game, group, room, ctx);
-                    return;
-                }
+                if(!p.isRefuseBoss()) reHandout=false;
+            }
+            if(reHandout){
+                game.restart();
+                GameReadyHandler.gameStart(game, group, room, ctx);
+                return;
             }
             // 判断地主是否可以直接得出
             Player boss = game.getBossInstantly();
