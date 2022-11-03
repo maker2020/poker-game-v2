@@ -108,12 +108,13 @@ public class ResultVO {
      * @param putPokers
      * @return
      */
-    public static Map<String,Object> resultMap(ActionEnum action,String turn,Notification notification,List<Poker> putPokers){
+    public static Map<String,Object> resultMap(ActionEnum action,String turn,Notification notification,List<Poker> putPokers,int restPokerNum){
         Map<String,Object> map=new HashMap<>();
         map.put("action", action.getAction());
         map.put("turn", turn);
         map.put("notification", notification);
         map.put("putPokers", putPokers);
+        map.put("restPokerNum", restPokerNum);
         return map;
     }
 
@@ -128,8 +129,14 @@ public class ResultVO {
         resultVO.put("turn", turn);
     }
 
-    public static void gameOver(){
-        
+    /**
+     * 游戏结果对象: 可以包含很多内容，例如胜利方、分数计算等等
+     * @param winnerIdList
+     */
+    public static Map<String,Object> gameResult(List<String> winnerIdList){
+        Map<String,Object> map=new HashMap<>();
+        map.put("winners", winnerIdList);
+        return map;
     }
 
 }

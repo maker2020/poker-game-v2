@@ -8,9 +8,10 @@ Page({
     data: {
         // 房间内的各个变量
         // [2]为当前玩家,[0]为左边、[1]为右边
-        playerList: [], // 房间内的玩家(玩家包含各个信息：nickName、sex、id、是否准备等)
+        playerList: [], // 房间内的玩家(包含玩家各个初始信息：nickName、sex、id、是否准备等)
         playerListNotice: [], // 房间内的玩家 的操作行为
         playerListPut: [], // 房间内的玩家 打出的牌
+        playerListRestPokerNum: [], // 房间内的玩家 剩余手牌数
         lastPut: [], // 最近一次玩家打出的手牌
         roomID: '', // 房间ID
         myPokers: [], // 我的手牌(此处应该是被处理过的js对象，封装了用于渲染的额外属性)
@@ -152,8 +153,17 @@ Page({
         })
     },
     updateBoss(data) {
+        // 耦合度太高，维护性差。缺陷
+        var playerList=this.data.playerList
+        var playerListRestPokerNum=this.data.playerListRestPokerNum
+        for(var i=0;i<playerList.length;i++){
+            if(playerList[i].playerID==data.boss){
+                playerListRestPokerNum[i]=20
+            }
+        }
         this.setData({
-            boss: data.boss
+            boss: data.boss,
+            playerListRestPokerNum:playerListRestPokerNum
         })
     },
 
@@ -174,6 +184,8 @@ Page({
     },
 
     updatePutStatus(data) {
+        var restPokerNum=data.restPokerNum // 玩家剩余手牌
+        var playerListRestPokerNum=this.data.playerListRestPokerNum // 同上
         var putPokers = data.putPokers
         var lastPut = putPokers
         var notification = data.notification
@@ -181,12 +193,14 @@ Page({
         var playerListPut = this.data.playerListPut
         for (var i = 0; i < playerList.length; i++) {
             if (playerList[i].playerID == notification.playerID) {
-                playerListPut[i] = putPokers;
+                playerListPut[i] = putPokers
+                playerListRestPokerNum[i]=restPokerNum
             }
         }
         this.setData({
             playerListPut: playerListPut,
-            lastPut: lastPut
+            lastPut: lastPut,
+            playerListRestPokerNum: playerListRestPokerNum
         })
     },
 

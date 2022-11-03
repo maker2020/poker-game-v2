@@ -1,5 +1,6 @@
 package com.samay.netty.handler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,12 +39,23 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO>{
         List<Poker> putPokers=msg.getPutPokers();
         boolean choice=msg.isTendency();
         
-        Map<String,Object> result=ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player), new Notification(ActionEnum.PUT,choice,player.getName()), putPokers);
+        Map<String,Object> result=ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player), new Notification(ActionEnum.PUT,choice,player.getName()), putPokers, putPokers==null?player.getPokers().size():player.getPokers().size()-putPokers.size());
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
         if(putPokers!=null) {
             player.removeAllPoker(putPokers);
             if(player.getPokers().size()==0){
-                
+                List<String> winnerIdList=new ArrayList<>();
+                if(player.isBoss()){
+                    winnerIdList.add(player.getName());
+                }else{
+                    for(Player p:room.getPlayers()){
+                        if(!p.isBoss()){
+                            winnerIdList.add(p.getName());
+                        }
+                    }
+                }
+                Map<String,Object> gameResult=ResultVO.gameResult(winnerIdList);
+                group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(gameResult)));
             }
         }
     }
