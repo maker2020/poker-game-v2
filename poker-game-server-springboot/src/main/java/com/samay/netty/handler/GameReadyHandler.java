@@ -13,7 +13,6 @@ import com.samay.game.Game;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
-import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.RoomStatusEnum;
 import com.samay.game.vo.ResultVO;
 import io.netty.buffer.Unpooled;
@@ -40,13 +39,25 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
     protected void channelRead0(ChannelHandlerContext ctx, Game game) throws Exception {
         if (!canStart(game))
             return;
-        // 仅最后一个进入的线程处理发牌工作
+        // 游戏发牌阶段: 仅最后一个进入的线程处理发牌工作
         ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
-        // 游戏发牌阶段
         Room room = ChannelHolder.attrRoom(ctx.channel());
         log.info("RoomID[" + room.getId() + "]:ready to start");
+
         // 更新房间 (此更新操作是明确的，没有线程安全问题)
         room.setStatus(RoomStatusEnum.START);
+
+        gameStart(game, group, room, ctx);
+    }
+
+    /**
+     * 游戏开始: 发牌、随机开始询问开始叫地主。（其他的业务不在这里）
+     * @param game
+     * @param group
+     * @param room
+     * @param ctx
+     */
+    public static void gameStart(Game game,ChannelGroup group,Room room,ChannelHandlerContext ctx){
         // 初始化游戏、准备发牌
         game = initGame(game);
         // 发牌至玩家(只有一个线程处理，所以需要分发group里的channel)
@@ -101,12 +112,9 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
      *              注释)不必担心jmm的工作内存无法刷新至主存。即使没有volatile，sync块内变量，在锁释放之前都会刷新到主存
      * @return
      */
-    private Game initGame(Game game) {
-        if (game.getStatus() == GameStatusEnum.START)
-            return game;
+    private static Game initGame(Game game) {
         // 初始化游戏数据: 发牌、更新状态
         game.init();
-        game.setStatus(GameStatusEnum.START);
         return game;
     }
 

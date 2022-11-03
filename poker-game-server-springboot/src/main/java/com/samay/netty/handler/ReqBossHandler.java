@@ -51,19 +51,19 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             player.reqBoss();
             if("call".equals(msg.getAction())){
                 player.setFirstCall(true);
-                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player).getName(),
+                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
                 new Notification(ActionEnum.CALL, true, player.getName()));
             }else if("ask".equals(msg.getAction())){
-                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player).getName(),
+                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
                 new Notification(ActionEnum.ASK, true, player.getName()));
             }
         } else { // 拒绝
             player.refuseBoss();
             if("call".equals(msg.getAction())){
-                result = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(player).getName(),
+                result = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(player),
                 new Notification(ActionEnum.CALL, false, player.getName()));
             }else if("ask".equals(msg.getAction())){
-                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player).getName(),
+                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
                 new Notification(ActionEnum.ASK, false, player.getName()));
             }
         }
@@ -78,7 +78,8 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             for(Player p:game.getPlayers()){
                 if(!p.isRefuseBoss()) break;
                 else{
-                    
+                    game.restart();
+                    GameReadyHandler.gameStart(game, group, room, ctx);
                     return;
                 }
             }

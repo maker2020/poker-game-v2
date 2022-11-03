@@ -30,16 +30,18 @@ public abstract class Game implements Serializable {
     private Collection<Poker> pokerBossCollector;
     private List<Player> players=new CopyOnWriteArrayList<>();
     private GameStatusEnum status=GameStatusEnum.READY;
-    private boolean handOut=false;
+    // 暂时保留
+    // private boolean handOut=false;
     private boolean over=false;
     /**
      * 地主请求轮询的序号
      */
-    private final AtomicInteger turnCallIndex=new AtomicInteger(0);
+    private AtomicInteger turnCallIndex=new AtomicInteger(0);
 
     public abstract void init();
     protected abstract void handOutPokers();
     public abstract Player getBossInstantly();
+    public abstract void restart();
 
     public void addPlayer(Player player){
         players.add(player);

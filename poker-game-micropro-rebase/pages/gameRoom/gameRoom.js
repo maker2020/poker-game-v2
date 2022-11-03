@@ -125,6 +125,14 @@ Page({
                 selected: false
             })
         })
+
+        //
+        if(this.data.myPokers.length>0){ // 收到手牌且我已经有手牌（该情况只有是重新发牌的标识）
+            // 重新发牌标识则清除playerListNotice
+            this.setData({
+                playerListNotice:[]
+            })
+        }
         this.setData({
             myPokers: myPokers,
             // 也意味着status=start

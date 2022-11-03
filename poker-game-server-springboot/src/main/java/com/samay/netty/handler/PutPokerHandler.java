@@ -37,7 +37,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO>{
         List<Poker> putPokers=msg.getPutPokers();
         boolean choice=msg.isTendency();
         
-        Map<String,Object> result=ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player).getName(), new Notification(ActionEnum.PUT,choice,player.getName()), putPokers);
+        Map<String,Object> result=ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player), new Notification(ActionEnum.PUT,choice,player.getName()), putPokers);
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
     }
     

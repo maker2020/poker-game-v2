@@ -2,6 +2,7 @@ package com.samay.game;
 
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
+import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerValueEnum;
 import com.samay.game.utils.PokerUtil;
@@ -29,8 +30,9 @@ public class NormalGame extends Game{
     }
 
     public synchronized void init(){
-        if(!isHandOut()) handOutPokers();
-        setHandOut(true);
+        if(getStatus()==GameStatusEnum.START) return;
+        if(getStatus()!=GameStatusEnum.START) handOutPokers();
+        setStatus(GameStatusEnum.START);
     }
 
     /**
@@ -106,6 +108,27 @@ public class NormalGame extends Game{
         }
         for(Player p:getPlayers()){
             PokerUtil.sort(p.getPokers());
+        }
+    }
+
+    /**
+     * 重置游戏状态
+     */
+    @Override
+    public void restart() {
+        this.getPokerBossCollector().clear();
+        this.getPokerCollector().clear();
+        this.setOver(false);
+        this.setStatus(GameStatusEnum.READY);
+        this.getTurnCallIndex().set(0);
+        for(Player p:getPlayers()){
+            p.setBoss(false);
+            p.setFirstCall(false);
+            p.setReady(false);
+            p.setRefuseBoss(false);
+            p.setReqIndex(0);
+            p.setReqTimes(0);
+            p.getPokers().clear();
         }
     }
     

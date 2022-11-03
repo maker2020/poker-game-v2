@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
+import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerValueEnum;
 import com.samay.game.utils.PokerUtil;
@@ -28,8 +29,9 @@ public class HappyGame extends Game{
     }
 
     public synchronized void init(){
-        if(!isHandOut()) handOutPokers();
-        setHandOut(true);
+        if(getStatus()==GameStatusEnum.START) return;
+        if(getStatus()!=GameStatusEnum.START) handOutPokers();
+        setStatus(GameStatusEnum.START);
     }
 
     /**
@@ -83,6 +85,12 @@ public class HappyGame extends Game{
         for(Player p:getPlayers()){
             PokerUtil.sort(p.getPokers());
         }
+    }
+
+    @Override
+    public void restart() {
+        // TODO Auto-generated method stub
+        
     }
 
     
