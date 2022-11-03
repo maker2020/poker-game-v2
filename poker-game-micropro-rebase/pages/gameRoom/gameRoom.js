@@ -242,9 +242,14 @@ Page({
                         && (rightPos.y<resultList[i].bottom && rightPos.y>resultList[i].top
                         && leftPos.y<resultList[i].bottom && leftPos.y>resultList[i].top) 
                         )
-                // 以上条件的牌dom，突出、选中状态
-                targetPokersDomIndex.push(i)
+                    // 以上条件的牌dom，突出、选中状态
+                    targetPokersDomIndex.push(i)
             }
+            // 最后一张牌比较特殊它的右侧暴露在外，因此针对突出部分做特殊处理
+            if(resultList[resultList.length-1].left+diff<leftPos.x 
+                    && (rightPos.y<resultList[resultList.length-1].bottom && rightPos.y>resultList[resultList.length-1].top
+                    && leftPos.y<resultList[resultList.length-1].bottom && leftPos.y>resultList[resultList.length-1].top) )
+                targetPokersDomIndex.push(resultList.length-1)
             for(var i=0;i<targetPokersDomIndex.length;i++){
                 myPokers[targetPokersDomIndex[i]].selected=!myPokers[targetPokersDomIndex[i]].selected
             }
