@@ -12,7 +12,6 @@ Page({
         playerListNotice: [], // 房间内的玩家 的操作行为
         playerListPut: [], // 房间内的玩家 打出的牌
         playerListRestPokerNum: [], // 房间内的玩家 剩余手牌数
-        lastPut: [], // 最近一次玩家打出的手牌
         roomID: '', // 房间ID
         myPokers: [], // 我的手牌(此处应该是被处理过的js对象，封装了用于渲染的额外属性)
         bossPokers: [], // 地主的牌(三只牌)
@@ -22,6 +21,9 @@ Page({
         status: 'ready', // 房间状态(默认ready，待玩家全部准备变为开始状态)
         boss: '', // 房间内地主玩家的唯一标识(即id)
         multiple: 2, // 房间内倍数
+
+        // 辅助变量：优化性能
+        unselectedPokers:[], // 记录选中牌之余的牌，验证合规后使用（避免了嵌套遍历）
 
         // UI体验相关辅助变量
         touchStartPos:{},
@@ -82,6 +84,10 @@ Page({
             // 收到 地主是谁的结果
             if (data.boss) {
                 context.updateBoss(data)
+            }
+            // 收到 操作失败的反馈
+            if(data.fail){
+                context.updateFeedBack(data)
             }
         })
     },
@@ -146,12 +152,6 @@ Page({
             bossPokers: data.bossPokers
         })
     },
-    updateOpeatorStatus(data) {
-        this.setData({
-            turnFlag: data.turn,
-            action: data.action
-        })
-    },
     updateBoss(data) {
         // 耦合度太高，维护性差。缺陷
         var playerList=this.data.playerList
@@ -166,7 +166,26 @@ Page({
             playerListRestPokerNum:playerListRestPokerNum
         })
     },
-
+    updateOpeatorStatus(data) {
+        // 轮到的那个玩家操作xx时，它相关的提示应该全部清除
+        var playerList=this.data.playerList
+        var playerListNotice=this.data.playerListNotice // notice清除
+        var playerListPut=this.data.playerListPut // putStatus清除
+        for(var i=0;i<playerList.length;i++){
+            if(playerList[i].playerID==data.turn){
+                playerListNotice[i]=undefined
+                playerListPut[i]=undefined
+                this.setData({
+                    playerListNotice:playerListNotice,
+                    playerListPut:playerListPut
+                })
+            }
+        }
+        this.setData({
+            turnFlag: data.turn,
+            action: data.action
+        })
+    },
     updateNotification(data) {
         // type='call | ask',choice=true | false,playerID='xxx'
         var notification = data.notification
@@ -187,20 +206,41 @@ Page({
         var restPokerNum=data.restPokerNum // 玩家剩余手牌
         var playerListRestPokerNum=this.data.playerListRestPokerNum // 同上
         var putPokers = data.putPokers
-        var lastPut = putPokers
         var notification = data.notification
         var playerList = this.data.playerList
         var playerListPut = this.data.playerListPut
         for (var i = 0; i < playerList.length; i++) {
-            if (playerList[i].playerID == notification.playerID) {
+            if (playerList[i].playerID == notification.playerID) { // 定位到是关于谁的通知
                 playerListPut[i] = putPokers
                 playerListRestPokerNum[i]=restPokerNum
+            }
+            if(playerList[2].playerID == notification.playerID) { // 更新自己打出的牌状态、同时更新手牌
+                this.setData({
+                    myPokers:this.data.unselectedPokers
+                })
             }
         }
         this.setData({
             playerListPut: playerListPut,
-            lastPut: lastPut,
             playerListRestPokerNum: playerListRestPokerNum
+        })
+    },
+
+    updateFeedBack(data){
+        // 校验出牌不合法的反馈
+        // 还原选中态
+        var myPokers=this.data.myPokers
+        myPokers.forEach(function(item,i){
+            item.selected=false
+        })
+        this.setData({
+            myPokers:myPokers
+        })
+        // 弹出短暂的提示
+        wx.showToast({
+            title: '您打出的牌不符合规则！',
+            icon:'none',
+            duration: 1500
         })
     },
 
@@ -347,39 +387,20 @@ Page({
 
     // 出牌
     put() {
-        var putPokers = [] // 用于存取出的牌(用于逻辑判断、发送服务器)
-        var myPokers = []; // 用于更新手牌
-        var lastPut = this.data.lastPut
+        var putPokers = [] // 用于存取出的牌(用于发送服务器)
+        var unselectedPokers = [] // 未选中的牌缓存到data
         this.data.myPokers.forEach(function (item, i) {
             if (item.selected) {
                 putPokers.push({
                     "colorEnum": item.name.split('_')[0],
                     "valueEnum": item.name.split('_')[1]
                 })
-            } else {
-                myPokers.push(item)
+            }else{
+                unselectedPokers.push(item)
             }
         });
-        // 前端校验出牌合法
-        if(!this.valid(lastPut,putPokers)){
-            // 还原选中态
-            var myPokers=this.data.myPokers
-            myPokers.forEach(function(item,i){
-                item.selected=false
-            })
-            this.setData({
-                myPokers:myPokers
-            })
-            // 弹出短暂的提示
-            wx.showToast({
-              title: '您出牌不合规范！',
-              icon:'none',
-              duration: 1500
-            })
-            return
-        }
         this.setData({
-            myPokers: myPokers
+            unselectedPokers:unselectedPokers
         })
         var params = {
             "action": "put",
@@ -392,8 +413,6 @@ Page({
     },
 
     pass() {
-        var lastPut = this.data.lastPut
-        if(this.valid(lastPut))
         var params = {
             "action": "put",
             "tendency": false,
@@ -402,21 +421,6 @@ Page({
         wx.sendSocketMessage({
           data: JSON.stringify(params),
         })
-    },
-
-    valid(lastPut,putPokers){
-        // 出牌合法 && 比较合法
-        return this.inputValid(putPokers) && this.compareValid(lastPut,putPokers)
-    },
-
-    inputValid(putPokers){
-        return true
-    },
-
-    compareValid(lastPut,putPokers){
-        if(lastPut.length==0) return true;
-        // 比较逻辑...
-        return true
     },
 
     out() {

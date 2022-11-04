@@ -139,4 +139,15 @@ public class ResultVO {
         return map;
     }
 
+    /**
+     * 操作行为失败
+     * @return
+     */
+    public static Map<String,Object> actionFail(ActionEnum action){
+        Map<String,Object> map=new HashMap<>();
+        map.put("fail", true); // 后续添加失败原因
+        map.put("action", action);
+        return map;
+    }
+
 }

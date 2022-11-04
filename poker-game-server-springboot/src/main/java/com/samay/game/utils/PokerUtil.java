@@ -26,6 +26,7 @@ public class PokerUtil {
      * @param list
      */
     public static void sortForPUT(List<Poker> list) {
+        if(list==null) return;
         // 记录各牌(的值)出现次数
         Map<String, Integer> countMap = new HashMap<>();
         for (Poker p : list) {

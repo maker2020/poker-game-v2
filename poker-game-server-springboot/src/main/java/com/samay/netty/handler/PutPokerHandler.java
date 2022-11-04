@@ -1,6 +1,7 @@
 package com.samay.netty.handler;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +16,11 @@ import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.rule.CommonRule;
 import com.samay.game.rule.GameRule;
+import com.samay.game.utils.PokerUtil;
 import com.samay.game.vo.Notification;
 import com.samay.game.vo.ResultVO;
+
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -26,47 +30,58 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import com.samay.netty.handler.holder.ChannelHolder;
 
 /**
- * <b>游戏进行过程中的出牌处理器</b><p>
+ * <b>游戏进行过程中的出牌处理器</b>
+ * <p>
  * 无太多状态变量需要关注。
  */
 @Sharable
 @Component
-public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO>{
+public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, PutPokerDTO msg) throws Exception {
-        Player player=ChannelHolder.attrPlayer(ctx.channel());
-        ChannelGroup group=ChannelHolder.groupMap.get(ctx.channel());
-        Room room=ChannelHolder.attrRoom(ctx.channel());
-        Game game=room.getGame();
+        Player player = ChannelHolder.attrPlayer(ctx.channel());
+        ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
+        Room room = ChannelHolder.attrRoom(ctx.channel());
+        Game game = room.getGame();
+        List<Poker> putPokers = msg.getPutPokers();
+        Collection<Poker> lastPutPokers=game.getLastPutPokers();        
+        if(game.getLastPlayerID().equals(player.getName())) lastPutPokers=null; // 清除本身压制
 
-        List<Poker> putPokers=msg.getPutPokers();
-        boolean choice=msg.isTendency();
-        GameRule rule=new CommonRule(putPokers, game.getLastPutPokers());
-        if(rule.valid()){
-            Map<String,Object> result=ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player), new Notification(ActionEnum.PUT,choice,player.getName()), putPokers, putPokers==null?player.getPokers().size():player.getPokers().size()-putPokers.size());
+        // 防止恶心请求:出了牌但choice为false,于是choice参数通过实际putPoker得出，因此该参数暂时不用
+        GameRule rule = new CommonRule(putPokers, lastPutPokers);
+        PokerUtil.sortForPUT(putPokers);
+        if (rule.valid()) {
+            Map<String, Object> result = ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player),
+                    new Notification(ActionEnum.PUT, putPokers != null, player.getName()), putPokers,
+                    putPokers == null ? player.getPokers().size() : player.getPokers().size() - putPokers.size());
             group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
-            if(putPokers!=null) {
+
+            if (putPokers != null) {
                 player.removeAllPoker(putPokers);
                 game.setLastPutPokers(putPokers);
-                if(player.getPokers().size()==0){
-                    List<String> winnerIdList=new ArrayList<>();
-                    if(player.isBoss()){
+                game.setLastPlayerID(player.getName());
+                if (player.getPokers().size() == 0) {
+                    List<String> winnerIdList = new ArrayList<>();
+                    if (player.isBoss()) {
                         winnerIdList.add(player.getName());
-                    }else{
-                        for(Player p:room.getPlayers()){
-                            if(!p.isBoss()){
+                    } else {
+                        for (Player p : room.getPlayers()) {
+                            if (!p.isBoss()) {
                                 winnerIdList.add(p.getName());
                             }
                         }
                     }
-                    Map<String,Object> gameResult=ResultVO.gameResult(winnerIdList);
+                    Map<String, Object> gameResult = ResultVO.gameResult(winnerIdList);
                     group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(gameResult)));
                 }
             }
-        }else{ // 反馈不合法
-            
+        } else { // 反馈不合法
+                 // 此处仅提示操作者玩家，而非group
+            Channel ch = group.find(ChannelHolder.uid_chidMap.get(player.getName()));
+            Map<String, Object> result = ResultVO.actionFail(ActionEnum.PUT);
+            ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
         }
     }
-    
+
 }

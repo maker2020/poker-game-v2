@@ -1,8 +1,8 @@
 package com.samay.game.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public class Player implements Serializable{
      * 0:未设置，1:男，2:女
      */
     private char sex='1';
-    private List<Poker> pokers=new ArrayList<>();
+    private List<Poker> pokers=new LinkedList<>();
     private boolean boss=false;
     private boolean ready;
 

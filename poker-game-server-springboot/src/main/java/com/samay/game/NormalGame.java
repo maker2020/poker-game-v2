@@ -129,7 +129,10 @@ public class NormalGame extends Game{
             p.setReqTimes(0);
             p.getPokers().clear();
         }
-        this.getLastPutPokers().clear();
+        
+        this.setLastPutPokers(null);
+        this.setLastPlayerID("");
+
         this.setBaseScore(200);
         this.setCardinality(2);
         this.setMultiple(2);

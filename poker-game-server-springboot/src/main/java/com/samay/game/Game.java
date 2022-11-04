@@ -36,6 +36,11 @@ public abstract class Game implements Serializable {
      */
     private Collection<Poker> lastPutPokers;
     /**
+     * 上一个打出的牌的玩家id
+     */
+    private String lastPlayerID="";
+
+    /**
      * 底分
      */
     private int baseScore;
