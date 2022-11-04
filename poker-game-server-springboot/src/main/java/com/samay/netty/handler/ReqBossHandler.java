@@ -56,6 +56,11 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             }else if("ask".equals(msg.getAction())){
                 result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
                 new Notification(ActionEnum.ASK, true, player.getName()));
+
+                // 倍数翻一番
+                game.setMultiple(game.getMultiple()*2);
+                Map<String,Object> multipleResult=ResultVO.mutiplying(game.getMultiple());
+                group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multipleResult)));
             }
         } else { // 拒绝
             player.refuseBoss();

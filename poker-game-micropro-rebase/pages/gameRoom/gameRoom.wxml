@@ -8,7 +8,7 @@
     <view class='top'>
         <view class='basescore' wx:if='{{status=="start"}}'>
             <text class='txt'>底分</text>
-            <text class='num'>200</text>
+            <text class='num'>{{baseScore}}</text>
         </view>
         <view class='basehand' wx:if='{{status=="start"}}'>
             <image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' wx:key='index' mode="widthFix" wx:for='{{bossPokers}}'></image>

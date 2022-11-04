@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.samay.game.entity.Poker;
 import com.samay.game.enums.PokerColorEnum;
+import com.samay.game.enums.PokerTypeEnum;
 import com.samay.game.enums.PokerValueEnum;
 
 /**
@@ -20,13 +21,9 @@ import com.samay.game.enums.PokerValueEnum;
 public class CommonRule implements GameRule {
 
     /**
-     * 当前选中的牌（已排好序）
-     * <p>
-     * 排序规则依次：1.从大到小 2.出现次数最多
-     * <p>
-     * 示例：3336(√),6333(x)，98765(√)，887766(√)。
-     * <p>
-     * 基于这个排序，验证规则写起来更简单，可以采用硬编码即：get(1),get(2)
+     * <b>当前选中的牌(已排好序)</b><p>
+     * 排序规则依次：1.从大到小 2.出现次数最多<p>
+     * 基于排序，验证规则写起来更简单，可以采用硬编码即：get(1),get(2)
      */
     private Collection<? extends Poker> putPokers;
     /**
@@ -445,6 +442,47 @@ public class CommonRule implements GameRule {
             }
         }
         return false;
+    }
+
+    /**
+     * 判断pokers是否是同花顺<p>
+     * 注意：同样的类似valid()方法，也需要在调用flush之前用sortForPut排序
+     * @param pokers
+     * @return
+    ' */
+    public static boolean flush(Collection<? extends Poker> pokers){
+        if(pokers.size()<3) return false;
+        Iterator<? extends Poker> it=pokers.iterator();
+        Poker lastPoker=it.next();
+        while (it.hasNext()) {
+            Poker curPoker=it.next();
+            if(curPoker.getValueEnum().getWeight()!=lastPoker.getValueEnum().getWeight()+1)
+                return false;
+            if(curPoker.getColorEnum()!=lastPoker.getColorEnum())
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * <b>返回玩家牌型</b>
+     * @return
+     */
+    public PokerTypeEnum getPokersType(){
+        if(boom()) return PokerTypeEnum.BOOM;
+        if(single()) return PokerTypeEnum.SINGLE;
+        if(doublePut()) return PokerTypeEnum.DOUBLE;
+        if(three()) return PokerTypeEnum.TRIPLE;
+        if(threeWithOne()) return PokerTypeEnum.TRIPLE_SINGLE;
+        if(threeWithTwo()) return PokerTypeEnum.TRIPLE_DOUBLE;
+        if(planeAlone()) return PokerTypeEnum.PLANE_ALONE;
+        if(planeWithTwo()) return PokerTypeEnum.PLANE_SINGLE;
+        if(planeWithFour()) return PokerTypeEnum.PLANE_DOUBLE;
+        if(fourWithTwo()) return PokerTypeEnum.BOOM_SINGLE;
+        if(fourWithFour()) return PokerTypeEnum.BOOM_DOUBLE;
+        if(singleStraights()) return PokerTypeEnum.STRAIGHTS_SINGLE;
+        if(doubleStraights()) return PokerTypeEnum.STRAIGHTS_DOUBLE;
+        return null;
     }
 
 }

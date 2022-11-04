@@ -20,7 +20,8 @@ Page({
         second: 30, // 剩余操作时间
         status: 'ready', // 房间状态(默认ready，待玩家全部准备变为开始状态)
         boss: '', // 房间内地主玩家的唯一标识(即id)
-        multiple: 2, // 房间内倍数
+        multiple: '', // 房间内倍数
+        baseScore:'', // 底分(例如200分场次)
 
         // 辅助变量：优化性能
         unselectedPokers:[], // 记录选中牌之余的牌，验证合规后使用（避免了嵌套遍历）
@@ -89,6 +90,10 @@ Page({
             if(data.fail){
                 context.updateFeedBack(data)
             }
+            // 收到 当前倍数信息
+            if(data.multiple){
+                context.updateMultiple(data)
+            }
         })
     },
 
@@ -109,7 +114,8 @@ Page({
         }
         this.setData({
             roomID: data.roomID,
-            playerList: playerList
+            playerList: playerList,
+            baseScore:data.baseScore
         })
     },
     updateReady(data) {
@@ -241,6 +247,11 @@ Page({
             title: '您打出的牌不符合规则！',
             icon:'none',
             duration: 1500
+        })
+    },
+    updateMultiple(data){
+        this.setData({
+            multiple:data.multiple
         })
     },
 

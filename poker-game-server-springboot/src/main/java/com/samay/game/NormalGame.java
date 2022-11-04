@@ -5,6 +5,7 @@ import com.samay.game.entity.Poker;
 import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerValueEnum;
+import com.samay.game.rule.CommonRule;
 import com.samay.game.utils.PokerUtil;
 
 import java.util.ArrayList;
@@ -13,20 +14,18 @@ import java.util.LinkedList;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
  * 普通的游戏模式
  */
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 @ToString
 public class NormalGame extends Game{
 
-    public NormalGame(List<Player> players){
-        super.setPlayers(players);
+    public NormalGame(){
+        restart();
     }
 
     public synchronized void init(){
@@ -106,13 +105,20 @@ public class NormalGame extends Game{
                 getPokerBossCollector().add(poker);
             handIndex++;
         }
+
+        PokerUtil.sortForPUT((LinkedList<Poker>)getPokerBossCollector());
+        // 同花顺或大小王加倍
+        if(CommonRule.flush(getPokerBossCollector())){
+            setMultiple(getMultiple()*2);
+        }
+
         for(Player p:getPlayers()){
             PokerUtil.sort(p.getPokers());
         }
     }
 
     /**
-     * 重置游戏状态
+     * 重置游戏状态/初始化游戏状态
      */
     @Override
     public void restart() {

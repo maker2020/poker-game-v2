@@ -14,8 +14,8 @@ import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
+import com.samay.game.enums.PokerTypeEnum;
 import com.samay.game.rule.CommonRule;
-import com.samay.game.rule.GameRule;
 import com.samay.game.utils.PokerUtil;
 import com.samay.game.vo.Notification;
 import com.samay.game.vo.ResultVO;
@@ -49,7 +49,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
         if(game.getLastPlayerID().equals(player.getName())) lastPutPokers=null; // 清除本身压制
 
         // 防止恶心请求:出了牌但choice为false,于是choice参数通过实际putPoker得出，因此该参数暂时不用
-        GameRule rule = new CommonRule(putPokers, lastPutPokers);
+        CommonRule rule = new CommonRule(putPokers, lastPutPokers);
         PokerUtil.sortForPUT(putPokers);
         if (rule.valid()) {
             Map<String, Object> result = ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player),
@@ -61,6 +61,14 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                 player.removeAllPoker(putPokers);
                 game.setLastPutPokers(putPokers);
                 game.setLastPlayerID(player.getName());
+                
+                // 炸弹翻倍
+                if(rule.getPokersType()==PokerTypeEnum.BOOM){
+                    game.setMultiple(game.getMultiple()*2);
+                    Map<String,Object> multiple=ResultVO.mutiplying(game.getMultiple());
+                    group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multiple)));
+                }
+
                 if (player.getPokers().size() == 0) {
                     List<String> winnerIdList = new ArrayList<>();
                     if (player.isBoss()) {

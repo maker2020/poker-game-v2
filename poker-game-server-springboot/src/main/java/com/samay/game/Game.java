@@ -61,9 +61,25 @@ public abstract class Game implements Serializable {
      */
     private AtomicInteger turnCallIndex=new AtomicInteger(0);
 
+    /**
+     * 初始化
+     */
     public abstract void init();
+    
+    /**
+     * 分发手牌
+     */
     protected abstract void handOutPokers();
+    
+    /**
+     * 尝试得出地主
+     * @return
+     */
     public abstract Player getBossInstantly();
+
+    /**
+     * 重置游戏状态/初始化游戏状态
+     */
     public abstract void restart();
 
     public void addPlayer(Player player){

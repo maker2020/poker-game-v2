@@ -58,10 +58,13 @@ public class ResultVO {
         }
         map.put("playerStatus", playerStatusList);
         map.put("roomID", room.getId());
+        map.put("multiple", room.getGame().getMultiple());
+        map.put("baseScore", room.getGame().getBaseScore());
         return map;
     }
 
     /**
+     * 某某id的玩家准备了
      * @param user 玩家唯一标识(playerID)
      * @param ready
      * @return
@@ -74,6 +77,7 @@ public class ResultVO {
     }
 
     /**
+     * 某某id，出了xx牌
      * @param user 玩家唯一标识(playerID)
      * @param pokers
      * @return
@@ -86,7 +90,7 @@ public class ResultVO {
     }
 
     /**
-     * 
+     * 操作轮询
      * @param action 标识下一个行为
      * @param turn 下一个轮到谁:玩家唯一标识(playerID)
      * @param notification 广播通知
@@ -147,6 +151,12 @@ public class ResultVO {
         Map<String,Object> map=new HashMap<>();
         map.put("fail", true); // 后续添加失败原因
         map.put("action", action);
+        return map;
+    }
+
+    public static Map<String,Object> mutiplying(int multiple){
+        Map<String,Object> map=new HashMap<>();
+        map.put("multiple", multiple);
         return map;
     }
 
