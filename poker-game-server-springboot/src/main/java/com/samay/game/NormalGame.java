@@ -118,7 +118,6 @@ public class NormalGame extends Game{
     public void restart() {
         this.getPokerBossCollector().clear();
         this.getPokerCollector().clear();
-        this.setOver(false);
         this.setStatus(GameStatusEnum.READY);
         this.getTurnCallIndex().set(0);
         for(Player p:getPlayers()){
@@ -130,6 +129,10 @@ public class NormalGame extends Game{
             p.setReqTimes(0);
             p.getPokers().clear();
         }
+        this.getLastPutPokers().clear();
+        this.setBaseScore(200);
+        this.setCardinality(2);
+        this.setMultiple(2);
     }
     
 }

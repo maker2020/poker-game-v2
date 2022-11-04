@@ -7,12 +7,14 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
-
+import com.samay.game.Game;
 import com.samay.game.dto.PutPokerDTO;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
+import com.samay.game.rule.CommonRule;
+import com.samay.game.rule.GameRule;
 import com.samay.game.vo.Notification;
 import com.samay.game.vo.ResultVO;
 import io.netty.channel.ChannelHandlerContext;
@@ -36,27 +38,34 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO>{
         Player player=ChannelHolder.attrPlayer(ctx.channel());
         ChannelGroup group=ChannelHolder.groupMap.get(ctx.channel());
         Room room=ChannelHolder.attrRoom(ctx.channel());
+        Game game=room.getGame();
+
         List<Poker> putPokers=msg.getPutPokers();
         boolean choice=msg.isTendency();
-        
-        Map<String,Object> result=ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player), new Notification(ActionEnum.PUT,choice,player.getName()), putPokers, putPokers==null?player.getPokers().size():player.getPokers().size()-putPokers.size());
-        group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
-        if(putPokers!=null) {
-            player.removeAllPoker(putPokers);
-            if(player.getPokers().size()==0){
-                List<String> winnerIdList=new ArrayList<>();
-                if(player.isBoss()){
-                    winnerIdList.add(player.getName());
-                }else{
-                    for(Player p:room.getPlayers()){
-                        if(!p.isBoss()){
-                            winnerIdList.add(p.getName());
+        GameRule rule=new CommonRule(putPokers, game.getLastPutPokers());
+        if(rule.valid()){
+            Map<String,Object> result=ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player), new Notification(ActionEnum.PUT,choice,player.getName()), putPokers, putPokers==null?player.getPokers().size():player.getPokers().size()-putPokers.size());
+            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
+            if(putPokers!=null) {
+                player.removeAllPoker(putPokers);
+                game.setLastPutPokers(putPokers);
+                if(player.getPokers().size()==0){
+                    List<String> winnerIdList=new ArrayList<>();
+                    if(player.isBoss()){
+                        winnerIdList.add(player.getName());
+                    }else{
+                        for(Player p:room.getPlayers()){
+                            if(!p.isBoss()){
+                                winnerIdList.add(p.getName());
+                            }
                         }
                     }
+                    Map<String,Object> gameResult=ResultVO.gameResult(winnerIdList);
+                    group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(gameResult)));
                 }
-                Map<String,Object> gameResult=ResultVO.gameResult(winnerIdList);
-                group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(gameResult)));
             }
+        }else{ // 反馈不合法
+            
         }
     }
     

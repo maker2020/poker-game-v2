@@ -30,9 +30,27 @@ public abstract class Game implements Serializable {
     private Collection<Poker> pokerBossCollector;
     private List<Player> players=new CopyOnWriteArrayList<>();
     private GameStatusEnum status=GameStatusEnum.READY;
-    // 暂时保留
+    
+    /**
+     * 上一个打出的牌
+     */
+    private Collection<Poker> lastPutPokers;
+    /**
+     * 底分
+     */
+    private int baseScore;
+    /**
+     * 倍数
+     */
+    private int multiple;
+    /**
+     * 基数
+     */
+    private int cardinality;
+    
+    // 以下变量暂时保留
     // private boolean handOut=false;
-    private boolean over=false;
+    // private boolean over=false;
     /**
      * 地主请求轮询的序号
      */
