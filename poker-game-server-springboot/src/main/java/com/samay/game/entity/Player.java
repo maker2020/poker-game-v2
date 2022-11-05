@@ -18,10 +18,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Player extends User implements Serializable{
-    /**
-     * 玩家唯一标识(name/id等)，而非玩家昵称
-     */
-    // private String name;
     
     private List<Poker> pokers=new LinkedList<>();
     private boolean boss=false;

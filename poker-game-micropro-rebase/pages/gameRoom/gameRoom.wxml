@@ -28,7 +28,7 @@
                 <image src='../../static/img/{{playerList[0].playerID==boss?"landlord":"civilian"}}{{playerList[0].sex?playerList[0].sex:"1"}}.png' mode='widthFix'></image>
                 <view class='humanTxt'>
                     <text class='txt'>{{playerList[0].nickName}}</text>
-                    <text class='num'>6700</text>
+                    <text class='num'>{{playerList[0].freeMoney}}</text>
                 </view>
             </view>
             <view class='brandShow' wx:if='{{status=="start"}}'>
@@ -79,7 +79,7 @@
                 <image src='../../static/img/{{playerList[1].playerID==boss?"landlord":"civilian"}}{{playerList[1].sex?playerList[1].sex:"1"}}.png' mode='widthFix'></image>
                 <view class='humanTxt'>
                     <text class='txt'>{{playerList[1].nickName}}</text>
-                    <text class='num'>2900</text>
+                    <text class='num'>{{playerList[1].freeMoney}}</text>
                 </view>
             </view>
             <view class='brandShow' wx:if='{{status=="start"}}'>
@@ -118,7 +118,7 @@
                 <image src='../../static/img/{{playerList[2].playerID==boss?"landlord":"civilian"}}{{playerList[2].sex?playerList[2].sex:"1"}}.png' mode='widthFix'></image>
                 <view class='humanTxt'>
                     <text class='txt'>{{playerList[2].nickName}}</text>
-                    <text class='num'>3000</text>
+                    <text class='num'>{{playerList[2].freeMoney}}</text>
                 </view>
             </view>
         </view>

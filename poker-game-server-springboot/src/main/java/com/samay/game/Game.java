@@ -78,6 +78,11 @@ public abstract class Game implements Serializable {
     public abstract Player getBossInstantly();
 
     /**
+     * 游戏结算
+     */
+    public abstract void settlement();
+
+    /**
      * 重置游戏状态/初始化游戏状态
      */
     public abstract void restart();

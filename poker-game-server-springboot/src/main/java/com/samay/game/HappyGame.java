@@ -93,5 +93,11 @@ public class HappyGame extends Game{
         
     }
 
+    @Override
+    public void settlement() {
+        // TODO Auto-generated method stub
+        
+    }
+
     
 }

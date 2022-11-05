@@ -54,6 +54,7 @@ public class ResultVO {
             playerStatusMap.put("ready", p.isReady());
             playerStatusMap.put("sex", p.getSex());
             playerStatusMap.put("nickName", p.getNickName());
+            playerStatusMap.put("freeMoney", p.getFreeMoney());
             playerStatusList.add(playerStatusMap);
         }
         map.put("playerStatus", playerStatusList);

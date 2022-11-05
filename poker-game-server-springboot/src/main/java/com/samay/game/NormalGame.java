@@ -143,5 +143,50 @@ public class NormalGame extends Game{
         this.setCardinality(2);
         this.setMultiple(2);
     }
+
+    /**
+     * 结算（未考虑货币不够的情况，直接为负数）
+     */
+    @Override
+    public void settlement() {
+        List<Player> winnerList=new ArrayList<>();
+        List<Player> loserList=new ArrayList<>();
+        for(Player p:getPlayers()){
+            if(p.getPokers().size()==0){
+                winnerList.add(p);
+            }
+        }
+        if(winnerList.size()==0) return;
+        Player winner=winnerList.get(0);
+        if(!winner.isBoss()){
+            for(Player p:getPlayers()){
+                if(p==winner) continue;
+                if(!p.isBoss()){
+                    winnerList.add(p);
+                }else{
+                    loserList.add(p);
+                }
+            }
+        }else{
+            for(Player p:getPlayers()){
+                if(!p.isBoss()){
+                    loserList.add(p);
+                }
+            }
+        }
+        // 首先根据底分(该NormalGame是200) 扣去玩家入场费
+        int baseScore=getBaseScore();
+        for(Player p:getPlayers()){
+            p.setFreeMoney(p.getFreeMoney()-baseScore);
+        }
+        // 其次根据基数、底分、倍数，计算本局游戏货币
+        int earning=getBaseScore()*getCardinality()*getMultiple();
+        for(Player p:winnerList){
+            p.setFreeMoney(p.getFreeMoney()+earning);
+        }
+        for(Player p:loserList){
+            p.setFreeMoney(p.getFreeMoney()-earning);
+        }
+    }
     
 }

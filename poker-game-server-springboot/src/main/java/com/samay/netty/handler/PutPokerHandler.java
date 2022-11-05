@@ -80,6 +80,8 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                             }
                         }
                     }
+                    // 游戏结算
+                    game.settlement();
                     Map<String, Object> gameResult = ResultVO.gameResult(winnerIdList);
                     group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(gameResult)));
                 }
