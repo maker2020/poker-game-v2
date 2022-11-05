@@ -122,8 +122,8 @@ public class NormalGame extends Game{
      */
     @Override
     public void restart() {
-        this.getPokerBossCollector().clear();
-        this.getPokerCollector().clear();
+        this.setPokerBossCollector(null);
+        this.setPokerCollector(null);
         this.setStatus(GameStatusEnum.READY);
         this.getTurnCallIndex().set(0);
         for(Player p:getPlayers()){
