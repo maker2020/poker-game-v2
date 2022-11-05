@@ -52,10 +52,10 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             if("call".equals(msg.getAction())){
                 player.setFirstCall(true);
                 result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
-                new Notification(ActionEnum.CALL, true, player.getName()));
+                new Notification(ActionEnum.CALL, true, player.getId()));
             }else if("ask".equals(msg.getAction())){
                 result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
-                new Notification(ActionEnum.ASK, true, player.getName()));
+                new Notification(ActionEnum.ASK, true, player.getId()));
 
                 // 倍数翻一番
                 game.setMultiple(game.getMultiple()*2);
@@ -66,10 +66,10 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             player.refuseBoss();
             if("call".equals(msg.getAction())){
                 result = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(player),
-                new Notification(ActionEnum.CALL, false, player.getName()));
+                new Notification(ActionEnum.CALL, false, player.getId()));
             }else if("ask".equals(msg.getAction())){
                 result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
-                new Notification(ActionEnum.ASK, false, player.getName()));
+                new Notification(ActionEnum.ASK, false, player.getId()));
             }
         }
         
@@ -92,7 +92,7 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             // 判断地主是否可以直接得出
             Player boss = game.getBossInstantly();
             if (boss != null) {
-                Map<String, Object> result2 = ResultVO.resultMap(boss.getName());
+                Map<String, Object> result2 = ResultVO.resultMap(boss.getId());
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result2)));
 
                 // 广播地主牌
@@ -102,13 +102,13 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
                 // 给地主整理新加入的牌并单独发送给地主
                 boss.addAllPoker(game.getPokerBossCollector());
                 PokerUtil.sort(boss.getPokers());
-                Map<String,Object> resortBossPokers=ResultVO.resultMap(boss.getName(), boss.getPokers());
-                ChannelId chID=ChannelHolder.uid_chidMap.get(boss.getName());
+                Map<String,Object> resortBossPokers=ResultVO.resultMap(boss.getId(), boss.getPokers());
+                ChannelId chID=ChannelHolder.uid_chidMap.get(boss.getId());
                 group.find(chID).writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resortBossPokers)));
 
                 // 地主既然得出，action的应更新为put，而非turn下一个玩家ask。
                 // 更新result的action
-                ResultVO.updateResultMap(result, ActionEnum.PUT, boss.getName());
+                ResultVO.updateResultMap(result, ActionEnum.PUT, boss.getId());
 
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
                 return;

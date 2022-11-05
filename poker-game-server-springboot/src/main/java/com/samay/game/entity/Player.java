@@ -16,20 +16,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of="name")
-public class Player implements Serializable{
+@EqualsAndHashCode(callSuper = true)
+public class Player extends User implements Serializable{
     /**
      * 玩家唯一标识(name/id等)，而非玩家昵称
      */
-    private String name;
-    /**
-     * 玩家展示的昵称
-     */
-    private String nickName;
-    /**
-     * 0:未设置，1:男，2:女
-     */
-    private char sex='1';
+    // private String name;
+    
     private List<Poker> pokers=new LinkedList<>();
     private boolean boss=false;
     private boolean ready;
@@ -65,10 +58,10 @@ public class Player implements Serializable{
 
     /**
      * 按照玩家唯一标识(cloudID/id等)
-     * @param name 唯一标识
+     * @param id 唯一标识
      */
-    public Player(String name){
-        this.name=name;
+    public Player(String id){
+        super.setId(id);
     }
 
     public void addPoker(Poker poker){
@@ -97,6 +90,6 @@ public class Player implements Serializable{
 
     @Override
     public String toString(){
-        return "player[name:"+name+"]";
+        return "player[id:"+getId()+"]";
     }
 }

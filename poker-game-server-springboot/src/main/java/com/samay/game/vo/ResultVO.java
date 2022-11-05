@@ -50,7 +50,7 @@ public class ResultVO {
             Player p=room.getPlayers().get(i);
             // 玩家座位信息（即玩家个人信息）...
             Map<String,Object> playerStatusMap=new HashMap<>();
-            playerStatusMap.put("playerID", p.getName());
+            playerStatusMap.put("playerID", p.getId());
             playerStatusMap.put("ready", p.isReady());
             playerStatusMap.put("sex", p.getSex());
             playerStatusMap.put("nickName", p.getNickName());

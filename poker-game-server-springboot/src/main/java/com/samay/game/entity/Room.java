@@ -51,7 +51,7 @@ public class Room implements Serializable {
         int pos=-1;
         for(int i=0;i<players.size();i++){
             Player p=players.get(i);
-            if(p.getName().equals(player.getName())){
+            if(p.getId().equals(player.getId())){
                 pos=i;
                 break;
             }
@@ -60,13 +60,13 @@ public class Room implements Serializable {
         pos=pos==players.size()-1?0:pos+1;
         if(existBoss()){
             // 意味着出牌阶段的轮询
-            return players.get(pos).getName();
+            return players.get(pos).getId();
         }else{
             // 意味着叫/抢地主的轮询
             while (players.get(pos).isRefuseBoss()) {
                 pos=pos==players.size()-1?0:pos+1;
             }
-            return players.get(pos).getName();
+            return players.get(pos).getId();
         }
     }
 

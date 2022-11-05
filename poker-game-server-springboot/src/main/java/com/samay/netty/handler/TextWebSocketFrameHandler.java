@@ -87,7 +87,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         List<Player> playerList=room.getPlayers();
         String[] playerNameArr=new String[playerList.size()];
         for(int i=0;i<playerList.size();i++){
-            playerNameArr[i]=playerList.get(i).getName();
+            playerNameArr[i]=playerList.get(i).getId();
         }
 
         Map<String,Object> msg=ResultVO.resultMap(room);

@@ -20,8 +20,14 @@ public class User {
     
     private String id;
     private String phone;
+    /**
+     * 玩家展示的昵称
+     */
     private String nickName;
-    private char sex;
+    /**
+     * 0:未设置，1:男，2:女
+     */
+    private char sex='1';
     private long freeMoney;
     private long payMoney;
     private long winCount;

@@ -31,7 +31,7 @@ public class RoomReadyHandler extends SimpleChannelInboundHandler<RoomReadyDTO>{
             Player player=ChannelHolder.attrPlayer(ctx.channel());
             ChannelGroup group=ChannelHolder.groupMap.get(ctx.channel());
             player.setReady(true);
-            Map<String,Object> msg=ResultVO.resultMap(player.getName(), true);
+            Map<String,Object> msg=ResultVO.resultMap(player.getId(), true);
             // 设计问题记录：先准备的玩家channel陷入阻塞，将无法read消息，造成延迟显示数据
             // 解决：不再用并发包的阻塞，始终不阻塞(放行)，通过count人数来放行
             // 推荐另一种：业务层面思考，将发牌逻辑放到GameReady中处理

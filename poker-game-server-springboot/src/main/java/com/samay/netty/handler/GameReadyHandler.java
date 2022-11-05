@@ -67,8 +67,8 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
             Channel ch = it.next();
             Player p = ChannelHolder.attrPlayer(ch);
             for (int i = 0; i < game.getPlayers().size(); i++) {
-                if (p.getName().equals(game.getPlayers().get(i).getName())) {
-                    Map<String, Object> msg = ResultVO.resultMap(p.getName(), p.getPokers());
+                if (p.getId().equals(game.getPlayers().get(i).getId())) {
+                    Map<String, Object> msg = ResultVO.resultMap(p.getId(), p.getPokers());
                     ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
                     break;
                 }
@@ -77,7 +77,7 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
         // 随机选一名玩家作为第一个叫地主的
         Random random = new Random(System.currentTimeMillis());
         Player randomPlayer = game.getPlayers().get(random.nextInt(0, 2));
-        Map<String, Object> msg = ResultVO.resultMap(ActionEnum.CALL, randomPlayer.getName(), null);
+        Map<String, Object> msg = ResultVO.resultMap(ActionEnum.CALL, randomPlayer.getId(), null);
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
 
         // 辅助变量：维护players出牌顺序

@@ -108,7 +108,7 @@ public class RoomManager {
         // 通道与group绑定
         ChannelHolder.groupMap.put(ctx.channel(), group);
         // 玩家唯一标识与ChannelID绑定
-        ChannelHolder.uid_chidMap.put(player.getName(), ctx.channel().id());
+        ChannelHolder.uid_chidMap.put(player.getId(), ctx.channel().id());
     }
 
 }

@@ -46,21 +46,21 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
         Game game = room.getGame();
         List<Poker> putPokers = msg.getPutPokers();
         Collection<Poker> lastPutPokers=game.getLastPutPokers();        
-        if(game.getLastPlayerID().equals(player.getName())) lastPutPokers=null; // 清除本身压制
+        if(game.getLastPlayerID().equals(player.getId())) lastPutPokers=null; // 清除本身压制
 
         // 防止恶心请求:出了牌但choice为false,于是choice参数通过实际putPoker得出，因此该参数暂时不用
         CommonRule rule = new CommonRule(putPokers, lastPutPokers);
         PokerUtil.sortForPUT(putPokers);
         if (rule.valid()) {
             Map<String, Object> result = ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player),
-                    new Notification(ActionEnum.PUT, putPokers != null, player.getName()), putPokers,
+                    new Notification(ActionEnum.PUT, putPokers != null, player.getId()), putPokers,
                     putPokers == null ? player.getPokers().size() : player.getPokers().size() - putPokers.size());
             group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
 
             if (putPokers != null) {
                 player.removeAllPoker(putPokers);
                 game.setLastPutPokers(putPokers);
-                game.setLastPlayerID(player.getName());
+                game.setLastPlayerID(player.getId());
                 
                 // 炸弹翻倍
                 if(rule.getPokersType()==PokerTypeEnum.BOOM){
@@ -72,11 +72,11 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                 if (player.getPokers().size() == 0) {
                     List<String> winnerIdList = new ArrayList<>();
                     if (player.isBoss()) {
-                        winnerIdList.add(player.getName());
+                        winnerIdList.add(player.getId());
                     } else {
                         for (Player p : room.getPlayers()) {
                             if (!p.isBoss()) {
-                                winnerIdList.add(p.getName());
+                                winnerIdList.add(p.getId());
                             }
                         }
                     }
@@ -86,7 +86,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
             }
         } else { // 反馈不合法
                  // 此处仅提示操作者玩家，而非group
-            Channel ch = group.find(ChannelHolder.uid_chidMap.get(player.getName()));
+            Channel ch = group.find(ChannelHolder.uid_chidMap.get(player.getId()));
             Map<String, Object> result = ResultVO.actionFail(ActionEnum.PUT);
             ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
         }
