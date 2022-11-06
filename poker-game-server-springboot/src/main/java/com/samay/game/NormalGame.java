@@ -198,6 +198,7 @@ public class NormalGame extends Game{
         }
         result.put("winners", winnerList);
         result.put("losers", loserList);
+        result.put("players", getPlayers());
         return result;
     }
     

@@ -94,6 +94,10 @@ Page({
             if(data.multiple){
                 context.updateMultiple(data)
             }
+            // 收到winners,losers信息
+            if(data.winners && data.losers){
+                context.updateGameResult(data)
+            }
         })
     },
 
@@ -253,6 +257,24 @@ Page({
         this.setData({
             multiple:data.multiple
         })
+    },
+    updateGameResult(data){
+        // players包含结束时的状态信息：手牌、当前货币等玩家信息
+        var players=data.players
+        var playerList=this.data.playerList
+        // 更新货币
+        for(var i=0;i<playerList.length;i++){
+            for(var j=0;j<players.length;j++){
+                if(players[j].id==playerList[i].playerID){
+                    playerList[i].freeMoney=players[j].freeMoney
+                }
+            }
+        }
+        this.setData({
+            playerList:playerList
+        })
+
+        // 游戏结果相关展示(待UI完成)
     },
 
     /**
