@@ -1,6 +1,5 @@
 package com.samay.netty.handler;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -70,20 +69,10 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                 }
 
                 if (player.getPokers().size() == 0) {
-                    List<String> winnerIdList = new ArrayList<>();
-                    if (player.isBoss()) {
-                        winnerIdList.add(player.getId());
-                    } else {
-                        for (Player p : room.getPlayers()) {
-                            if (!p.isBoss()) {
-                                winnerIdList.add(p.getId());
-                            }
-                        }
-                    }
                     // 游戏结算
-                    game.settlement();
-                    Map<String, Object> gameResult = ResultVO.gameResult(winnerIdList);
-                    group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(gameResult)));
+                    Map<String,Object> gameResult=game.settlement();
+                    Map<String, Object> resultVO = ResultVO.gameResult(gameResult);
+                    group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resultVO)));
                 }
             }
         } else { // 反馈不合法

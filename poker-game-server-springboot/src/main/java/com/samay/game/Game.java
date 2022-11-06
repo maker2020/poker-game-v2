@@ -3,6 +3,7 @@ package com.samay.game;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -80,7 +81,7 @@ public abstract class Game implements Serializable {
     /**
      * 游戏结算
      */
-    public abstract void settlement();
+    public abstract Map<String,Object> settlement();
 
     /**
      * 重置游戏状态/初始化游戏状态

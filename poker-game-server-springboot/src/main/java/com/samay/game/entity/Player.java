@@ -23,26 +23,26 @@ public class Player extends User implements Serializable{
     private boolean boss=false;
     private boolean ready;
 
-    // 辅助变量
+    // 辅助变量，大多不会序列化(如使用jackson、jdk、msgpack、google等序列化框架)/传输这些字段
     /**
      * 用于判断出地主
      */
-    private int reqTimes=0;
+    private transient int reqTimes=0;
    
     /**
      * 是否拒绝过当地主
      */
-    private boolean refuseBoss=false;
+    private transient boolean refuseBoss=false;
 
     /**
      * 请求的索引
      */
-    private int reqIndex=0;
+    private transient int reqIndex=0;
 
     /**
      * 是否是叫地主的/第一个叫
      */
-    private boolean firstCall=false;
+    private transient boolean firstCall=false;
 
     
     /**

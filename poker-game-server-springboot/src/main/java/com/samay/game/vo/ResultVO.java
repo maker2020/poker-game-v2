@@ -138,10 +138,9 @@ public class ResultVO {
      * 游戏结果对象: 可以包含很多内容，例如胜利方、分数计算等等
      * @param winnerIdList
      */
-    public static Map<String,Object> gameResult(List<String> winnerIdList){
-        Map<String,Object> map=new HashMap<>();
-        map.put("winners", winnerIdList);
-        return map;
+    public static Map<String,Object> gameResult(Map<String,Object> result){
+        // 其他数据
+        return result;
     }
 
     /**

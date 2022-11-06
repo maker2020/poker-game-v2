@@ -3,6 +3,7 @@ package com.samay.game;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
@@ -94,9 +95,8 @@ public class HappyGame extends Game{
     }
 
     @Override
-    public void settlement() {
-        // TODO Auto-generated method stub
-        
+    public Map<String,Object> settlement() {
+        return null;        
     }
 
     
