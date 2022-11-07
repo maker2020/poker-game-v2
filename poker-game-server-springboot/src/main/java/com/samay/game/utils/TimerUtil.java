@@ -1,6 +1,9 @@
 package com.samay.game.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,77 +11,101 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.samay.game.Game;
+import com.samay.game.dto.PutPokerDTO;
 import com.samay.game.dto.ReqBossDTO;
 import com.samay.game.entity.Player;
+import com.samay.game.entity.Poker;
+import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.netty.handler.holder.ChannelHolder;
 
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 
-
 /**
  * <b>时间管理相关工具</b>
  * <p>
- * 例: 限时30s完成操作
+ * 例: 限时xx秒完成操作
  */
 @Slf4j
 public class TimerUtil {
 
-    private static long time=30;
-    private static TimeUnit timeUnit=TimeUnit.SECONDS;
+    private static final long time = 5;
+    private static final TimeUnit timeUnit = TimeUnit.SECONDS;
 
-    private static Map<String,Object> playerAct=new HashMap<>();
+    private static Map<String, Object> playerAct = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * <b>指定操作类型的时间监测</b>
-     * <p>即在一定的时间内没有检测到玩家发起的相关action请求，系统将按照默认行为方式处理
+     * <p>
+     * 即在一定的时间内没有检测到玩家发起的相关action请求，系统将按照默认行为方式处理
      * 
      * @param action 什么操作
-     * @param ch 通道
+     * @param ch     通道
      */
-    public static void checkTimeout(ActionEnum action, Channel ch) throws Exception {
-        Player p=ChannelHolder.attrPlayer(ch);
-        if(playerAct.get(p.getId())==null){
-            playerAct.put(p.getId(), new Object());
-            ExecutorService exec=Executors.newFixedThreadPool(2);
-            Future<?> future=exec.submit(()->{
-                synchronized(playerAct.get(p.getId())){
-                    playerAct.get(p.getId()).wait();
+    public static void checkTimeout(ActionEnum action, String playerID) throws Exception {
+        if (playerID == null || action == null)
+            return;
+        if (playerAct.get(playerID) == null) {
+            playerAct.put(playerID, new Object());
+            ExecutorService exec = Executors.newFixedThreadPool(2);
+            Future<?> future = exec.submit(() -> {
+                synchronized (playerAct.get(playerID)) {
+                    playerAct.get(playerID).wait();
                 }
-                return p.getId();
+                playerAct.put(playerID, null);
+                return playerID;
             });
-            exec.submit(()->{
+            exec.submit(() -> {
                 try {
-                    future.get(time, timeUnit);                
+                    future.get(time, timeUnit);
                 } catch (Exception e) {
-                    if(e instanceof TimeoutException){
+                    if (e instanceof TimeoutException) {
                         // 根据action，做出默认操作
-                        defaultAction(action, ch);
-                    }else{
+                        defaultAction(action, ChannelHolder.getByPlayerID(playerID));
+                    } else {
                         log.error("超时检测异常", e);
+                    }
+                    synchronized(playerAct.get(playerID)){
+                        playerAct.get(playerID).notify();                    
                     }
                 }
             });
-        }else{
-            synchronized(playerAct.get(p.getId())){
-                playerAct.get(p.getId()).notify();
+        } else {
+            synchronized (playerAct.get(playerID)) {
+                playerAct.get(playerID).notify();
             }
-            playerAct.put(p.getId(), null);
         }
     }
 
-    private static void defaultAction(ActionEnum actionEnum,Channel ch){
-        if(actionEnum==ActionEnum.CALL){
-            ReqBossDTO reqBossDTO=new ReqBossDTO();
+    private static void defaultAction(ActionEnum actionEnum, Channel ch) {
+        Room room=ChannelHolder.attrRoom(ch);
+        Game game=room.getGame();
+        Player player=ChannelHolder.attrPlayer(ch);
+        if (actionEnum == ActionEnum.CALL) {
+            ReqBossDTO reqBossDTO = new ReqBossDTO();
             reqBossDTO.setAction("call");
             reqBossDTO.setTendency(false);
             ch.pipeline().fireChannelRead(reqBossDTO);
-        }else if(actionEnum==ActionEnum.ASK){
-            ReqBossDTO reqBossDTO=new ReqBossDTO();
+        } else if (actionEnum == ActionEnum.ASK) {
+            ReqBossDTO reqBossDTO = new ReqBossDTO();
             reqBossDTO.setAction("ask");
             reqBossDTO.setTendency(false);
             ch.pipeline().fireChannelRead(reqBossDTO);
+        } else if (actionEnum == ActionEnum.PUT) {
+            PutPokerDTO putPokerDTO = new PutPokerDTO();
+            putPokerDTO.setAction("put");
+            if((game.getLastPutPokers()!=null || player.getPokers().size()==0) && !game.getLastPlayerID().equals(player.getId())){
+                putPokerDTO.setPutPokers(null);
+                putPokerDTO.setTendency(false);
+            }else{
+                List<Poker> defaultPut=new ArrayList<>();
+                defaultPut.add(player.getPokers().get(player.getPokers().size()-1));
+                putPokerDTO.setPutPokers(defaultPut);
+                putPokerDTO.setTendency(true);
+            }
+            ch.pipeline().fireChannelRead(putPokerDTO);
         }
     }
 

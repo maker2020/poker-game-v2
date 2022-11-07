@@ -1,6 +1,8 @@
 package com.samay.netty.handler.holder;
 
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.samay.game.entity.Player;
@@ -47,6 +49,24 @@ public class ChannelHolder {
     public static Room attrRoom(Channel ch){
         Room room=(Room)(ch.attr(AttributeKey.valueOf("room")).get());
         return room;
+    }
+
+    /**
+     * 通过playerID获取Channel
+     * @param playerID
+     * @return
+     */
+    public static Channel getByPlayerID(String playerID){
+        ChannelId chid=uid_chidMap.get(playerID);
+        Set<Channel> channelSet=groupMap.keySet();
+        Iterator<Channel> chIt=channelSet.iterator();
+        while (chIt.hasNext()) {
+            Channel ch=chIt.next();
+            if(ch.id().equals(chid)){
+                return ch;
+            }
+        }
+        return null;
     }
 
 }

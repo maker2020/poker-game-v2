@@ -12,6 +12,7 @@ import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.utils.PokerUtil;
+import com.samay.game.utils.TimerUtil;
 import com.samay.game.vo.Notification;
 import com.samay.game.vo.ResultVO;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,6 +45,8 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         // 针对客户端请求出牌不合规的校验
         if(!game.getActingPlayer().equals(player.getId())) return;
 
+        TimerUtil.checkTimeout(ActionEnum.CALL, player.getId());
+
         // 维护player请求序号
         // player.setReqIndex(room.getTurnCallIndex().get());
         game.getTurnCallIndex().incrementAndGet();
@@ -54,12 +57,16 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             player.reqBoss();
             if("call".equals(msg.getAction())){
                 player.setFirstCall(true);
-                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
+                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player,ActionEnum.ASK),
                 new Notification(ActionEnum.CALL, true, player.getId()));
                 
+                // 操作相关逻辑调用该方法以消除 限时检测的阻塞
+                TimerUtil.checkTimeout(ActionEnum.CALL, player.getId());
             }else if("ask".equals(msg.getAction())){
-                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
+                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player,ActionEnum.ASK),
                 new Notification(ActionEnum.ASK, true, player.getId()));
+
+                TimerUtil.checkTimeout(ActionEnum.ASK, player.getId());
 
                 // 倍数翻一番
                 game.setMultiple(game.getMultiple()*2);
@@ -69,11 +76,15 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         } else { // 拒绝
             player.refuseBoss();
             if("call".equals(msg.getAction())){
-                result = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(player),
+                result = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(player,ActionEnum.CALL),
                 new Notification(ActionEnum.CALL, false, player.getId()));
+
+                TimerUtil.checkTimeout(ActionEnum.CALL, player.getId());
             }else if("ask".equals(msg.getAction())){
-                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
+                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player,ActionEnum.ASK),
                 new Notification(ActionEnum.ASK, false, player.getId()));
+
+                TimerUtil.checkTimeout(ActionEnum.ASK, player.getId());
             }
         }
         
@@ -113,6 +124,8 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
                 // 地主既然得出，action的应更新为put，而非turn下一个玩家ask。
                 // 更新result的action
                 ResultVO.updateResultMap(result, ActionEnum.PUT, boss.getId());
+                
+                TimerUtil.checkTimeout(ActionEnum.PUT, boss.getId());
 
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
                 return;

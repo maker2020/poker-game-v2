@@ -7,7 +7,10 @@ import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.samay.game.Game;
+import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.RoomStatusEnum;
+import com.samay.game.utils.TimerUtil;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,10 +45,10 @@ public class Room implements Serializable {
     /**
      * 传入一个player，获取下一个player ID<p>
      * 若传null,则随机选一个player
-     * @param player
+     * @param player 当前的player，用来辅助得到下一个playerID
      * @return playerID,null
      */
-    public String turnPlayer(Player player) throws Exception{
+    public String turnPlayer(Player player,ActionEnum actionEnum) throws Exception{
         String playerID;
         if(player==null){ // 叫地主
             // 随机选一名玩家作为第一个叫地主的
@@ -83,6 +86,8 @@ public class Room implements Serializable {
         if(playerID!=null){
             game.setActingPlayer(playerID);
         }
+        // 每每轮到xx操作，即开启限时检测，在操作完后也需要调用以关闭
+        TimerUtil.checkTimeout(actionEnum, playerID);
         return playerID;
     }
 

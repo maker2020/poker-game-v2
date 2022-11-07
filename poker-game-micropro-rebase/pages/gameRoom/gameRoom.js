@@ -21,14 +21,11 @@ Page({
         status: 'ready', // 房间状态(默认ready，待玩家全部准备变为开始状态)
         boss: '', // 房间内地主玩家的唯一标识(即id)
         multiple: '', // 房间内倍数
-        baseScore:'', // 底分(例如200分场次)
-
-        // 辅助变量：优化性能
-        unselectedPokers:[], // 记录选中牌之余的牌，验证合规后使用（避免了嵌套遍历）
+        baseScore: '', // 底分(例如200分场次)
 
         // UI体验相关辅助变量
-        touchStartPos:{},
-        pokerDiff:''
+        touchStartPos: {},
+        pokerDiff: ''
     },
 
     /**
@@ -87,15 +84,15 @@ Page({
                 context.updateBoss(data)
             }
             // 收到 操作失败的反馈
-            if(data.fail){
+            if (data.fail) {
                 context.updateFeedBack(data)
             }
             // 收到 当前倍数信息
-            if(data.multiple){
+            if (data.multiple) {
                 context.updateMultiple(data)
             }
             // 收到winners,losers信息
-            if(data.winners && data.losers){
+            if (data.winners && data.losers) {
                 context.updateGameResult(data)
             }
         })
@@ -119,7 +116,7 @@ Page({
         this.setData({
             roomID: data.roomID,
             playerList: playerList,
-            baseScore:data.baseScore
+            baseScore: data.baseScore
         })
     },
     updateReady(data) {
@@ -145,10 +142,10 @@ Page({
         })
 
         //
-        if(this.data.myPokers.length>0){ // 收到手牌且我已经有手牌（该情况只有是重新发牌的标识）
+        if (this.data.myPokers.length > 0) { // 收到手牌且我已经有手牌（该情况只有是重新发牌的标识）
             // 重新发牌标识则清除playerListNotice
             this.setData({
-                playerListNotice:[]
+                playerListNotice: []
             })
         }
         this.setData({
@@ -164,30 +161,30 @@ Page({
     },
     updateBoss(data) {
         // 耦合度太高，维护性差。缺陷
-        var playerList=this.data.playerList
-        var playerListRestPokerNum=this.data.playerListRestPokerNum
-        for(var i=0;i<playerList.length;i++){
-            if(playerList[i].playerID==data.boss){
-                playerListRestPokerNum[i]=20
+        var playerList = this.data.playerList
+        var playerListRestPokerNum = this.data.playerListRestPokerNum
+        for (var i = 0; i < playerList.length; i++) {
+            if (playerList[i].playerID == data.boss) {
+                playerListRestPokerNum[i] = 20
             }
         }
         this.setData({
             boss: data.boss,
-            playerListRestPokerNum:playerListRestPokerNum
+            playerListRestPokerNum: playerListRestPokerNum
         })
     },
     updateOpeatorStatus(data) {
         // 轮到的那个玩家操作xx时，它相关的提示应该全部清除
-        var playerList=this.data.playerList
-        var playerListNotice=this.data.playerListNotice // notice清除
-        var playerListPut=this.data.playerListPut // putStatus清除
-        for(var i=0;i<playerList.length;i++){
-            if(playerList[i].playerID==data.turn){
-                playerListNotice[i]=undefined
-                playerListPut[i]=undefined
+        var playerList = this.data.playerList
+        var playerListNotice = this.data.playerListNotice // notice清除
+        var playerListPut = this.data.playerListPut // putStatus清除
+        for (var i = 0; i < playerList.length; i++) {
+            if (playerList[i].playerID == data.turn) {
+                playerListNotice[i] = undefined
+                playerListPut[i] = undefined
                 this.setData({
-                    playerListNotice:playerListNotice,
-                    playerListPut:playerListPut
+                    playerListNotice: playerListNotice,
+                    playerListPut: playerListPut
                 })
             }
         }
@@ -213,20 +210,31 @@ Page({
     },
 
     updatePutStatus(data) {
-        var restPokerNum=data.restPokerNum // 玩家剩余手牌
-        var playerListRestPokerNum=this.data.playerListRestPokerNum // 同上
+        var restPokerNum = data.restPokerNum // 玩家剩余手牌
+        var playerListRestPokerNum = this.data.playerListRestPokerNum // 同上
         var putPokers = data.putPokers
+        var myPokers = this.data.myPokers
         var notification = data.notification
         var playerList = this.data.playerList
         var playerListPut = this.data.playerListPut
         for (var i = 0; i < playerList.length; i++) {
             if (playerList[i].playerID == notification.playerID) { // 定位到是关于谁的通知
                 playerListPut[i] = putPokers
-                playerListRestPokerNum[i]=restPokerNum
+                playerListRestPokerNum[i] = restPokerNum
             }
-            if(playerList[2].playerID == notification.playerID) { // 更新自己打出的牌状态、同时更新手牌
+            if (playerList[2].playerID == notification.playerID) {
+                // 以上更新自己打出的牌状态也要同时更新手牌，尽管出牌方法put()更新了手牌，但还要有这个判断，原因就是可能是超时被迫打出的牌等。
+                var myPokersNew = [] // 新维护的手牌（要移除服务器给出的打出的牌）
+                // 优化项: 此双循环查找看能否通过辅助变量优化
+                for (var j = 0; j < myPokers.length; j++) {
+                    var exist = false
+                    for (var k = 0; k < putPokers.length; k++) {
+                        if ((putPokers[k].colorEnum+'_'+putPokers[k].valueEnum)==myPokers[j].name) exist = true
+                    }
+                    if (!exist) myPokersNew.push(myPokers[j])
+                }
                 this.setData({
-                    myPokers:this.data.unselectedPokers
+                    myPokers: myPokersNew
                 })
             }
         }
@@ -236,42 +244,42 @@ Page({
         })
     },
 
-    updateFeedBack(data){
+    updateFeedBack(data) {
         // 校验出牌不合法的反馈
         // 还原选中态
-        var myPokers=this.data.myPokers
-        myPokers.forEach(function(item,i){
-            item.selected=false
+        var myPokers = this.data.myPokers
+        myPokers.forEach(function (item, i) {
+            item.selected = false
         })
         this.setData({
-            myPokers:myPokers
+            myPokers: myPokers
         })
         // 弹出短暂的提示
         wx.showToast({
             title: '您打出的牌不符合规则！',
-            icon:'none',
+            icon: 'none',
             duration: 1500
         })
     },
-    updateMultiple(data){
+    updateMultiple(data) {
         this.setData({
-            multiple:data.multiple
+            multiple: data.multiple
         })
     },
-    updateGameResult(data){
+    updateGameResult(data) {
         // players包含结束时的状态信息：手牌、当前货币等玩家信息
-        var players=data.players
-        var playerList=this.data.playerList
+        var players = data.players
+        var playerList = this.data.playerList
         // 更新货币
-        for(var i=0;i<playerList.length;i++){
-            for(var j=0;j<players.length;j++){
-                if(players[j].id==playerList[i].playerID){
-                    playerList[i].freeMoney=players[j].freeMoney
+        for (var i = 0; i < playerList.length; i++) {
+            for (var j = 0; j < players.length; j++) {
+                if (players[j].id == playerList[i].playerID) {
+                    playerList[i].freeMoney = players[j].freeMoney
                 }
             }
         }
         this.setData({
-            playerList:playerList
+            playerList: playerList
         })
 
         // 游戏结果相关展示(待UI完成)
@@ -290,73 +298,73 @@ Page({
     //     })
     // },
 
-    touchStartPoker(e){
+    touchStartPoker(e) {
         // 记录点击的牌的位置
-        var x=e.touches[0].pageX
-        var y=e.touches[0].pageY
-        var touchStartPos={
-            x:x,
-            y:y
+        var x = e.touches[0].pageX
+        var y = e.touches[0].pageY
+        var touchStartPos = {
+            x: x,
+            y: y
         }
         this.setData({
-            touchStartPos:touchStartPos
+            touchStartPos: touchStartPos
         })
     },
 
-    touchEndPoker(e){
-        var startPos=this.data.touchStartPos
-        var endPos={
-            x:e.changedTouches[0].pageX,
-            y:e.changedTouches[0].pageY
+    touchEndPoker(e) {
+        var startPos = this.data.touchStartPos
+        var endPos = {
+            x: e.changedTouches[0].pageX,
+            y: e.changedTouches[0].pageY
         }
-        var leftPos=startPos.x<endPos.x?startPos:endPos
-        var rightPos=startPos.x>endPos.x?startPos:endPos
-        var myPokers=this.data.myPokers
+        var leftPos = startPos.x < endPos.x ? startPos : endPos
+        var rightPos = startPos.x > endPos.x ? startPos : endPos
+        var myPokers = this.data.myPokers
         // 全部遍历完成后处理
-        this.touchCalculate().then((resultList)=>{
-            var targetPokersDomIndex=[]
+        this.touchCalculate().then((resultList) => {
+            var targetPokersDomIndex = []
             // 获取两张牌重叠宽度
-            var diff=this.data.pokerDiff
-            if(diff==''){
-                diff=resultList[1].left-resultList[0].left
+            var diff = this.data.pokerDiff
+            if (diff == '') {
+                diff = resultList[1].left - resultList[0].left
                 this.setData({
-                    pokerDiff:diff
+                    pokerDiff: diff
                 })
             }
-            for(var i=0;i<resultList.length;i++){
+            for (var i = 0; i < resultList.length; i++) {
                 // right:x,top:y
-                if(resultList[i].right-resultList[i].width<rightPos.x && resultList[i].left+diff>leftPos.x
-                        && (rightPos.y<resultList[i].bottom && rightPos.y>resultList[i].top
-                        && leftPos.y<resultList[i].bottom && leftPos.y>resultList[i].top) 
-                        )
+                if (resultList[i].right - resultList[i].width < rightPos.x && resultList[i].left + diff > leftPos.x &&
+                    (rightPos.y < resultList[i].bottom && rightPos.y > resultList[i].top &&
+                        leftPos.y < resultList[i].bottom && leftPos.y > resultList[i].top)
+                )
                     // 以上条件的牌dom，突出、选中状态
                     targetPokersDomIndex.push(i)
             }
             // 最后一张牌比较特殊它的右侧暴露在外，因此针对突出部分做特殊处理
-            if(resultList[resultList.length-1].left+diff<leftPos.x 
-                    && (rightPos.y<resultList[resultList.length-1].bottom && rightPos.y>resultList[resultList.length-1].top
-                    && leftPos.y<resultList[resultList.length-1].bottom && leftPos.y>resultList[resultList.length-1].top) )
-                targetPokersDomIndex.push(resultList.length-1)
-            for(var i=0;i<targetPokersDomIndex.length;i++){
-                myPokers[targetPokersDomIndex[i]].selected=!myPokers[targetPokersDomIndex[i]].selected
+            if (resultList[resultList.length - 1].left + diff < leftPos.x &&
+                (rightPos.y < resultList[resultList.length - 1].bottom && rightPos.y > resultList[resultList.length - 1].top &&
+                    leftPos.y < resultList[resultList.length - 1].bottom && leftPos.y > resultList[resultList.length - 1].top))
+                targetPokersDomIndex.push(resultList.length - 1)
+            for (var i = 0; i < targetPokersDomIndex.length; i++) {
+                myPokers[targetPokersDomIndex[i]].selected = !myPokers[targetPokersDomIndex[i]].selected
             }
             this.setData({
-                myPokers:myPokers
+                myPokers: myPokers
             })
         })
     },
 
-    touchCalculate(){
-        return new Promise((resolve,reject)=>{
+    touchCalculate() {
+        return new Promise((resolve, reject) => {
             // 利用选择器遍历图片元素，得出牌图片边界，看文档注意只返回第一个匹配的节点，所以循环
-            var myPokers=this.data.myPokers
-            var resultList=[]
-            var count=myPokers.length
-            var query=wx.createSelectorQuery();
-            for(var i=0;i<myPokers.length;i++){
-                query.select('#myPokerImage_'+i).boundingClientRect(function(res){
+            var myPokers = this.data.myPokers
+            var resultList = []
+            var count = myPokers.length
+            var query = wx.createSelectorQuery();
+            for (var i = 0; i < myPokers.length; i++) {
+                query.select('#myPokerImage_' + i).boundingClientRect(function (res) {
                     resultList.push(res)
-                    if(count==resultList.length) resolve(resultList)
+                    if (count == resultList.length) resolve(resultList)
                 })
             }
             query.exec()
@@ -421,19 +429,19 @@ Page({
     // 出牌
     put() {
         var putPokers = [] // 用于存取出的牌(用于发送服务器)
-        var unselectedPokers = [] // 未选中的牌缓存到data
+        var myPokers = [] // 未选中的牌、更新到data刷新手牌
         this.data.myPokers.forEach(function (item, i) {
             if (item.selected) {
                 putPokers.push({
                     "colorEnum": item.name.split('_')[0],
                     "valueEnum": item.name.split('_')[1]
                 })
-            }else{
-                unselectedPokers.push(item)
+            } else {
+                myPokers.push(item)
             }
         });
         this.setData({
-            unselectedPokers:unselectedPokers
+            myPokers: myPokers
         })
         var params = {
             "action": "put",
@@ -452,7 +460,7 @@ Page({
             // putPokers空着
         }
         wx.sendSocketMessage({
-          data: JSON.stringify(params),
+            data: JSON.stringify(params),
         })
     },
 

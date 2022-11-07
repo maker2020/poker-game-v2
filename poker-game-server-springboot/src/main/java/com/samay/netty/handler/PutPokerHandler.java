@@ -17,6 +17,7 @@ import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.PokerTypeEnum;
 import com.samay.game.rule.CommonRule;
 import com.samay.game.utils.PokerUtil;
+import com.samay.game.utils.TimerUtil;
 import com.samay.game.vo.Notification;
 import com.samay.game.vo.ResultVO;
 
@@ -55,7 +56,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
         CommonRule rule = new CommonRule(putPokers, lastPutPokers);
         PokerUtil.sortForPUT(putPokers);
         if (rule.valid()) {
-            Map<String, Object> result = ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player),
+            Map<String, Object> result = ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player,ActionEnum.PUT),
                     new Notification(ActionEnum.PUT, putPokers != null, player.getId()), putPokers,
                     putPokers == null ? player.getPokers().size() : player.getPokers().size() - putPokers.size());
             group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
@@ -64,6 +65,8 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                 player.removeAllPoker(putPokers);
                 game.setLastPutPokers(putPokers);
                 game.setLastPlayerID(player.getId());
+
+                TimerUtil.checkTimeout(ActionEnum.CALL, player.getId());
                 
                 // 炸弹翻倍
                 if(rule.getPokersType()==PokerTypeEnum.BOOM){

@@ -12,7 +12,6 @@ import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.RoomStatusEnum;
-import com.samay.game.utils.TimerUtil;
 import com.samay.game.vo.ResultVO;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -74,13 +73,8 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
                 }
             }
         }
-        Map<String, Object> msg = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(null), null);
+        Map<String, Object> msg = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(null,ActionEnum.CALL), null);
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
-
-        // 限时检测开启（同时对应的操作相关逻辑也要调用该方法以消除标识）
-        TimerUtil.checkTimeout(ActionEnum.CALL, ctx.channel());
-        // 操作相关逻辑调用该方法以消除 限时检测的阻塞
-        // TimerUtil.checkTimeout(ActionEnum.CALL, ctx.channel());
                 
         // 至此结束，其他业务由其他handler从头处理
         ctx.fireChannelRead(Unpooled.EMPTY_BUFFER);
