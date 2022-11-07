@@ -1,8 +1,9 @@
 {
     "pages": [
+        "pages/gameRoom/gameRoom",
         "pages/gamePermit/gamePermit",
         "pages/gameMenu/gameMenu",
-        "pages/gameRoom/gameRoom",
+        
         "pages/index/index",
         "pages/logs/logs",
         "pages/aloneRoom/aloneRoom"
