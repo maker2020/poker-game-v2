@@ -1,9 +1,7 @@
 package com.samay.netty.handler;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
 
 import org.springframework.stereotype.Component;
 
@@ -14,6 +12,7 @@ import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.RoomStatusEnum;
+import com.samay.game.utils.TimerUtil;
 import com.samay.game.vo.ResultVO;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -56,8 +55,9 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
      * @param group
      * @param room
      * @param ctx
+     * @throws Exception
      */
-    public static void gameStart(Game game,ChannelGroup group,Room room,ChannelHandlerContext ctx){
+    public static void gameStart(Game game,ChannelGroup group,Room room,ChannelHandlerContext ctx) throws Exception{
         // 初始化游戏、准备发牌
         game = initGame(game);
         // 发牌至玩家(只有一个线程处理，所以需要分发group里的channel)
@@ -74,15 +74,14 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
                 }
             }
         }
-        // 随机选一名玩家作为第一个叫地主的
-        Random random = new Random(System.currentTimeMillis());
-        Player randomPlayer = game.getPlayers().get(random.nextInt(0, 2));
-        Map<String, Object> msg = ResultVO.resultMap(ActionEnum.CALL, randomPlayer.getId(), null);
+        Map<String, Object> msg = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(null), null);
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
 
-        // 辅助变量：维护players出牌顺序
-        Collections.shuffle(room.getPlayers(), random); // 打乱players顺序
-
+        // 限时检测开启（同时对应的操作相关逻辑也要调用该方法以消除标识）
+        TimerUtil.checkTimeout(ActionEnum.CALL, ctx.channel());
+        // 操作相关逻辑调用该方法以消除 限时检测的阻塞
+        // TimerUtil.checkTimeout(ActionEnum.CALL, ctx.channel());
+                
         // 至此结束，其他业务由其他handler从头处理
         ctx.fireChannelRead(Unpooled.EMPTY_BUFFER);
     }

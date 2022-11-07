@@ -1,7 +1,9 @@
 package com.samay.game.entity;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.samay.game.Game;
@@ -38,36 +40,50 @@ public class Room implements Serializable {
     }
 
     /**
-     * 传入一个player，获取下一个player ID
+     * 传入一个player，获取下一个player ID<p>
+     * 若传null,则随机选一个player
      * @param player
-     * @return
+     * @return playerID,null
      */
     public String turnPlayer(Player player) throws Exception{
-        boolean restart=true;
-        for(Player p:players){
-            if(!p.isRefuseBoss()) restart=false;
-        }
-        if(restart) return null;
-        int pos=-1;
-        for(int i=0;i<players.size();i++){
-            Player p=players.get(i);
-            if(p.getId().equals(player.getId())){
-                pos=i;
-                break;
-            }
-        }
-        if(pos==-1) throw new Exception();
-        pos=pos==players.size()-1?0:pos+1;
-        if(existBoss()){
-            // 意味着出牌阶段的轮询
-            return players.get(pos).getId();
+        String playerID;
+        if(player==null){ // 叫地主
+            // 随机选一名玩家作为第一个叫地主的
+            Random random = new Random(System.currentTimeMillis());
+            Player randomPlayer = game.getPlayers().get(random.nextInt(0, 2));
+            Collections.shuffle(getPlayers(), random); // 打乱players顺序
+            playerID=randomPlayer.getId();
         }else{
-            // 意味着叫/抢地主的轮询
-            while (players.get(pos).isRefuseBoss()) {
-                pos=pos==players.size()-1?0:pos+1;
+            boolean restart=true;
+            for(Player p:players){
+                if(!p.isRefuseBoss()) restart=false;
             }
-            return players.get(pos).getId();
+            if(restart) playerID=null;
+            int pos=-1;
+            for(int i=0;i<players.size();i++){
+                Player p=players.get(i);
+                if(p.getId().equals(player.getId())){
+                    pos=i;
+                    break;
+                }
+            }
+            if(pos==-1) throw new Exception();
+            pos=pos==players.size()-1?0:pos+1;
+            if(existBoss()){
+                // 意味着出牌阶段的轮询
+                playerID=players.get(pos).getId();
+            }else{
+                // 意味着叫/抢地主的轮询
+                while (players.get(pos).isRefuseBoss()) {
+                    pos=pos==players.size()-1?0:pos+1;
+                }
+                playerID=players.get(pos).getId();
+            }
         }
+        if(playerID!=null){
+            game.setActingPlayer(playerID);
+        }
+        return playerID;
     }
 
     /**

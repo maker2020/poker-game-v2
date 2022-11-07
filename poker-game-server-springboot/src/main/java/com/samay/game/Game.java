@@ -39,7 +39,12 @@ public abstract class Game implements Serializable {
     /**
      * 上一个打出的牌的玩家id
      */
-    private String lastPlayerID="";
+    private String lastPlayerID;
+    /**
+     * 正在操作的玩家id<p>
+     * (本来不需要该状态变量，但这种情况: 客户端恶意请求，若没有该状态变量维护，任何人任何时刻都可以出牌)
+     */
+    private String actingPlayer;
 
     /**
      * 底分
@@ -53,14 +58,16 @@ public abstract class Game implements Serializable {
      * 基数
      */
     private int cardinality;
-    
-    // 以下变量暂时保留
-    // private boolean handOut=false;
-    // private boolean over=false;
+
     /**
      * 地主请求轮询的序号
      */
     private AtomicInteger turnCallIndex=new AtomicInteger(0);
+    
+
+    // 以下变量暂时保留
+    // private boolean handOut=false;
+    // private boolean over=false;
 
     /**
      * 初始化

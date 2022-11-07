@@ -41,6 +41,9 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
         Game game = room.getGame();
 
+        // 针对客户端请求出牌不合规的校验
+        if(!game.getActingPlayer().equals(player.getId())) return;
+
         // 维护player请求序号
         // player.setReqIndex(room.getTurnCallIndex().get());
         game.getTurnCallIndex().incrementAndGet();
@@ -53,6 +56,7 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
                 player.setFirstCall(true);
                 result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
                 new Notification(ActionEnum.CALL, true, player.getId()));
+                
             }else if("ask".equals(msg.getAction())){
                 result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player),
                 new Notification(ActionEnum.ASK, true, player.getId()));

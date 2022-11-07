@@ -1,12 +1,12 @@
 {
     "pages": [
-        "pages/gameRoom/gameRoom",
         "pages/gamePermit/gamePermit",
         "pages/gameMenu/gameMenu",
+        "pages/gameRoom/gameRoom",
+        "pages/aloneRoom/aloneRoom",
         
         "pages/index/index",
-        "pages/logs/logs",
-        "pages/aloneRoom/aloneRoom"
+        "pages/logs/logs"
     ],
     "window": {
         "backgroundTextStyle": "light",

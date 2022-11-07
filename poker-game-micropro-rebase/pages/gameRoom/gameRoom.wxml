@@ -175,7 +175,7 @@
             <text class='num'>{{second}}</text>
         </view>
     </view>
-    <view class='resultCon'>
+    <view class='resultCon' wx:if="{{turnFlag==-1}}">
         <view class='result win'>
             <image src='../../static/img/win.png' mode='widthFix' class='bg'></image>
             <view class='resultList'>

@@ -141,6 +141,7 @@ public class NormalGame extends Game{
         
         this.setLastPutPokers(null);
         this.setLastPlayerID("");
+        this.setActingPlayer("");
 
         this.setBaseScore(200);
         this.setCardinality(2);

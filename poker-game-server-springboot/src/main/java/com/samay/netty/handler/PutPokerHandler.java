@@ -44,6 +44,9 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
         ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
         Room room = ChannelHolder.attrRoom(ctx.channel());
         Game game = room.getGame();
+        // 针对客户端请求出牌不合规的校验
+        if(!game.getActingPlayer().equals(player.getId())) return;
+
         List<Poker> putPokers = msg.getPutPokers();
         Collection<Poker> lastPutPokers=game.getLastPutPokers();        
         if(game.getLastPlayerID().equals(player.getId())) lastPutPokers=null; // 清除本身压制
