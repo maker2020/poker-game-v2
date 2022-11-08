@@ -130,6 +130,7 @@ public class NormalGame extends Game{
         this.setPokerCollector(null);
         this.setStatus(GameStatusEnum.READY);
         this.getTurnCallIndex().set(0);
+        // 玩家于游戏中的一些状态变量的重置
         for(Player p:getPlayers()){
             p.setBoss(false);
             p.setFirstCall(false);
@@ -179,27 +180,45 @@ public class NormalGame extends Game{
                 }
             }
         }
-        Map<String,Object> result=new HashMap<>();
 
         // 首先根据底分(该NormalGame是200) 扣去玩家入场费
         int baseScore=getBaseScore();
         for(Player p:getPlayers()){
             p.setFreeMoney(p.getFreeMoney()-baseScore);
         }
-        // 其次根据基数、底分、倍数，计算本局游戏货币
+
+        // 其次根据基数、底分、倍数，计算本局游戏货币，并存入list返回客户端渲染resultTable
+        List<Map<String,Object>> resultList=new ArrayList<>();
+        
         int earning=getBaseScore()*getCardinality()*getMultiple();
         for(Player p:winnerList){
+            Map<String,Object> result=new HashMap<>();
+            // 更新player
             long actualEarn=p.isBoss()?earning*2:earning;
-            result.put(p.getId(), actualEarn);
             p.setFreeMoney(p.getFreeMoney()+actualEarn);
+            // 结果存入
+            result.put("playerID", p.getId());
+            result.put("nickName", p.getNickName());
+            result.put("baseScore", getBaseScore());
+            result.put("multiple", getMultiple());
+            result.put("earning", actualEarn);
+            result.put("win", true);
+            resultList.add(result);
         }
         for(Player p:loserList){
+            Map<String,Object> result=new HashMap<>();
             long actualEarn=p.isBoss()?earning*2:earning;
-            result.put(p.getId(), -actualEarn);
             p.setFreeMoney(p.getFreeMoney()-actualEarn);
+            result.put("playerID", p.getId());
+            result.put("nickName", p.getNickName());
+            result.put("baseScore", getBaseScore());
+            result.put("multiple", getMultiple());
+            result.put("earning", -actualEarn);
+            result.put("win", false);
+            resultList.add(result);
         }
-        result.put("winners", winnerList);
-        result.put("losers", loserList);
+        Map<String,Object> result=new HashMap<>();
+        result.put("resultTable", resultList);
         result.put("players", getPlayers());
         return result;
     }

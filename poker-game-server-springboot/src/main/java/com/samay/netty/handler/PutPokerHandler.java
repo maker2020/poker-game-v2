@@ -27,6 +27,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import lombok.extern.slf4j.Slf4j;
 
 import com.samay.netty.handler.holder.ChannelHolder;
 
@@ -37,6 +38,7 @@ import com.samay.netty.handler.holder.ChannelHolder;
  */
 @Sharable
 @Component
+@Slf4j
 public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
 
     @Override
@@ -56,13 +58,8 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
         CommonRule rule = new CommonRule(putPokers, lastPutPokers);
         PokerUtil.sortForPUT(putPokers);
         if (rule.valid()) {
-            
-            TimerUtil.checkTimeout(ActionEnum.PUT, player.getId());
 
-            Map<String, Object> result = ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player,ActionEnum.PUT),
-                    new Notification(ActionEnum.PUT, putPokers != null, player.getId()), putPokers,
-                    putPokers == null ? player.getPokers().size() : player.getPokers().size() - putPokers.size());
-            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
+            TimerUtil.checkTimeout(ActionEnum.PUT, player.getId());
 
             if (putPokers != null) {
                 player.removeAllPoker(putPokers);
@@ -75,14 +72,23 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                     Map<String,Object> multiple=ResultVO.mutiplying(game.getMultiple());
                     group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multiple)));
                 }
+            }
 
-                if (player.getPokers().size() == 0) {
-                    // 游戏结算
-                    Map<String,Object> gameResult=game.settlement();
-                    Map<String, Object> resultVO = ResultVO.gameResult(gameResult);
-                    // fastjson禁用引用重复检测（不禁用会导致同一对象被$.ref表示，从而不便于前端解析
-                    group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resultVO,SerializerFeature.DisableCircularReferenceDetect)));
-                }
+            Map<String, Object> result = ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player,ActionEnum.PUT),
+                    new Notification(ActionEnum.PUT, putPokers != null, player.getId()), putPokers,
+                    player.getPokers().size());
+            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
+
+            if (player.getPokers().size() == 0) {
+                log.info("ROOM["+room.getId()+"] 游戏已结束");
+                // 游戏结算
+                Map<String,Object> gameResult=game.settlement();
+                Map<String, Object> resultVO = ResultVO.gameResult(gameResult);
+                // fastjson禁用引用重复检测（不禁用会导致同一对象被$.ref表示，从而不便于前端解析
+                group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resultVO,SerializerFeature.DisableCircularReferenceDetect)));
+            
+                // 游戏重置
+                game.restart();
             }
 
         } else { // 反馈不合法

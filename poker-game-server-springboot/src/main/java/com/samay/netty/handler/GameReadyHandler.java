@@ -107,6 +107,7 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
      */
     private static Game initGame(Game game) {
         // 初始化游戏数据: 发牌、更新状态
+        game.restart();
         game.init();
         return game;
     }

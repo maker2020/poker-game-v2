@@ -22,6 +22,7 @@ Page({
         boss: '', // 房间内地主玩家的唯一标识(即id)
         multiple: '', // 房间内倍数
         baseScore: '', // 底分(例如200分场次)
+        gameResultTable:[],
 
         // 全局定时器
         timer:{},
@@ -58,10 +59,6 @@ Page({
                 // playerStatus包含玩家状态：是否准备、玩家id、玩家性别、玩家游戏币等信息。（不尽全)
                 context.updateRoom(data)
             }
-            // 收到玩家id为xxx的准备
-            if (data.ready && data.playerID) {
-                context.updateReady(data)
-            }
             // 收到玩家id为xxx(自己)的手牌
             if (data.pokers && data.playerID == app.globalData.userInfo.cloudID) {
                 context.updateMyPokers(data)
@@ -94,10 +91,33 @@ Page({
             if (data.multiple) {
                 context.updateMultiple(data)
             }
-            // 收到winners,losers信息
-            if (data.winners && data.losers) {
+            // 收到游戏结束结算信息
+            if (data.resultTable) {
                 context.updateGameResult(data)
             }
+        })
+    },
+
+    // 游戏状态变量清空重置
+    reset(){
+        clearInterval(this.data.timer)
+        this.setData({
+            playerListNotice:[],
+            playerListPut:[],
+            playerListRestPokerNum:[],
+            myPokers:[],
+            bossPokers:[],
+            turnFlag:'',
+            action:'ready',
+            second:30,
+            status:'ready',
+            boss:'',
+            multiple:'',
+            baseScore:'',
+            gameResultTable:[],
+            timer:{},
+            touchStartPos:{},
+            pokerDiff:''
         })
     },
 
@@ -120,17 +140,6 @@ Page({
             roomID: data.roomID,
             playerList: playerList,
             baseScore: data.baseScore
-        })
-    },
-    updateReady(data) {
-        var playerList = this.data.playerList;
-        for (var i = 0; i < playerList.length; i++) {
-            if (playerList[i].playerID == data.playerID) {
-                playerList[i].ready = data.ready
-            }
-        }
-        this.setData({
-            playerList: playerList
         })
     },
     updateMyPokers(data) {
@@ -211,7 +220,7 @@ Page({
         this.setData({
             timer:timer
         })
-        
+
         this.setData({
             turnFlag: data.turn,
             action: data.action
@@ -294,19 +303,60 @@ Page({
         // players包含结束时的状态信息：手牌、当前货币等玩家信息
         var players = data.players
         var playerList = this.data.playerList
-        // 更新货币
+        // 更新货币、清除准备状态
         for (var i = 0; i < playerList.length; i++) {
             for (var j = 0; j < players.length; j++) {
                 if (players[j].id == playerList[i].playerID) {
                     playerList[i].freeMoney = players[j].freeMoney
                 }
             }
+            playerList[i].ready=false
         }
         this.setData({
             playerList: playerList
         })
+        // 以下处理并非reset()方法，此处没有更改状态、要点继续游戏后的逻辑才重置所有状态
+        // 游戏各玩家摊牌展示
+        var playerListPut=[]
+        for(var i=0;i<players.length;i++){
+            for(var j=0;j<playerList.length;j++){
+                if(j==2) continue;
+                if(playerList[j].playerID==players[i].id){
+                    if(players[i].pokers.length!=0){
+                        playerListPut[j]=players[i].pokers
+                    }
+                }
+            }
+        }
+        this.setData({
+            playerListPut:playerListPut
+        })
 
-        // 游戏结果相关展示(待UI完成)
+        // 清除时钟
+        clearInterval(this.data.timer)
+        // 清除turnFlag
+        this.setData({
+            turnFlag:''
+        })
+        // 清除最后的一次操作状态
+        this.setData({
+            playerListNotice:[]
+        })
+
+        // 游戏结果面板相关展示(待UI完成)
+        var gameResultTable=data.resultTable
+        for(var i=0;i<gameResultTable.length;i++){
+            if(gameResultTable[i].playerID==playerList[2].playerID){
+                // 交换位置方便wxml结果展示输赢图片及结果（始终把当前玩家放在第一个)
+                var temp=gameResultTable[0]
+                gameResultTable[0]=gameResultTable[i]
+                gameResultTable[i]=temp
+                break;
+            }
+        }
+        this.setData({
+            gameResultTable:data.resultTable
+        })
     },
 
     /**
@@ -441,6 +491,7 @@ Page({
 
     // 准备
     ready() {
+        this.reset() // 重置房间
         var params = {
             "action": "ready",
             "tendency": true

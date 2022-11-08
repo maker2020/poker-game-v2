@@ -50,6 +50,12 @@ public class Room implements Serializable {
      */
     public String turnPlayer(Player player,ActionEnum actionEnum) throws Exception{
         String playerID=null;
+        // 游戏结束判断
+        boolean gameOver=false;
+        for(Player p:getPlayers()){
+            if(p.getPokers().size()==0) gameOver=true;
+        }
+        if(gameOver) return null;
         if(player==null){ // 叫地主
             // 随机选一名玩家作为第一个叫地主的
             Random random = new Random(System.currentTimeMillis());

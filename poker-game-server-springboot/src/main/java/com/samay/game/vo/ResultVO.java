@@ -65,19 +65,6 @@ public class ResultVO {
     }
 
     /**
-     * 某某id的玩家准备了
-     * @param user 玩家唯一标识(playerID)
-     * @param ready
-     * @return
-     */
-    public static Map<String,Object> resultMap(String user,boolean ready){
-        Map<String,Object> map=new HashMap<>();
-        map.put("playerID", user);
-        map.put("ready", ready);
-        return map;
-    }
-
-    /**
      * 某某id，出了xx牌
      * @param user 玩家唯一标识(playerID)
      * @param pokers

@@ -2,7 +2,7 @@
 <view class='gamecontainer' > 
     <view class='out' bindtap='out'></view>
     <view class='room'>房间号：{{roomID}}</view>
-    <view class='readyBtn btnCon' wx:if='{{!playerList[2].ready}}'>
+    <view class='readyBtn btnCon' wx:if='{{!playerList[2].ready && status=="ready"}}'>
         <view class='btn' bindtap='ready'>准备</view>
     </view>
     <view class='top'>
@@ -175,9 +175,9 @@
             <text class='num'>{{second}}</text>
         </view>
     </view>
-    <view class='resultCon' wx:if="{{turnFlag==-1}}">
+    <view class='resultCon' wx:if="{{gameResultTable.length==3}}">
         <view class='result win'>
-            <image src='../../static/img/win.png' mode='widthFix' class='bg'></image>
+            <image src='../../static/img/{{gameResultTable[0].win?"win":"loser"}}.png' mode='widthFix' class='bg'></image>
             <view class='resultList'>
                 <view class='item th'>
                     <text>昵称</text>
@@ -185,30 +185,16 @@
                     <text>倍数</text>
                     <text>欢乐豆</text>
                 </view>
-                <view class='item self'>
-                    <text class='isD'></text>
-                    <text>澎湃</text>
-                    <text>10</text>
-                    <text>x240</text>
-                    <text>1650</text>
-                </view>
-                <view class='item'>
-                    <text class='isD'></text>
-                    <text>小草青青</text>
-                    <text>10</text>
-                    <text>x120</text>
-                    <text>-825</text>
-                </view>
-                <view class='item'>
-                    <text class='isD'></text>
-                    <text>一言难尽</text>
-                    <text>10</text>
-                    <text>x120</text>
-                    <text>-825</text>
+                <view wx:for="{{gameResultTable}}" class='item {{item.playerID==playerList[2].playerID?"self":""}}'>
+                    <text class='{{item.playerID==boss?"isD":""}}'></text>
+                    <text>{{item.nickName}}</text>
+                    <text>{{item.baseScore}}</text>
+                    <text>x{{item.multiple}}</text>
+                    <text>{{item.earning}}</text>
                 </view>
             </view>
             <view class='btn_con'>
-                <view class='continueBtn'>继续游戏</view>
+                <view class='continueBtn' bindtap="ready">继续游戏</view>
             </view>
         </view>
     </view>

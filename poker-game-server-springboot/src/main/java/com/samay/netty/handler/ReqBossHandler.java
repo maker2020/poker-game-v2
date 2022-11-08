@@ -107,7 +107,6 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
                 reHandout = false;
         }
         if (reHandout) {
-            game.restart();
             GameReadyHandler.gameStart(game, group, room, ctx);
             return;
         }
