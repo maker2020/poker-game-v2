@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TimerUtil {
 
-    private static final long time = 5;
+    private static final long time = 7;
     private static final TimeUnit timeUnit = TimeUnit.SECONDS;
 
     private static Map<String, Object> playerAct = Collections.synchronizedMap(new HashMap<>());
@@ -48,6 +48,7 @@ public class TimerUtil {
         if (playerID == null || action == null)
             return;
         if (playerAct.get(playerID) == null) {
+            log.info("player ["+playerID+"]/"+action.getAction()+" 已开启限时监测");
             playerAct.put(playerID, new Object());
             ExecutorService exec = Executors.newFixedThreadPool(2);
             Future<?> future = exec.submit(() -> {
@@ -62,17 +63,20 @@ public class TimerUtil {
                     future.get(time, timeUnit);
                 } catch (Exception e) {
                     if (e instanceof TimeoutException) {
+                        log.info("player ["+playerID+"]/"+action.getAction()+" 已超时，被系统默认处理");
                         // 根据action，做出默认操作
                         defaultAction(action, ChannelHolder.getByPlayerID(playerID));
                     } else {
                         log.error("超时检测异常", e);
                     }
-                    synchronized(playerAct.get(playerID)){
+                    // 不需要再次唤醒，因为做出操作后默认会调用一次checkTimeout()
+                    /* synchronized(playerAct.get(playerID)){
                         playerAct.get(playerID).notify();                    
-                    }
+                    } */
                 }
             });
         } else {
+            log.info("player ["+playerID+"]/"+action.getAction()+" 已解除限时监测");
             synchronized (playerAct.get(playerID)) {
                 playerAct.get(playerID).notify();
             }

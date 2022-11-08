@@ -49,19 +49,22 @@ public class Room implements Serializable {
      * @return playerID,null
      */
     public String turnPlayer(Player player,ActionEnum actionEnum) throws Exception{
-        String playerID;
+        String playerID=null;
         if(player==null){ // 叫地主
             // 随机选一名玩家作为第一个叫地主的
             Random random = new Random(System.currentTimeMillis());
             Player randomPlayer = game.getPlayers().get(random.nextInt(0, 2));
             Collections.shuffle(getPlayers(), random); // 打乱players顺序
             playerID=randomPlayer.getId();
-        }else{
+        }else done: {
             boolean restart=true;
             for(Player p:players){
                 if(!p.isRefuseBoss()) restart=false;
             }
-            if(restart) playerID=null;
+            if(restart) {
+                playerID=null;
+                break done;
+            }
             int pos=-1;
             for(int i=0;i<players.size();i++){
                 Player p=players.get(i);
@@ -80,14 +83,23 @@ public class Room implements Serializable {
                 while (players.get(pos).isRefuseBoss()) {
                     pos=pos==players.size()-1?0:pos+1;
                 }
-                playerID=players.get(pos).getId();
+                Player boss=game.getBossInstantly();
+                if(boss!=null){ // 这说明地主已经可以选出，下一个人应该轮到地主操作，所以更新setActing为地主玩家
+                    playerID=null;
+                    game.setActingPlayer(boss.getId());
+
+                    TimerUtil.checkTimeout(ActionEnum.PUT, boss.getId());
+                }else{
+                    playerID=players.get(pos).getId();
+                }
             }
         }
         if(playerID!=null){
             game.setActingPlayer(playerID);
+        
+            // 每每轮到xx操作，即开启限时检测，在操作完后也需要调用以关闭
+            TimerUtil.checkTimeout(actionEnum, playerID);
         }
-        // 每每轮到xx操作，即开启限时检测，在操作完后也需要调用以关闭
-        TimerUtil.checkTimeout(actionEnum, playerID);
         return playerID;
     }
 

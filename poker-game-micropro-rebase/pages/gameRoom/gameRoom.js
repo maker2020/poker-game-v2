@@ -23,6 +23,9 @@ Page({
         multiple: '', // 房间内倍数
         baseScore: '', // 底分(例如200分场次)
 
+        // 全局定时器
+        timer:{},
+
         // UI体验相关辅助变量
         touchStartPos: {},
         pokerDiff: ''
@@ -188,6 +191,27 @@ Page({
                 })
             }
         }
+        // 设置时钟
+        this.setData({
+            second: 7
+        })
+        // 倒计时
+        var context=this
+        clearInterval(this.data.timer)
+        var timer=setInterval(function(){
+            if(context.data.second && context.data.second>0){
+                context.setData({
+                    second:context.data.second-1
+                })
+                if(context.data.second==0){
+                    clearInterval(timer)
+                }
+            }
+        },1000)
+        this.setData({
+            timer:timer
+        })
+        
         this.setData({
             turnFlag: data.turn,
             action: data.action
@@ -429,20 +453,16 @@ Page({
     // 出牌
     put() {
         var putPokers = [] // 用于存取出的牌(用于发送服务器)
-        var myPokers = [] // 未选中的牌、更新到data刷新手牌
+        // var myPokers = [] // 未选中的牌、更新到data刷新手牌
+        // 这里不能更新手牌，要交给后端返回的牌来更新，因为出牌逻辑校验在服务器
         this.data.myPokers.forEach(function (item, i) {
             if (item.selected) {
                 putPokers.push({
                     "colorEnum": item.name.split('_')[0],
                     "valueEnum": item.name.split('_')[1]
                 })
-            } else {
-                myPokers.push(item)
             }
         });
-        this.setData({
-            myPokers: myPokers
-        })
         var params = {
             "action": "put",
             "tendency": true,

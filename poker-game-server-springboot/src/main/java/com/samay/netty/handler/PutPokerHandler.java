@@ -56,6 +56,9 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
         CommonRule rule = new CommonRule(putPokers, lastPutPokers);
         PokerUtil.sortForPUT(putPokers);
         if (rule.valid()) {
+            
+            TimerUtil.checkTimeout(ActionEnum.PUT, player.getId());
+
             Map<String, Object> result = ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player,ActionEnum.PUT),
                     new Notification(ActionEnum.PUT, putPokers != null, player.getId()), putPokers,
                     putPokers == null ? player.getPokers().size() : player.getPokers().size() - putPokers.size());
@@ -65,8 +68,6 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                 player.removeAllPoker(putPokers);
                 game.setLastPutPokers(putPokers);
                 game.setLastPlayerID(player.getId());
-
-                TimerUtil.checkTimeout(ActionEnum.CALL, player.getId());
                 
                 // 炸弹翻倍
                 if(rule.getPokersType()==PokerTypeEnum.BOOM){
@@ -83,6 +84,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                     group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resultVO,SerializerFeature.DisableCircularReferenceDetect)));
                 }
             }
+
         } else { // 反馈不合法
                  // 此处仅提示操作者玩家，而非group
             Channel ch = group.find(ChannelHolder.uid_chidMap.get(player.getId()));

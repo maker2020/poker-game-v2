@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.samay.game.enums.ActionEnum;
+import com.samay.game.utils.TimerUtil;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -76,12 +79,34 @@ public class Player extends User implements Serializable{
         pokers.removeAll(listPoker);
     }
 
-    public void reqBoss(){
+    private void reqBoss(){
         reqTimes++;
     }
 
-    public void refuseBoss(){
+    private void refuseBoss(){
         refuseBoss=true;
+    }
+
+    public void callBoss() throws Exception{
+        setFirstCall(true);
+        reqBoss();
+        // 操作相关逻辑调用该方法以消除 限时检测的阻塞
+        TimerUtil.checkTimeout(ActionEnum.CALL, getId());
+    }
+
+    public void askBoss() throws Exception{
+        reqBoss();
+        TimerUtil.checkTimeout(ActionEnum.ASK, getId());
+    }
+
+    public void unCallBoss() throws Exception{
+        refuseBoss();
+        TimerUtil.checkTimeout(ActionEnum.CALL, getId());
+    }
+
+    public void unAskBoss() throws Exception{
+        refuseBoss();
+        TimerUtil.checkTimeout(ActionEnum.ASK, getId());
     }
 
     @Override

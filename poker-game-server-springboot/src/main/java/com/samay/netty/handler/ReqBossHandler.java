@@ -12,7 +12,6 @@ import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.utils.PokerUtil;
-import com.samay.game.utils.TimerUtil;
 import com.samay.game.vo.Notification;
 import com.samay.game.vo.ResultVO;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,10 +20,13 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import lombok.extern.slf4j.Slf4j;
+
 import com.samay.netty.handler.holder.ChannelHolder;
 
 /**
- * <b>叫地主/抢地主处理器</b><p>
+ * <b>叫地主/抢地主处理器</b>
+ * <p>
  * 叫地主/抢地主轮询过程处理
  * <p>
  * 顺序不再是v1中多线程竞争，而是维护了room中的玩家list
@@ -33,6 +35,7 @@ import com.samay.netty.handler.holder.ChannelHolder;
  */
 @Sharable
 @Component
+@Slf4j
 public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
 
     @Override
@@ -43,98 +46,97 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         Game game = room.getGame();
 
         // 针对客户端请求出牌不合规的校验
-        if(!game.getActingPlayer().equals(player.getId())) return;
-
-        TimerUtil.checkTimeout(ActionEnum.CALL, player.getId());
+        if (!game.getActingPlayer().equals(player.getId())) {
+            log.warn("player [" + player.getId() + "] 不合规请求已被拦截处理");
+        }
 
         // 维护player请求序号
         // player.setReqIndex(room.getTurnCallIndex().get());
         game.getTurnCallIndex().incrementAndGet();
         player.setReqIndex(game.getTurnCallIndex().get());
 
-        Map<String, Object> result=null;
+        Map<String, Object> result = null;
         if (msg.isTendency()) {
-            player.reqBoss();
-            if("call".equals(msg.getAction())){
-                player.setFirstCall(true);
-                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player,ActionEnum.ASK),
-                new Notification(ActionEnum.CALL, true, player.getId()));
-                
-                // 操作相关逻辑调用该方法以消除 限时检测的阻塞
-                TimerUtil.checkTimeout(ActionEnum.CALL, player.getId());
-            }else if("ask".equals(msg.getAction())){
-                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player,ActionEnum.ASK),
-                new Notification(ActionEnum.ASK, true, player.getId()));
+            if ("call".equals(msg.getAction())) {
 
-                TimerUtil.checkTimeout(ActionEnum.ASK, player.getId());
+                player.callBoss();
+
+                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
+                        new Notification(ActionEnum.CALL, true, player.getId()));
+
+
+            } else if ("ask".equals(msg.getAction())) {
+
+                player.askBoss();
+
+                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
+                        new Notification(ActionEnum.ASK, true, player.getId()));
 
                 // 倍数翻一番
-                game.setMultiple(game.getMultiple()*2);
-                Map<String,Object> multipleResult=ResultVO.mutiplying(game.getMultiple());
+                game.setMultiple(game.getMultiple() * 2);
+                Map<String, Object> multipleResult = ResultVO.mutiplying(game.getMultiple());
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multipleResult)));
             }
         } else { // 拒绝
-            player.refuseBoss();
-            if("call".equals(msg.getAction())){
-                result = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(player,ActionEnum.CALL),
-                new Notification(ActionEnum.CALL, false, player.getId()));
+            if ("call".equals(msg.getAction())) {
 
-                TimerUtil.checkTimeout(ActionEnum.CALL, player.getId());
-            }else if("ask".equals(msg.getAction())){
-                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player,ActionEnum.ASK),
-                new Notification(ActionEnum.ASK, false, player.getId()));
+                player.unCallBoss();
 
-                TimerUtil.checkTimeout(ActionEnum.ASK, player.getId());
+                result = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(player, ActionEnum.CALL),
+                        new Notification(ActionEnum.CALL, false, player.getId()));
+
+            } else if ("ask".equals(msg.getAction())) {
+
+                player.unAskBoss();
+
+                result = ResultVO.resultMap(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
+                        new Notification(ActionEnum.ASK, false, player.getId()));
+
             }
         }
-        
+
         //
-        if(result==null) throw new Exception("ReqBossDTO msg 消息异常");
+        if (result == null)
+            throw new Exception("ReqBossDTO msg 消息异常");
 
-        // 叫地主/抢地主最终结果：
-        // 判断轮询次数是否满足最低次数(每位玩家已做出一轮选择)
-        if (game.getTurnCallIndex().get() > 2) { // 3
-            // 判断是否重发
-            boolean reHandout=true;
-            for(Player p:game.getPlayers()){
-                if(!p.isRefuseBoss()) reHandout=false;
-            }
-            if(reHandout){
-                game.restart();
-                GameReadyHandler.gameStart(game, group, room, ctx);
-                return;
-            }
-            // 判断地主是否可以直接得出
-            Player boss = game.getBossInstantly();
-            if (boss != null) {
-                Map<String, Object> result2 = ResultVO.resultMap(boss.getId());
-                group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result2)));
 
-                // 广播地主牌
-                Map<String,Object> bossPokersResult=ResultVO.resultMap(game.getPokerBossCollector());
-                group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(bossPokersResult)));
-                
-                // 给地主整理新加入的牌并单独发送给地主
-                boss.addAllPoker(game.getPokerBossCollector());
-                PokerUtil.sort(boss.getPokers());
-                Map<String,Object> resortBossPokers=ResultVO.resultMap(boss.getId(), boss.getPokers());
-                ChannelId chID=ChannelHolder.uid_chidMap.get(boss.getId());
-                group.find(chID).writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resortBossPokers)));
+        // 判断是否重发
+        boolean reHandout = true;
+        for (Player p : game.getPlayers()) {
+            if (!p.isRefuseBoss())
+                reHandout = false;
+        }
+        if (reHandout) {
+            game.restart();
+            GameReadyHandler.gameStart(game, group, room, ctx);
+            return;
+        }
+        // 尝试获得地主
+        Player boss = game.getBossInstantly();
+        if (boss != null) {
+            Map<String, Object> result2 = ResultVO.resultMap(boss.getId());
+            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result2)));
 
-                // 地主既然得出，action的应更新为put，而非turn下一个玩家ask。
-                // 更新result的action
-                ResultVO.updateResultMap(result, ActionEnum.PUT, boss.getId());
-                
-                TimerUtil.checkTimeout(ActionEnum.PUT, boss.getId());
+            // 广播地主牌
+            Map<String, Object> bossPokersResult = ResultVO.resultMap(game.getPokerBossCollector());
+            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(bossPokersResult)));
 
-                group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
-                return;
-            } else { // 自此说明需要最后一次询问
-                     // do nothing
-            }
+            // 给地主整理新加入的牌并单独发送给地主
+            boss.addAllPoker(game.getPokerBossCollector());
+            PokerUtil.sort(boss.getPokers());
+            Map<String, Object> resortBossPokers = ResultVO.resultMap(boss.getId(), boss.getPokers());
+            ChannelId chID = ChannelHolder.uid_chidMap.get(boss.getId());
+            group.find(chID).writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resortBossPokers)));
+
+            // 地主既然得出，action的应更新为put，而非turn下一个玩家ask。
+            // 更新result的action
+            ResultVO.updateResultMap(result, ActionEnum.PUT, boss.getId());
+
+            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
+            return;
         }
 
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
     }
-    
+
 }

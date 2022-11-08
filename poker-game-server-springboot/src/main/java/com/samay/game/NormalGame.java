@@ -45,6 +45,7 @@ public class NormalGame extends Game{
      * @return
      */
     public Player getBossInstantly(){
+        if(getTurnCallIndex().get()<3) return null;
         Player player=null;
         int most=0;
         for(Player p:getPlayers()){
