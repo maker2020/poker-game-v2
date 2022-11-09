@@ -235,14 +235,19 @@ public class PokerUtil {
                             String valueSingle = it1.next();
                             if(!valueSingle.equals(value)){
                                 //有多张相同单牌时，只取第一张进行三带一
-                                List<Poker> selected1 = selected;
+                                List<Poker> selected1 = new ArrayList<>(){{
+                                    for(int i = 0; i < selected.size() ; i++){
+                                        add(null);
+                                    }
+                                }};
+                                Collections.copy(selected1, selected);
                                 for(Poker p : pokers){
                                     if(p.getValueEnum().getValue().equals(valueSingle)){
                                         selected1.add(p);
+                                        resultList.add(selected1);
                                         break;
                                     }
                                 }
-                                resultList.add(selected1);
                             }
                         }
                     }
@@ -279,16 +284,22 @@ public class PokerUtil {
                             String valueDouble = it1.next();
                             if(!valueDouble.equals(value) && countMap.get(valueDouble) > 1){
                                 int countDouble = 0;
+                                List<Poker> selected1 = new ArrayList<>(){{
+                                    for(int i = 0; i < selected.size() ; i++){
+                                        add(null);
+                                    }
+                                }};
+                                Collections.copy(selected1, selected);
                                 for(Poker p : pokers){
                                     //大于等于2张时，只取前面两张
                                     if(countDouble < 2){
                                         if(p.getValueEnum().getValue().equals(valueDouble)){
-                                            selected.add(p);
+                                            selected1.add(p);
+                                            resultList.add(selected1);
                                             countDouble++;
                                         }
                                     }else break;
                                 }
-                                resultList.add(selected);
                             }
                         }
                     }
