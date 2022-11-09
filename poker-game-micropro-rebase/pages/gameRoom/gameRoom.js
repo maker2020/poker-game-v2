@@ -320,16 +320,28 @@ Page({
         var playerListPut=[]
         for(var i=0;i<players.length;i++){
             for(var j=0;j<playerList.length;j++){
-                if(j==2) continue;
+                if(j==2) {
+                    playerListPut[2]=this.data.playerListPut[2]
+                }
                 if(playerList[j].playerID==players[i].id){
                     if(players[i].pokers.length!=0){
                         playerListPut[j]=players[i].pokers
+                    }else{
+                        playerListPut[j]=this.data.playerListPut[j]
                     }
                 }
             }
         }
         this.setData({
             playerListPut:playerListPut
+        })
+        // （摊开后手牌数量为0)
+        var playerListRestPokerNum=[]
+        for(var i=0;i<playerList.length;i++){
+            playerListRestPokerNum[i]=0
+        }
+        this.setData({
+            playerListRestPokerNum:playerListRestPokerNum
         })
 
         // 清除时钟
