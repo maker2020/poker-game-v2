@@ -235,14 +235,19 @@ public class PokerUtil {
                             String valueSingle = it1.next();
                             if(!valueSingle.equals(value)){
                                 //有多张相同单牌时，只取第一张进行三带一
-                                List<Poker> selected1 = selected;
+                                List<Poker> selected1 = new ArrayList<>(){{
+                                    for(int i = 0; i < selected.size() ; i++){
+                                        add(null);
+                                    }
+                                }};
+                                Collections.copy(selected1, selected);
                                 for(Poker p : pokers){
                                     if(p.getValueEnum().getValue().equals(valueSingle)){
                                         selected1.add(p);
+                                        resultList.add(selected1);
                                         break;
                                     }
                                 }
-                                resultList.add(selected1);
                             }
                         }
                     }
@@ -279,16 +284,22 @@ public class PokerUtil {
                             String valueDouble = it1.next();
                             if(!valueDouble.equals(value) && countMap.get(valueDouble) > 1){
                                 int countDouble = 0;
+                                List<Poker> selected1 = new ArrayList<>(){{
+                                    for(int i = 0; i < selected.size() ; i++){
+                                        add(null);
+                                    }
+                                }};
+                                Collections.copy(selected1, selected);
                                 for(Poker p : pokers){
                                     //大于等于2张时，只取前面两张
                                     if(countDouble < 2){
                                         if(p.getValueEnum().getValue().equals(valueDouble)){
-                                            selected.add(p);
+                                            selected1.add(p);
+                                            resultList.add(selected1);
                                             countDouble++;
                                         }
                                     }else break;
                                 }
-                                resultList.add(selected);
                             }
                         }
                     }
@@ -303,7 +314,6 @@ public class PokerUtil {
         //当上家出牌为飞机(不带牌)时,判断自己是否有比他大的飞机(不带牌)或者炸弹或者王炸
         if(ruleOld.getPokersType() == PokerTypeEnum.PLANE_ALONE && pokers.size() >= size){
             //判断飞机(不带牌)
-            Iterator<String> it = countMap.keySet().iterator();
 
             //判断炸弹
             List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
@@ -398,7 +408,33 @@ public class PokerUtil {
         if(ruleOld.getPokersType() == PokerTypeEnum.STRAIGHTS_SINGLE && pokers.size() >= size){
             //判断顺子
             Iterator<String> it = countMap.keySet().iterator();
-            
+            List<String> valueList = new ArrayList<>();
+            while(it.hasNext()){
+                valueList.add(it.next());
+            }
+            Iterator<String> it1 = countMap.keySet().iterator();
+            int count = -1;
+            while(it1.hasNext()){
+                String value = it.next();
+                count++;
+                if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                    //判断是否存在顺子，根据上家的顺子的size进行寻找，若头尾都符合，则判断为顺子存在
+                    if(PokerValueEnum.getByValue(valueList.get(count + size - 1)).getWeight() - PokerValueEnum.getByValue(value).getWeight() == size - 1 ){
+                        List<Poker> selected = new ArrayList<>();
+                        for(int i = count; i <= count + size - 1 ; i++){
+                            String single = valueList.get(i);
+                            for(Poker p : pokers){
+                                //找到需要的单牌，若有多张则只取第一张
+                                if(p.getValueEnum().getValue().equals(single)){
+                                    selected.add(p);
+                                    break;
+                                }
+                            }
+                        }
+                        resultList.add(selected);
+                    }
+                }
+            }
             lastPutPokers.iterator().next().getValueEnum().getWeight();
 
             //判断炸弹
