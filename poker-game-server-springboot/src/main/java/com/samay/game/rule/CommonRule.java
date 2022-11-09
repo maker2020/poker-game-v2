@@ -1,5 +1,6 @@
 package com.samay.game.rule;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -54,8 +55,8 @@ public class CommonRule implements GameRule {
         else if (putPokers == null && lastPutPokers != null)
             return true;
         return single() || doublePut() || three() || threeWithOne() ||
-                threeWithTwo() || planeAlone() || planeWithTwo() ||
-                planeWithFour() || fourWithTwo() || fourWithFour() ||
+                threeWithTwo() || planeAlone() || planeWithSingle() ||
+                planeWithDouble() || fourWithTwo() || fourWithFour() ||
                 singleStraights() || doubleStraights() || boom();
     }
 
@@ -90,13 +91,13 @@ public class CommonRule implements GameRule {
             putPokers = backup;
             return byPlaneAlone();
         }
-        if (planeWithTwo()) {
+        if (planeWithSingle()) {
             putPokers = backup;
-            return byPlaneWithTwo();
+            return byPlaneWithSingle();
         }
-        if (planeWithFour()) {
+        if (planeWithDouble()) {
             putPokers = backup;
-            return byPlaneWithFour();
+            return byPlaneWithDouble();
         }
         if (fourWithTwo()) {
             putPokers = backup;
@@ -176,19 +177,19 @@ public class CommonRule implements GameRule {
                 .getWeight();
     }
 
-    private boolean byPlaneWithTwo() {
+    private boolean byPlaneWithSingle() {
         if (boom())
             return true;
-        if (!planeWithTwo())
+        if (!planeWithSingle())
             return false;
         return putPokers.iterator().next().getValueEnum().getWeight() > lastPutPokers.iterator().next().getValueEnum()
                 .getWeight();
     }
 
-    private boolean byPlaneWithFour() {
+    private boolean byPlaneWithDouble() {
         if (boom())
             return true;
-        if (!planeWithFour())
+        if (!planeWithDouble())
             return false;
         return putPokers.iterator().next().getValueEnum().getWeight() > lastPutPokers.iterator().next().getValueEnum()
                 .getWeight();
@@ -289,50 +290,74 @@ public class CommonRule implements GameRule {
     }
 
     private boolean planeAlone() {
-        if (putPokers.size() != 6)
+        /* if (putPokers.size() < 6)
             return false;
         Iterator<? extends Poker> it = putPokers.iterator();
         Poker last = it.next();
         int countSame = 0;
+        int planeLen = 0;
         while (it.hasNext()) {
             Poker now = it.next();
             if (now.getValueEnum() == last.getValueEnum()) {
                 countSame++;
             } else {
                 if (countSame != 2)
-                    countSame = 0;
+                    return false;
+                else
+                    planeLen++;
             }
             last = now;
         }
-        return countSame == 4;
+        return planeLen == putPokers.size()/3*2; */
+        return false;
     }
 
-    private boolean planeWithTwo() {
-        if (putPokers.size() != 8)
+    private boolean planeWithSingle() {
+        if (putPokers.size() < 8)
             return false;
         List<? extends Poker> list = (List<? extends Poker>) putPokers;
-        putPokers = list.subList(0, 6);
-        boolean f1 = planeAlone();
-        boolean f2 = !list.get(5).equalsValue(list.get(6));
-        putPokers = list;
-        return f1 && f2;
+        int last=list.size()-2; // (最小飞机的可能)
+        int planeLen=0;
+        while (last>5) {
+            putPokers=list.subList(0, last);
+            if(planeAlone()){
+                planeLen=putPokers.size();
+                break;
+            }else last--;
+        }
+        // 恢复
+        putPokers=list;
+        return planeLen!=0 && list.size()-last==planeLen/3;
     }
 
-    private boolean planeWithFour() {
-        if (putPokers.size() != 10)
+    private boolean planeWithDouble() {
+        if (putPokers.size() < 10)
             return false;
         List<? extends Poker> list = (List<? extends Poker>) putPokers;
-        putPokers = list.subList(0, 6);
-        boolean f1 = planeAlone();
-        List<? extends Poker> subList1 = list.subList(6, 8);
-        List<? extends Poker> subList2 = list.subList(8, 10);
-        putPokers = subList1;
-        boolean f2 = doublePut();
-        putPokers = subList2;
-        boolean f3 = doublePut();
-        boolean f4 = !subList1.get(0).equalsValue(subList2.get(0));
+        int last=list.size()-4;
+        int planeLen=0;
+        while (last>5) {
+            putPokers=list.subList(0, last);
+            if(planeAlone()){
+                planeLen=putPokers.size();
+                break;
+            }else last--;
+        }
+        boolean f1=planeLen!=0;
+        // 判断带的牌皆为对子
+        boolean f2=true;
+        int begin=last;
+        while (begin<list.size()-2) {
+            putPokers=list.subList(begin, begin+2);
+            if(!doublePut()){
+                f2=false;
+                break;
+            }
+        }
+        // 判断对子数量满足纯飞机/3的数量
+        boolean f3=planeLen/3==(list.size()-last)/2;
         putPokers = list;
-        return f1 && f2 && f3 && f4;
+        return f1&&f2&&f3;
     }
 
     private boolean fourWithTwo() {
@@ -476,13 +501,32 @@ public class CommonRule implements GameRule {
         if(threeWithOne()) return PokerTypeEnum.TRIPLE_SINGLE;
         if(threeWithTwo()) return PokerTypeEnum.TRIPLE_DOUBLE;
         if(planeAlone()) return PokerTypeEnum.PLANE_ALONE;
-        if(planeWithTwo()) return PokerTypeEnum.PLANE_SINGLE;
-        if(planeWithFour()) return PokerTypeEnum.PLANE_DOUBLE;
+        if(planeWithSingle()) return PokerTypeEnum.PLANE_SINGLE;
+        if(planeWithDouble()) return PokerTypeEnum.PLANE_DOUBLE;
         if(fourWithTwo()) return PokerTypeEnum.BOOM_SINGLE;
         if(fourWithFour()) return PokerTypeEnum.BOOM_DOUBLE;
         if(singleStraights()) return PokerTypeEnum.STRAIGHTS_SINGLE;
         if(doubleStraights()) return PokerTypeEnum.STRAIGHTS_DOUBLE;
         return null;
+    }
+    
+    public static void main(String[] args) {
+        List<Poker> list=new ArrayList<>(){{
+            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Five));
+            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Five));
+            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Five));
+
+            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Six));
+            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Six));
+            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Six));
+
+            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Seven));
+            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Seven));
+            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Seven));
+
+        }};
+        CommonRule rule=new CommonRule(list, null);
+        System.out.println(rule.getPokersType());
     }
 
 }
