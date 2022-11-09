@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.samay.game.Game;
 import com.samay.game.entity.Player;
@@ -64,16 +66,31 @@ public class PokerUtil {
 
     public static List<List<Poker>> tipPokers(Player player,Game game){
         List<List<Poker>> resultList = new ArrayList<>();
-        Collection<Poker> pokers=player.getPokers();
+        List<Poker> pokersList=player.getPokers();
+        List<Poker> tmpPokersList=new ArrayList<>();
+        Collections.copy(tmpPokersList, pokersList);
+        Collections.reverse(tmpPokersList);
+        Collection<Poker> pokers=tmpPokersList;
         //记录当前手牌各个牌的出现次数，便于进行分组统计，与上家进行比对
-        Map<String, Integer> countMap = new HashMap<>();
+        Map<String, Integer> countMapSort = new HashMap<>();
         for (Poker p : pokers) {
-            if (!countMap.containsKey(p.getValueEnum().getValue())) {
-                countMap.put(p.getValueEnum().getValue(), 1);
+            if (!countMapSort.containsKey(p.getValueEnum().getValue())) {
+                countMapSort.put(p.getValueEnum().getValue(), 1);
             } else {
-                countMap.put(p.getValueEnum().getValue(), countMap.get(p.getValueEnum().getValue()) + 1);
+                countMapSort.put(p.getValueEnum().getValue(), countMapSort.get(p.getValueEnum().getValue()) + 1);
             }
         }
+        List<Entry<String,Integer>> list=new ArrayList<>(countMapSort.entrySet());
+        Collections.sort(list, ((o1, o2) -> {
+            int w1=PokerValueEnum.getByValue(o1.getKey()).getWeight();
+            int w2=PokerValueEnum.getByValue(o2.getKey()).getWeight();
+            return w1-w2;
+        }));
+        LinkedHashMap<String,Integer> countMap=new LinkedHashMap<>();
+        for(Entry<String,Integer> entry:list){
+            countMap.put(entry.getKey(), entry.getValue());
+        }
+
         Collection<Poker> lastPutPokers=game.getLastPutPokers();
         //获取上家出的牌的长度，确定本次提示需要出牌数量
         int size = lastPutPokers.size();
@@ -377,10 +394,8 @@ public class PokerUtil {
         if(ruleOld.getPokersType() == PokerTypeEnum.STRAIGHTS_SINGLE && pokers.size() >= size){
             //判断顺子
             Iterator<String> it = countMap.keySet().iterator();
-            List<String> list = new ArrayList<>();
-            while(it.hasNext()){
-                list.add(it.next());
-            }
+            
+            lastPutPokers.iterator().next().getValueEnum().getWeight();
 
             //判断炸弹
             List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
