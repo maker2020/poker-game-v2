@@ -1,6 +1,5 @@
 package com.samay.game.rule;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -290,7 +289,7 @@ public class CommonRule implements GameRule {
     }
 
     private boolean planeAlone() {
-        /* if (putPokers.size() < 6)
+        if (putPokers.size() < 6)
             return false;
         Iterator<? extends Poker> it = putPokers.iterator();
         Poker last = it.next();
@@ -298,18 +297,19 @@ public class CommonRule implements GameRule {
         int planeLen = 0;
         while (it.hasNext()) {
             Poker now = it.next();
+            if(countSame==2){
+                if(now.getValueEnum().getWeight()!=last.getValueEnum().getWeight()+1) return false;
+                countSame=0;
+            }
             if (now.getValueEnum() == last.getValueEnum()) {
                 countSame++;
-            } else {
-                if (countSame != 2)
-                    return false;
-                else
-                    planeLen++;
+                if(countSame==2) planeLen++;
+            }else{
+                countSame=0;
             }
             last = now;
         }
-        return planeLen == putPokers.size()/3*2; */
-        return false;
+        return planeLen*3 == putPokers.size();
     }
 
     private boolean planeWithSingle() {
@@ -353,6 +353,7 @@ public class CommonRule implements GameRule {
                 f2=false;
                 break;
             }
+            begin+=2;
         }
         // 判断对子数量满足纯飞机/3的数量
         boolean f3=planeLen/3==(list.size()-last)/2;
@@ -508,25 +509,6 @@ public class CommonRule implements GameRule {
         if(singleStraights()) return PokerTypeEnum.STRAIGHTS_SINGLE;
         if(doubleStraights()) return PokerTypeEnum.STRAIGHTS_DOUBLE;
         return null;
-    }
-    
-    public static void main(String[] args) {
-        List<Poker> list=new ArrayList<>(){{
-            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Five));
-            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Five));
-            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Five));
-
-            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Six));
-            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Six));
-            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Six));
-
-            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Seven));
-            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Seven));
-            add(new Poker(PokerColorEnum.CLUB, PokerValueEnum.Seven));
-
-        }};
-        CommonRule rule=new CommonRule(list, null);
-        System.out.println(rule.getPokersType());
     }
 
 }
