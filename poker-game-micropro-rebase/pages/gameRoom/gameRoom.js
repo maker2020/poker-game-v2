@@ -29,7 +29,10 @@ Page({
 
         // UI体验相关辅助变量
         touchStartPos: {},
-        pokerDiff: ''
+        pokerDiff: '',
+
+        // 提示辅助变量
+        tipIndex:0,
     },
 
     /**
@@ -224,6 +227,11 @@ Page({
         this.setData({
             turnFlag: data.turn,
             action: data.action
+        })
+
+        // 提示辅助变量 tipIndex重置
+        this.setData({
+            tipIndex:0
         })
     },
     updateNotification(data) {
@@ -533,6 +541,20 @@ Page({
         }
         wx.sendSocketMessage({
             data: JSON.stringify(params),
+        })
+    },
+
+    tip(){
+        var params={
+            "action":"tip",
+            "tendency":true,
+            "tipIndex":this.data.tipIndex
+        }
+        wx.sendSocketMessage({
+          data: JSON.stringify(params),
+        })
+        this.setData({
+            tipIndex:this.data.tipIndex+1
         })
     },
 

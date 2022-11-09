@@ -147,4 +147,15 @@ public class ResultVO {
         return map;
     }
 
+    /**
+     * 返回出牌提示信息
+     * @return
+     */
+    public static Map<String,Object> tipResult(List<Poker> pokers,boolean exist){
+        Map<String,Object> map=new HashMap<>();
+        map.put("tipPokers", pokers);
+        map.put("exist", exist);
+        return map;
+    }
+
 }

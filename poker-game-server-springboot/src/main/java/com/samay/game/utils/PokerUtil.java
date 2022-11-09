@@ -1,12 +1,22 @@
 package com.samay.game.utils;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.samay.game.Game;
+import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
 import com.samay.game.entity.Poker.PokerComparator;
+import com.samay.game.rule.CommonRule;
+import com.samay.game.enums.PokerColorEnum;
+import com.samay.game.enums.PokerTypeEnum;
+import com.samay.game.enums.PokerValueEnum;
+
 
 /**
  * 扑克牌工具类
@@ -41,7 +51,7 @@ public class PokerUtil {
                 return -1;
             } else if (countMap.get(p1.getValueEnum().getValue()) < countMap.get(p2.getValueEnum().getValue())) {
                 return 1;
-            } else {
+            } else {            
                 if (p1.getValueEnum().getWeight() > p2.getValueEnum().getWeight())
                     return 1;
                 else if (p1.getValueEnum().getWeight() < p2.getValueEnum().getWeight())
@@ -50,6 +60,386 @@ public class PokerUtil {
                     return 0;
             }
         });
+    }
+
+    public static List<List<Poker>> tipPokers(Player player,Game game){
+        List<List<Poker>> resultList = new ArrayList<>();
+        Collection<Poker> pokers=player.getPokers();
+        //记录当前手牌各个牌的出现次数，便于进行分组统计，与上家进行比对
+        Map<String, Integer> countMap = new HashMap<>();
+        for (Poker p : pokers) {
+            if (!countMap.containsKey(p.getValueEnum().getValue())) {
+                countMap.put(p.getValueEnum().getValue(), 1);
+            } else {
+                countMap.put(p.getValueEnum().getValue(), countMap.get(p.getValueEnum().getValue()) + 1);
+            }
+        }
+        Collection<Poker> lastPutPokers=game.getLastPutPokers();
+        //获取上家出的牌的长度，确定本次提示需要出牌数量
+        int size = lastPutPokers.size();
+        //判断上家出牌类型，确定本次提示需要出牌的类型
+        CommonRule ruleOld=new CommonRule(lastPutPokers, null);
+        //当上家出牌为炸弹时，判断自己是否有比他大的炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.BOOM && size == 4 && pokers.size() > 1){
+            //记录大小王个数，若count为2，则表示当前手牌有王炸并加入提示列表中
+            int count = 0;
+            Iterator<String> it=countMap.keySet().iterator();
+            while (it.hasNext()) {
+                String value=it.next();
+                if(value.equals("X") || value.equals("Y")) count++;
+                if(countMap.get(value)==4){
+                    if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                        List<Poker> selected=new ArrayList<>();
+                        for(Poker p : pokers){
+                            if(p.getValueEnum().getValue().equals(value)){
+                                selected.add(p);
+                            }
+                        }
+                        resultList.add(selected);
+                    }
+                }
+                if(count == 2){
+                    List<Poker> jokerPokers = new ArrayList<>(){{
+                        add(new Poker(PokerColorEnum.HEART,PokerValueEnum.King));
+                        add(new Poker(PokerColorEnum.SPADE,PokerValueEnum.Queen));
+                    }};
+                    resultList.add(jokerPokers);
+                }
+            }
+        }
+        //当上家出牌为单牌时，判断自己是否有比他大的单牌或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.SINGLE){
+            //判断单牌
+            Iterator<String> it=countMap.keySet().iterator();
+            while(it.hasNext()){
+                String value = it.next();
+                if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                    List<Poker> selected = new ArrayList<>();
+                    //有多张相同单牌时，只提示第一张
+                    for(Poker p : pokers){
+                        if(p.getValueEnum().getValue().equals(value)){
+                            selected.add(p);
+                            break;
+                        }
+                    }
+                    resultList.add(selected);
+                }
+            }
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为对子时，判断自己是否有比他大的对子或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.DOUBLE && pokers.size() >= size){
+            //判断对子
+            Iterator<String> it = countMap.keySet().iterator();
+            while(it.hasNext()){
+                String value = it.next();
+                if(countMap.get(value) > 1){
+                    if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                        List<Poker> selected = new ArrayList<>();
+                        int count = 0;
+                        for(Poker p : pokers){
+                            //大于等于2张时，只取前面两张
+                            if(count < 2){
+                                if(p.getValueEnum().getValue().equals(value)){
+                                    selected.add(p);
+                                    count++;
+                                }
+                            }else break;
+                        }
+                        resultList.add(selected);
+                    }
+
+                }
+            }
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为相同三张时,判断自己是否有比他大的三张或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.TRIPLE && pokers.size() >= size){
+            //判断三张
+            Iterator<String> it = countMap.keySet().iterator();
+            while(it.hasNext()){
+                String value = it.next();
+                if(countMap.get(value) > 2){
+                    if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                        List<Poker> selected = new ArrayList<>();
+                        int count = 0;
+                        for(Poker p : pokers){
+                            if(count < 3){
+                                if(p.getValueEnum().getValue().equals(value)){
+                                    selected.add(p);
+                                    count++;
+                                }
+                            }else break;
+                        }
+                        resultList.add(selected);
+                    }
+                }
+            }
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为三带一时,判断自己是否有比他大的三带一或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.TRIPLE_SINGLE && pokers.size() >= size){
+            //判断三带一
+            Iterator<String> it = countMap.keySet().iterator();
+            while(it.hasNext()){
+                String value = it.next();
+                if(countMap.get(value) > 2){
+                    if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                        //三
+                        List<Poker> selected = new ArrayList<>();
+                        int count = 0;
+                        for(Poker p : pokers){
+                            if(count < 3){
+                                if(p.getValueEnum().getValue().equals(value)){
+                                    selected.add(p);
+                                    count++;
+                                }
+                            }else break;
+                        }
+                        //一
+                        Iterator<String> it1 = countMap.keySet().iterator();
+                        while(it1.hasNext()){
+                            String valueSingle = it1.next();
+                            if(!valueSingle.equals(value)){
+                                //有多张相同单牌时，只取第一张进行三带一
+                                List<Poker> selected1 = selected;
+                                for(Poker p : pokers){
+                                    if(p.getValueEnum().getValue().equals(valueSingle)){
+                                        selected1.add(p);
+                                        break;
+                                    }
+                                }
+                                resultList.add(selected1);
+                            }
+                        }
+                    }
+                }
+            }
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为三带二时,判断自己是否有比他大的三带二或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.TRIPLE_DOUBLE && pokers.size() >= size){
+            //判断三带二
+            Iterator<String> it = countMap.keySet().iterator();
+            while(it.hasNext()){
+                String value = it.next();
+                if(countMap.get(value) > 2){
+                    if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                        //三
+                        List<Poker> selected = new ArrayList<>();
+                        int count = 0;
+                        for(Poker p : pokers){
+                            if(count < 3){
+                                if(p.getValueEnum().getValue().equals(value)){
+                                    selected.add(p);
+                                    count++;
+                                }
+                            }else break;
+                        }
+                        //二
+                        Iterator<String> it1 = countMap.keySet().iterator();
+                        while(it1.hasNext()){
+                            String valueDouble = it1.next();
+                            if(!valueDouble.equals(value) && countMap.get(valueDouble) > 1){
+                                int countDouble = 0;
+                                for(Poker p : pokers){
+                                    //大于等于2张时，只取前面两张
+                                    if(countDouble < 2){
+                                        if(p.getValueEnum().getValue().equals(valueDouble)){
+                                            selected.add(p);
+                                            countDouble++;
+                                        }
+                                    }else break;
+                                }
+                                resultList.add(selected);
+                            }
+                        }
+                    }
+                }
+            }
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为飞机(不带牌)时,判断自己是否有比他大的飞机(不带牌)或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.PLANE_ALONE && pokers.size() >= size){
+            //判断飞机(不带牌)
+            Iterator<String> it = countMap.keySet().iterator();
+
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为飞机带单牌时,判断自己是否有比他大的飞机带单牌或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.PLANE_SINGLE && pokers.size() >= size){
+            //判断飞机带单牌
+
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为飞机带一对时,判断自己是否有比他大的飞机带一对或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.PLANE_DOUBLE && pokers.size() >= size){
+            //判断飞机带一对
+
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为四带两张时,判断自己是否有比他大的四带两张或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.BOOM_SINGLE && pokers.size() >= size){
+            //判断四带两张
+            Iterator<String> it=countMap.keySet().iterator();
+            while(it.hasNext()){
+                String value = it.next();
+                if(countMap.get(value) == 4){
+                    if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                        //四
+                        List<Poker> selected = new ArrayList<>();
+                        for(Poker p : pokers){
+                            if(p.getValueEnum().getValue().equals(value)){
+                                selected.add(p);
+                            }
+                        }
+                        //两张
+                        int count = 0;
+                        for(Poker p : pokers){
+                            if(count < 2){
+                                if(!p.getValueEnum().getValue().equals(value)){
+                                    selected.add(p);
+                                }
+                            }else break;
+                        }
+                        resultList.add(selected);
+                    }
+                }
+            }
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为四带两对时,判断自己是否有比他大的四带两对或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.BOOM_DOUBLE && pokers.size() >= size){
+            //判断四带两对
+            Iterator<String> it=countMap.keySet().iterator();
+            while(it.hasNext()){
+                String value = it.next();
+                if(countMap.get(value) == 4){
+                    if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                        //四
+                        List<Poker> selected = new ArrayList<>();
+                        for(Poker p : pokers){
+                            if(p.getValueEnum().getValue().equals(value)){
+                                selected.add(p);
+                            }
+                        }
+                        //两对
+                        Iterator<String> it1 = countMap.keySet().iterator();
+                        while(it1.hasNext()){
+                            
+                        }
+                    }
+                }
+            }
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为顺子时,判断自己是否有比他大的顺子或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.STRAIGHTS_SINGLE && pokers.size() >= size){
+            //判断顺子
+            Iterator<String> it = countMap.keySet().iterator();
+            List<String> list = new ArrayList<>();
+            while(it.hasNext()){
+                list.add(it.next());
+            }
+
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        //当上家出牌为连对时,判断自己是否有比他大的连对或者炸弹或者王炸
+        if(ruleOld.getPokersType() == PokerTypeEnum.STRAIGHTS_DOUBLE && pokers.size() >= size){
+            //判断连对
+            
+            //判断炸弹
+            List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
+            if(boomOrJokerBoom != null){
+                resultList.addAll(boomOrJokerBoom);
+            }
+        }
+        return resultList;
+    }
+
+    private static List<List<Poker>> BoomOrJokerBoom(Player player){
+        List<List<Poker>> resultList = new ArrayList<>();
+        Collection<Poker> pokers=player.getPokers();
+        if(pokers.size() > 1){
+            //记录当前手牌各个牌的出现次数，便于进行分组统计，与上家进行比对
+            Map<String, Integer> countMap = new HashMap<>();
+            for (Poker p : pokers) {
+                if (!countMap.containsKey(p.getValueEnum().getValue())) {
+                    countMap.put(p.getValueEnum().getValue(), 1);
+                } else {
+                    countMap.put(p.getValueEnum().getValue(), countMap.get(p.getValueEnum().getValue()) + 1);
+                }
+            }
+            Iterator<String> it=countMap.keySet().iterator();
+            //记录大小王个数，若count为2，则表示当前手牌有王炸并加入提示列表中
+            int count = 0;
+            //在List中写入炸弹和王炸
+            while(it.hasNext()){
+                String value = it.next();
+                if(value.equals("X") || value.equals("Y")) count++;
+                if(countMap.get(value)==4){
+                    List<Poker> selected=new ArrayList<>();
+                        for(Poker p : pokers){
+                            if(p.getValueEnum().getValue().equals(value)){
+                            selected.add(p);
+                        }
+                    }
+                resultList.add(selected);
+            }
+                if(count == 2){
+                    List<Poker> jokerPokers = new ArrayList<>(){{
+                        add(new Poker(PokerColorEnum.HEART,PokerValueEnum.King));
+                        add(new Poker(PokerColorEnum.SPADE,PokerValueEnum.Queen));
+                    }};
+                    resultList.add(jokerPokers);
+                }
+            }
+        }
+        return resultList;
     }
 
 }

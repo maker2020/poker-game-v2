@@ -5,7 +5,8 @@ public enum ActionEnum {
     READY("ready"),
     CALL("call"),
     ASK("ask"),
-    PUT("put");
+    PUT("put"),
+    TIP("tip");
 
     private String action;
 

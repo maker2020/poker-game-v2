@@ -18,6 +18,7 @@ import com.samay.netty.handler.PutPokerHandler;
 import com.samay.netty.handler.ReqBossHandler;
 import com.samay.netty.handler.RoomReadyHandler;
 import com.samay.netty.handler.TextWebSocketFrameHandler;
+import com.samay.netty.handler.TipPokerHandler;
 import com.samay.netty.handler.heart.HeartHandler;
 import com.samay.netty.handler.http.HttpRequestHandler;
 
@@ -52,6 +53,9 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     @Autowired
     private PutPokerHandler putPokerHandler;
 
+    @Autowired
+    private TipPokerHandler tipPokerHandler;
+
     @Value("${netty.websocket.max-frame-size}")
     private int maxFrameSize;
 
@@ -71,6 +75,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(gameReadyHandler);
         pipeline.addLast(reqBossHandler);
         pipeline.addLast(putPokerHandler);
+        pipeline.addLast(tipPokerHandler);
         pipeline.addLast(new IdleStateHandler(120, 120, 120));
         pipeline.addLast(new HeartHandler());
     }

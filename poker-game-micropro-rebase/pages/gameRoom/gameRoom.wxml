@@ -155,6 +155,7 @@
 
         <view class='btnCon' wx:if='{{ turnFlag==playerList[2].playerID && action=="put"}}'>
             <view class='cancel btn' bindtap='pass'>跳过</view>
+            <view class="sure btn" bindtap="tip">提示</view>
             <view class='sure btn' bindtap='put'>出牌</view>
         </view>
         <view class='btnCon' wx:if='{{turnFlag==playerList[2].playerID && action=="call"}}'>

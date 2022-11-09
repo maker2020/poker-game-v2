@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONValidator;
 import com.samay.game.dto.PutPokerDTO;
 import com.samay.game.dto.ReqBossDTO;
 import com.samay.game.dto.RoomReadyDTO;
+import com.samay.game.dto.TipPokerDTO;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.vo.ResultVO;
@@ -74,6 +75,9 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
             }
             case "put" -> {
                 return PutPokerDTO.class;
+            }
+            case "tip" -> {
+                return TipPokerDTO.class;
             }
             default -> {
                 return Object.class;
