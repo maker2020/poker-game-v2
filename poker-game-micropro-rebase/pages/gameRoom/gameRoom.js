@@ -31,8 +31,13 @@ Page({
         touchStartPos: {},
         pokerDiff: '',
 
-        // 提示辅助变量
+        // 提示辅助变量 (其他地方不需要重置)
         tipIndex:0,
+        lastPutPokers:[], // 上一个人出的牌
+        lastPutPlayerID:'', // 上一个出牌的玩家ID 
+
+        // 常量
+        operateTime:30, // 操作时间
     },
 
     /**
@@ -98,6 +103,10 @@ Page({
             if (data.resultTable) {
                 context.updateGameResult(data)
             }
+            // 收到反馈的提示
+            if(data.tipMsg){
+                context.updateTipPokers(data)
+            }
         })
     },
 
@@ -120,7 +129,9 @@ Page({
             gameResultTable:[],
             timer:{},
             touchStartPos:{},
-            pokerDiff:''
+            pokerDiff:'',
+            lastPutPokers:[],
+            lastPutPlayerID:''
         })
     },
 
@@ -205,7 +216,7 @@ Page({
         }
         // 设置时钟
         this.setData({
-            second: 7
+            second: this.data.operateTime
         })
         // 倒计时
         var context=this
@@ -272,7 +283,10 @@ Page({
                     for (var k = 0; k < putPokers.length; k++) {
                         if ((putPokers[k].colorEnum+'_'+putPokers[k].valueEnum)==myPokers[j].name) exist = true
                     }
-                    if (!exist) myPokersNew.push(myPokers[j])
+                    if (!exist) {
+                        myPokers[j].selected=false
+                        myPokersNew.push(myPokers[j])
+                    }
                 }
                 this.setData({
                     myPokers: myPokersNew
@@ -281,7 +295,13 @@ Page({
         }
         this.setData({
             playerListPut: playerListPut,
-            playerListRestPokerNum: playerListRestPokerNum
+            playerListRestPokerNum: playerListRestPokerNum,
+        })
+        
+        // 更新上一个出牌的玩家ID、上一个出的牌
+        this.setData({
+            lastPutPlayerID:notification.playerID,
+            lastPutPokers:putPokers
         })
     },
 
@@ -301,6 +321,31 @@ Page({
             icon: 'none',
             duration: 1500
         })
+    },
+    updateTipPokers(data){
+        if(data.exist){
+            var tipPokers=data.tipPokers
+            // 消除已选中，并选中提示的牌
+            var myPokers = this.data.myPokers
+            myPokers.forEach(function (item, i) {
+                item.selected = false
+                for(var j=0;j<tipPokers.length;j++){
+                    if((tipPokers[j].colorEnum+'_'+tipPokers[j].valueEnum)==item.name){
+                        item.selected=true
+                    }
+                }
+            })
+            this.setData({
+                myPokers: myPokers
+            })
+        }else{
+            // 弹出短暂的提示
+            wx.showToast({
+                title: '没有打的过的牌！',
+                icon: 'none',
+                duration: 1500
+            })
+        }
     },
     updateMultiple(data) {
         this.setData({

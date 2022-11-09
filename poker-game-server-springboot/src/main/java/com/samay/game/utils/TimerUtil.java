@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TimerUtil {
 
-    private static final long time = 7;
+    private static final long time = 30;
     private static final TimeUnit timeUnit = TimeUnit.SECONDS;
 
     private static Map<String, Object> playerAct = Collections.synchronizedMap(new HashMap<>());

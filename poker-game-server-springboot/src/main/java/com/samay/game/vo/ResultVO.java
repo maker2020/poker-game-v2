@@ -155,6 +155,7 @@ public class ResultVO {
         Map<String,Object> map=new HashMap<>();
         map.put("tipPokers", pokers);
         map.put("exist", exist);
+        map.put("tipMsg", "none");
         return map;
     }
 
