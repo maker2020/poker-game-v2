@@ -67,7 +67,11 @@ public class PokerUtil {
     public static List<List<Poker>> tipPokers(Player player,Game game){
         List<List<Poker>> resultList = new ArrayList<>();
         List<Poker> pokersList=player.getPokers();
-        List<Poker> tmpPokersList=new ArrayList<>();
+        List<Poker> tmpPokersList=new ArrayList<>(){{
+            for(int i=0;i<pokersList.size();i++){
+                add(null);
+            }
+        }};
         Collections.copy(tmpPokersList, pokersList);
         Collections.reverse(tmpPokersList);
         Collection<Poker> pokers=tmpPokersList;

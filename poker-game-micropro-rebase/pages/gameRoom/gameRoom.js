@@ -259,6 +259,17 @@ Page({
         this.setData({
             playerListNotice: playerListNotice
         })
+
+        // 玩家选择不出牌，则清除 选中状态
+        if(notification.playerID==playerList[2].playerID && !notification.choice && notification.type=='PUT'){
+            var myPokers=this.data.myPokers
+            myPokers.forEach(function(item,i){
+                item.selected=false
+            })
+            this.setData({
+                myPokers:myPokers
+            })
+        }
     },
 
     updatePutStatus(data) {
