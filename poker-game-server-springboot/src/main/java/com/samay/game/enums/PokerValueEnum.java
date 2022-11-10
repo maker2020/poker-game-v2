@@ -4,7 +4,7 @@ package com.samay.game.enums;
  * 扑克牌值枚举
  */
 public enum PokerValueEnum {
-    A("A",1,13),
+    A("A",1,12),
     Two("2",2,14),
     Three("3",3,1),
     Four("4",4,2),
