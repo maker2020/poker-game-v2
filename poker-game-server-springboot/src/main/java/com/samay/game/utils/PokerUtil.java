@@ -295,10 +295,12 @@ public class PokerUtil {
                                     if(countDouble < 2){
                                         if(p.getValueEnum().getValue().equals(valueDouble)){
                                             selected1.add(p);
-                                            resultList.add(selected1);
                                             countDouble++;
                                         }
-                                    }else break;
+                                    }else{
+                                        resultList.add(selected1);
+                                        break;
+                                    }
                                 }
                             }
                         }
