@@ -1,7 +1,6 @@
 package com.samay.game.entity;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -59,8 +58,8 @@ public class Room implements Serializable {
         if(player==null){ // 叫地主
             // 随机选一名玩家作为第一个叫地主的
             Random random = new Random(System.currentTimeMillis());
-            Player randomPlayer = game.getPlayers().get(random.nextInt(0, 2));
-            Collections.shuffle(getPlayers(), random); // 打乱players顺序
+            Player randomPlayer = game.getPlayers().get(random.nextInt(0, 3));
+            // Collections.shuffle(getPlayers(), random); // 打乱players顺序
             playerID=randomPlayer.getId();
         }else done: {
             boolean restart=true;
