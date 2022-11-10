@@ -4,8 +4,8 @@ package com.samay.game.enums;
  * 扑克牌值枚举
  */
 public enum PokerValueEnum {
-    A("A",1,12),
-    Two("2",2,13),
+    A("A",1,13),
+    Two("2",2,14),
     Three("3",3,1),
     Four("4",4,2),
     Five("5",5,3),
@@ -17,8 +17,8 @@ public enum PokerValueEnum {
     J("J",11,9),
     Q("Q",12,10),
     K("K",13,11),
-    Queen("X",14,14),
-    King("Y",15,15);
+    Queen("X",14,15),
+    King("Y",15,16);
 
     private String value;
     private int code;
