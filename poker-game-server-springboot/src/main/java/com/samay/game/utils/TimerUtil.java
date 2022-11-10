@@ -1,10 +1,9 @@
 package com.samay.game.utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -34,7 +33,8 @@ public class TimerUtil {
     private static final long time = 30;
     private static final TimeUnit timeUnit = TimeUnit.SECONDS;
 
-    private static Map<String, Object> playerAct = Collections.synchronizedMap(new HashMap<>());
+    private static Map<String, Object> playerAct = new ConcurrentHashMap<>();
+    private static final Object NULL=new Object();
 
     /**
      * <b>指定操作类型的时间监测</b>
@@ -45,40 +45,43 @@ public class TimerUtil {
      * @param ch     通道
      */
     public static void checkTimeout(ActionEnum action, String playerID) throws Exception {
-        if (playerID == null || action == null)
-            return;
-        if (playerAct.get(playerID) == null) {
-            log.info("player ["+playerID+"]/"+action.getAction()+" 已开启限时监测");
-            playerAct.put(playerID, new Object());
-            ExecutorService exec = Executors.newFixedThreadPool(2);
-            Future<?> future = exec.submit(() -> {
-                synchronized (playerAct.get(playerID)) {
-                    playerAct.get(playerID).wait();
-                }
-                playerAct.put(playerID, null);
-                return playerID;
-            });
-            exec.submit(() -> {
-                try {
-                    future.get(time, timeUnit);
-                } catch (Exception e) {
-                    if (e instanceof TimeoutException) {
-                        log.info("player ["+playerID+"]/"+action.getAction()+" 已超时，被系统默认处理");
-                        // 根据action，做出默认操作
-                        defaultAction(action, ChannelHolder.getByPlayerID(playerID));
-                    } else {
-                        log.error("超时检测异常", e);
+        synchronized(playerID){
+            if (playerID == null || action == null)
+                return;
+            if (playerAct.get(playerID) == null || playerAct.get(playerID)==NULL) {
+                log.info("player ["+playerID+"]/"+action.getAction()+" 已开启限时监测");
+                playerAct.put(playerID, new Object());
+                ExecutorService exec = Executors.newFixedThreadPool(2);
+                Future<?> future = exec.submit(() -> {
+                    synchronized (playerAct.get(playerID)) {
+                        playerAct.get(playerID).wait();
                     }
-                    // 不需要再次唤醒，因为做出操作后默认会调用一次checkTimeout()
-                    /* synchronized(playerAct.get(playerID)){
-                        playerAct.get(playerID).notify();                    
-                    } */
+                    playerAct.put(playerID, NULL);
+                    return playerID;
+                });
+                exec.submit(() -> {
+                    try {
+                        future.get(time, timeUnit);
+                    } catch (Exception e) {
+                        if (e instanceof TimeoutException) {
+                            log.info("player ["+playerID+"]/"+action.getAction()+" 已超时，被系统默认处理");
+                            // 根据action，做出默认操作
+                            defaultAction(action, ChannelHolder.getByPlayerID(playerID));
+                        } else {
+                            log.error("超时检测异常", e);
+                        }
+                        // 不需要再次唤醒，因为做出操作后默认会调用一次checkTimeout()
+                        /* synchronized(playerAct.get(playerID)){
+                            playerAct.get(playerID).notify();                    
+                        } */
+                    }
+                });
+            } else {
+                if(playerAct.get(playerID)==null) return;
+                log.info("player ["+playerID+"]/"+action.getAction()+" 已解除限时监测");
+                synchronized (playerAct.get(playerID)) {
+                    playerAct.get(playerID).notify();
                 }
-            });
-        } else {
-            log.info("player ["+playerID+"]/"+action.getAction()+" 已解除限时监测");
-            synchronized (playerAct.get(playerID)) {
-                playerAct.get(playerID).notify();
             }
         }
     }

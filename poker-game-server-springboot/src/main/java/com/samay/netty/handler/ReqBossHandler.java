@@ -48,6 +48,7 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         // 针对客户端请求出牌不合规的校验
         if (!game.getActingPlayer().equals(player.getId())) {
             log.warn("player [" + player.getId() + "] 不合规请求已被拦截处理");
+            return;
         }
 
         // 维护player请求序号
