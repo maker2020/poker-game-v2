@@ -316,7 +316,10 @@ public class PokerUtil {
         //当上家出牌为飞机(不带牌)时,判断自己是否有比他大的飞机(不带牌)或者炸弹或者王炸
         if(ruleOld.getPokersType() == PokerTypeEnum.PLANE_ALONE && pokers.size() >= size){
             //判断飞机(不带牌)
+            Iterator<String> it = countMap.keySet().iterator();
+            while(it.hasNext()){
 
+            }
             //判断炸弹
             List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
             if(boomOrJokerBoom != null){
@@ -463,41 +466,59 @@ public class PokerUtil {
 
     private static List<List<Poker>> BoomOrJokerBoom(Player player){
         List<List<Poker>> resultList = new ArrayList<>();
-        Collection<Poker> pokers=player.getPokers();
+        List<Poker> pokersList=player.getPokers();
+        List<Poker> tmpPokersList=new ArrayList<>(){{
+            for(int i=0;i<pokersList.size();i++){
+                add(null);
+            }
+        }};
+        Collections.copy(tmpPokersList, pokersList);
+        Collections.reverse(tmpPokersList);
+        Collection<Poker> pokers=tmpPokersList;
         if(pokers.size() > 1){
             //记录当前手牌各个牌的出现次数，便于进行分组统计，与上家进行比对
-            Map<String, Integer> countMap = new HashMap<>();
+            Map<String, Integer> countMapSort = new HashMap<>();
             for (Poker p : pokers) {
-                if (!countMap.containsKey(p.getValueEnum().getValue())) {
-                    countMap.put(p.getValueEnum().getValue(), 1);
+                if (!countMapSort.containsKey(p.getValueEnum().getValue())) {
+                    countMapSort.put(p.getValueEnum().getValue(), 1);
                 } else {
-                    countMap.put(p.getValueEnum().getValue(), countMap.get(p.getValueEnum().getValue()) + 1);
+                    countMapSort.put(p.getValueEnum().getValue(), countMapSort.get(p.getValueEnum().getValue()) + 1);
                 }
             }
-            Iterator<String> it=countMap.keySet().iterator();
-            //记录大小王个数，若count为2，则表示当前手牌有王炸并加入提示列表中
-            int count = 0;
-            //在List中写入炸弹和王炸
-            while(it.hasNext()){
-                String value = it.next();
-                if(value.equals("X") || value.equals("Y")) count++;
-                if(countMap.get(value)==4){
-                    List<Poker> selected=new ArrayList<>();
-                        for(Poker p : pokers){
-                            if(p.getValueEnum().getValue().equals(value)){
-                            selected.add(p);
+            List<Entry<String,Integer>> list=new ArrayList<>(countMapSort.entrySet());
+            Collections.sort(list, ((o1, o2) -> {
+                int w1=PokerValueEnum.getByValue(o1.getKey()).getWeight();
+                int w2=PokerValueEnum.getByValue(o2.getKey()).getWeight();
+                return w1-w2;
+            }));
+            LinkedHashMap<String,Integer> countMap=new LinkedHashMap<>();
+            for(Entry<String,Integer> entry:list){
+                countMap.put(entry.getKey(), entry.getValue());
+            }
+                Iterator<String> it=countMap.keySet().iterator();
+                //记录大小王个数，若count为2，则表示当前手牌有王炸并加入提示列表中
+                int count = 0;
+                //在List中写入炸弹和王炸
+                while(it.hasNext()){
+                    String value = it.next();
+                    if(value.equals("X") || value.equals("Y")) count++;
+                    if(countMap.get(value)==4){
+                        List<Poker> selected=new ArrayList<>();
+                            for(Poker p : pokers){
+                                if(p.getValueEnum().getValue().equals(value)){
+                                selected.add(p);
+                            }
                         }
-                    }
-                resultList.add(selected);
-            }
-                if(count == 2){
-                    List<Poker> jokerPokers = new ArrayList<>(){{
-                        add(new Poker(PokerColorEnum.HEART,PokerValueEnum.King));
-                        add(new Poker(PokerColorEnum.SPADE,PokerValueEnum.Queen));
-                    }};
-                    resultList.add(jokerPokers);
+                    resultList.add(selected);
                 }
-            }
+                    if(count == 2){
+                        List<Poker> jokerPokers = new ArrayList<>(){{
+                            add(new Poker(PokerColorEnum.HEART,PokerValueEnum.King));
+                            add(new Poker(PokerColorEnum.SPADE,PokerValueEnum.Queen));
+                        }};
+                        resultList.add(jokerPokers);
+                    }
+                }
         }
         return resultList;
     }
