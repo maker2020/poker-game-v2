@@ -317,8 +317,46 @@ public class PokerUtil {
         if(ruleOld.getPokersType() == PokerTypeEnum.PLANE_ALONE && pokers.size() >= size){
             //判断飞机(不带牌)
             Iterator<String> it = countMap.keySet().iterator();
+            List<String> valueList = new ArrayList<>();
             while(it.hasNext()){
-
+                valueList.add(it.next());
+            }
+            Iterator<String> it1 = countMap.keySet().iterator();
+            int count = -1;
+            while(it1.hasNext()){
+                String value = it1.next();
+                count++;
+                //判断当前牌是否比上家大，且数量大于2
+                if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight() && countMap.get(value) > 2){
+                    if(count + size / 3 - 1 < valueList.size()){
+                        //判断是否在不看数量的情况下能否成为飞机
+                        if(PokerValueEnum.getByValue(valueList.get(count + size / 3 - 1)).getWeight() - PokerValueEnum.getByValue(value).getWeight() == size / 3 - 1){
+                            List<String> planeList = new ArrayList<>();
+                            //判断数量是否大于2，若大于2则存入list
+                            for(int i = count ; i <= count + size / 3 - 1 ; i++){
+                                if(countMap.get(valueList.get(i)) > 2){
+                                    planeList.add(valueList.get(i));
+                                }
+                            }
+                            //list大小正确 则可提示出牌
+                            if(planeList.size() == size / 3){
+                                List<Poker> selected = new ArrayList<>();
+                                for(int j = 0 ; j < planeList.size() ; j++){
+                                    int num = 0;
+                                    for(Poker p : pokers){
+                                        if(num < 3){
+                                            if(p.getValueEnum().getValue().equals(planeList.get(j))){
+                                                selected.add(p);
+                                                num++;
+                                            }
+                                        }else break;
+                                    }
+                                }
+                                resultList.add(selected);
+                            }
+                        }
+                    }
+                }
             }
             //判断炸弹
             List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
