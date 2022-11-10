@@ -415,25 +415,28 @@ public class PokerUtil {
             Iterator<String> it1 = countMap.keySet().iterator();
             int count = -1;
             while(it1.hasNext()){
-                String value = it.next();
+                String value = it1.next();
                 count++;
                 if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
                     //判断是否存在顺子，根据上家的顺子的size进行寻找，若头尾都符合，则判断为顺子存在
-                    if(PokerValueEnum.getByValue(valueList.get(count + size - 1)).getWeight() - PokerValueEnum.getByValue(value).getWeight() == size - 1 ){
-                        List<Poker> selected = new ArrayList<>();
-                        for(int i = count; i <= count + size - 1 ; i++){
-                            String single = valueList.get(i);
-                            for(Poker p : pokers){
-                                //找到需要的单牌，若有多张则只取第一张
-                                if(p.getValueEnum().getValue().equals(single)){
-                                    selected.add(p);
-                                    break;
+                    if(count + size - 1 < valueList.size()){
+                        if(PokerValueEnum.getByValue(valueList.get(count + size - 1)).getWeight() - PokerValueEnum.getByValue(value).getWeight() == size - 1 ){
+                            List<Poker> selected = new ArrayList<>();
+                            for(int i = count; i <= count + size - 1 ; i++){
+                                String single = valueList.get(i);
+                                for(Poker p : pokers){
+                                    //找到需要的单牌，若有多张则只取第一张
+                                    if(p.getValueEnum().getValue().equals(single)){
+                                        selected.add(p);
+                                        break;
+                                    }
                                 }
                             }
+                            resultList.add(selected);
                         }
-                        resultList.add(selected);
                     }
-                }
+                    }
+                    
             }
             lastPutPokers.iterator().next().getValueEnum().getWeight();
 
