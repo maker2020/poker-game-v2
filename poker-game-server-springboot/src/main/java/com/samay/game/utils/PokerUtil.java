@@ -387,7 +387,8 @@ public class PokerUtil {
                 temp = 3;
             }
             while(it1.hasNext()){
-                String value = it.next();
+                String value = it1.next();
+                count++;
                 if(countMap.get(value) > 2 && PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
                     if(count + temp < valueList.size()){
                         if(PokerValueEnum.getByValue(valueList.get(count + temp)).getWeight() - PokerValueEnum.getByValue(value).getWeight() == temp){
@@ -413,19 +414,41 @@ public class PokerUtil {
                                     }
                                 }
                                 //将List中已经是飞机的牌除去
-                                for(int i = 0; i < valueList.size() ; i++){
+                                List<String> valueList1 = new ArrayList<>(){{
+                                    for(int i = 0; i < valueList.size() ; i++){
+                                        add(null);
+                                    }
+                                }};
+                                Collections.copy(valueList1, valueList);
+                                for(int i = 0; i < valueList1.size() ; i++){
                                     for(int j = 0; j < planeList.size(); j++){
-                                        if(valueList.get(i) == planeList.get(j)){
-                                            valueList.remove(i);
+                                        if(valueList1.get(i) == planeList.get(j)){
+                                            valueList1.remove(i--);
+                                            break;
+                                        }
+                                    }
+                                }
+                                List<Poker> plane = new ArrayList<>();
+                                for(int i = 0; i < valueList1.size() ; i++){
+                                    for(Poker p : pokers){
+                                        if(p.getValueEnum().getValue().equals(valueList1.get(i))){
+                                            plane.add(p);
+                                            break;
                                         }
                                     }
                                 }
                                 //取飞机的翅膀
-                                for(int i = 0; i < valueList.size(); i++){
-                                    //
-                                    
+                                List<List<Poker>> planeSingle = combinePokers(plane, temp + 1);
+                                for(int i = 0 ; i < planeSingle.size() ; i++){
+                                    List<Poker> selected1 = new ArrayList<>(){{
+                                        for(int i = 0; i < selected.size() ; i++){
+                                            add(null);
+                                        }
+                                    }};
+                                    Collections.copy(selected1, selected);
+                                    selected1.addAll(planeSingle.get(i));
+                                    resultList.add(selected1);  
                                 }
-                                resultList.add(selected);
                             }
                         }
                     }
@@ -440,7 +463,108 @@ public class PokerUtil {
         //当上家出牌为飞机带一对时,判断自己是否有比他大的飞机带一对或者炸弹或者王炸
         if(ruleOld.getPokersType() == PokerTypeEnum.PLANE_DOUBLE && pokers.size() >= size){
             //判断飞机带一对
-            
+            Iterator<String> it = countMap.keySet().iterator();
+            List<String> valueList = new ArrayList<>();
+            while (it.hasNext()) {
+                valueList.add(it.next());
+            }
+            Iterator<String> it1 = countMap.keySet().iterator();
+            int count = -1;
+            //飞机部分
+            int temp = 0;
+            if(size == 10){
+                //3 + 3 + 4
+                temp = 1;
+            }else if(size == 16){
+                //3 + 3 + 3 + 6
+                temp = 2;
+            }
+            while(it1.hasNext()){
+                String value = it1.next();
+                count++;
+                if(countMap.get(value) > 2 && PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                    if(count + temp < valueList.size()){
+                        if(PokerValueEnum.getByValue(valueList.get(count + temp)).getWeight() - PokerValueEnum.getByValue(value).getWeight() == temp){
+                            List<String> planeList = new ArrayList<>();
+                            //判断数量是否大于2，若大于2则存入list
+                            for(int i = count ; i <= count + temp ; i++){
+                                if(countMap.get(valueList.get(i)) > 2){
+                                    planeList.add(valueList.get(i));
+                                }
+                            }
+                            //list大小正确 则可提示出牌
+                            if(planeList.size() == temp + 1){
+                                List<Poker> selected = new ArrayList<>();
+                                for(int j = 0 ; j < planeList.size() ; j++){
+                                    int num = 0;
+                                    for(Poker p : pokers){
+                                        if(num < 3){
+                                            if(p.getValueEnum().getValue().equals(planeList.get(j))){
+                                                selected.add(p);
+                                                num++;
+                                            }
+                                        }else break;
+                                    }
+                                }
+                                //将List中已经是飞机的牌除去
+                                List<String> valueList1 = new ArrayList<>(){{
+                                    for(int i = 0; i < valueList.size() ; i++){
+                                        add(null);
+                                    }
+                                }};
+                                Collections.copy(valueList1, valueList);
+                                for(int i = 0; i < valueList1.size() ; i++){
+                                    for(int j = 0; j < planeList.size(); j++){
+                                        if(valueList1.get(i) == planeList.get(j)){
+                                            valueList1.remove(i--);
+                                            break;
+                                        }
+                                    }
+                                }
+                                //删除剩余牌中无法组成对子的牌
+                                for(int i = 0 ; i < valueList1.size() ; i++){
+                                    if(countMap.get(valueList1.get(i)) < 2){
+                                        valueList1.remove(i--);
+                                    }
+                                }
+                                List<Poker> plane = new ArrayList<>();
+                                for(int i = 0; i < valueList1.size() ; i++){
+                                    for(Poker p : pokers){
+                                        if(p.getValueEnum().getValue().equals(valueList1.get(i))){
+                                            plane.add(p);
+                                            break;
+                                        }
+                                    }
+                                }
+                                //取飞机的翅膀
+                                List<List<Poker>> planeDouble = combinePokers(plane, temp + 1);
+                                for(int i = 0 ; i < planeDouble.size() ; i++){
+                                    List<Poker> selected1 = new ArrayList<>(){{
+                                        for(int i = 0; i < selected.size() ; i++){
+                                            add(null);
+                                        }
+                                    }};
+                                    Collections.copy(selected1, selected);
+                                    //取出对子
+                                    for(int j = 0; j < planeDouble.get(i).size() ; j++){
+                                        int num = 0;
+                                        for(Poker p : pokers){
+                                            if(num < 2){
+                                                if(p.getValueEnum().getValue().equals(planeDouble.get(i).get(j).getValueEnum().getValue())){
+                                                    selected1.add(p);
+                                                    num++;
+                                                }
+                                            }
+                                            else break;
+                                        }
+                                    }
+                                    resultList.add(selected1);  
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             //判断炸弹
             List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
             if(boomOrJokerBoom != null){
@@ -451,8 +575,13 @@ public class PokerUtil {
         if(ruleOld.getPokersType() == PokerTypeEnum.BOOM_SINGLE && pokers.size() >= size){
             //判断四带两张
             Iterator<String> it=countMap.keySet().iterator();
-            while(it.hasNext()){
-                String value = it.next();
+            List<String> valueList = new ArrayList<>();
+            while (it.hasNext()) {
+                valueList.add(it.next());
+            }
+            Iterator<String> it1 = countMap.keySet().iterator();
+            while(it1.hasNext()){
+                String value = it1.next();
                 if(countMap.get(value) == 4){
                     if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
                         //四
@@ -463,15 +592,41 @@ public class PokerUtil {
                             }
                         }
                         //两张
-                        int count = 0;
-                        for(Poker p : pokers){
-                            if(count < 2){
-                                if(!p.getValueEnum().getValue().equals(value)){
-                                    selected.add(p);
-                                }
-                            }else break;
+                        //将List中已经是炸弹的牌除去
+                        List<String> valueList1 = new ArrayList<>(){{
+                            for(int i = 0; i < valueList.size() ; i++){
+                                add(null);
+                            }
+                        }};
+                        Collections.copy(valueList1,valueList);
+                        for(int i = 0 ; i < valueList1.size() ; i++){
+                            if(valueList1.get(i).equals(value)){
+                                valueList1.remove(i);
+                                break;
+                            }
                         }
-                        resultList.add(selected);
+                        //除去炸弹后剩余的牌
+                        List<Poker> boom = new ArrayList<>();
+                        for(int i = 0; i < valueList1.size() ; i++){
+                            for(Poker p : pokers){
+                                if(p.getValueEnum().getValue().equals(valueList1.get(i))){
+                                    boom.add(p);
+                                    break;
+                                }
+                            }
+                        }
+                        //进行组合
+                        List<List<Poker>> BoomSingle = combinePokers(boom, 2);
+                        for(int i = 0 ; i < BoomSingle.size() ; i++){
+                            List<Poker> selected1 = new ArrayList<>(){{
+                                for(int i = 0; i < selected.size() ; i++){
+                                    add(null);
+                                }
+                            }};
+                            Collections.copy(selected1, selected);
+                            selected1.addAll(BoomSingle.get(i));
+                            resultList.add(selected1);  
+                        }
                     }
                 }
             }
@@ -485,8 +640,13 @@ public class PokerUtil {
         if(ruleOld.getPokersType() == PokerTypeEnum.BOOM_DOUBLE && pokers.size() >= size){
             //判断四带两对
             Iterator<String> it=countMap.keySet().iterator();
-            while(it.hasNext()){
-                String value = it.next();
+            List<String> valueList = new ArrayList<>();
+            while (it.hasNext()) {
+                valueList.add(it.next());
+            }
+            Iterator<String> it1 = countMap.keySet().iterator();
+            while(it1.hasNext()){
+                String value = it1.next();
                 if(countMap.get(value) == 4){
                     if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
                         //四
@@ -497,9 +657,58 @@ public class PokerUtil {
                             }
                         }
                         //两对
-                        Iterator<String> it1 = countMap.keySet().iterator();
-                        while(it1.hasNext()){
-                            
+                        //将List中已经是炸弹的牌除去
+                        List<String> valueList1 = new ArrayList<>(){{
+                            for(int i = 0; i < valueList.size() ; i++){
+                                add(null);
+                            }
+                        }};
+                        Collections.copy(valueList1,valueList);
+                        for(int i = 0 ; i < valueList1.size() ; i++){
+                            if(valueList1.get(i).equals(value)){
+                                valueList1.remove(i);
+                                break;
+                            }
+                        }
+                        //删除剩余牌中无法组成对子的牌
+                        for(int i = 0 ; i < valueList1.size() ; i++){
+                            if(countMap.get(valueList1.get(i)) < 2){
+                                valueList1.remove(i--);
+                            }
+                        }
+                        //除去炸弹后剩余的牌
+                        List<Poker> boom = new ArrayList<>();
+                        for(int i = 0; i < valueList1.size() ; i++){
+                            for(Poker p : pokers){
+                                if(p.getValueEnum().getValue().equals(valueList1.get(i))){
+                                    boom.add(p);
+                                    break;
+                                }
+                            }
+                        }
+                        //取炸弹的两对
+                        List<List<Poker>> BoomDouble = combinePokers(boom, 2);
+                        for(int i = 0 ; i < BoomDouble.size() ; i++){
+                            List<Poker> selected1 = new ArrayList<>(){{
+                                for(int i = 0; i < selected.size() ; i++){
+                                    add(null);
+                                }
+                            }};
+                            Collections.copy(selected1, selected);
+                            //取出对子
+                            for(int j = 0; j < BoomDouble.get(i).size() ; j++){
+                                int num = 0;
+                                for(Poker p : pokers){
+                                    if(num < 2){
+                                        if(p.getValueEnum().getValue().equals(BoomDouble.get(i).get(j).getValueEnum().getValue())){
+                                            selected1.add(p);
+                                            num++;
+                                        }
+                                    }
+                                    else break;
+                                }
+                            }
+                            resultList.add(selected1);  
                         }
                     }
                 }
@@ -544,8 +753,6 @@ public class PokerUtil {
                     }
                     
             }
-            lastPutPokers.iterator().next().getValueEnum().getWeight();
-
             //判断炸弹
             List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
             if(boomOrJokerBoom != null){
@@ -555,7 +762,49 @@ public class PokerUtil {
         //当上家出牌为连对时,判断自己是否有比他大的连对或者炸弹或者王炸
         if(ruleOld.getPokersType() == PokerTypeEnum.STRAIGHTS_DOUBLE && pokers.size() >= size){
             //判断连对
-            
+            Iterator<String> it = countMap.keySet().iterator();
+            List<String> valueList = new ArrayList<>();
+            while(it.hasNext()){
+                valueList.add(it.next());
+            }
+            Iterator<String> it1 = countMap.keySet().iterator();
+            int count = -1;
+            //连对长度除2
+            size = size / 2 ;
+            while(it1.hasNext()){
+                String value = it1.next();
+                count++;
+                if(PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight() && countMap.get(value) > 1){
+                    //判断是否存在顺子，根据上家的连对的size进行寻找，若头尾都符合，则判断为连对存在
+                    if(count + size - 1 < valueList.size()){
+                        if(PokerValueEnum.getByValue(valueList.get(count + size - 1)).getWeight() - PokerValueEnum.getByValue(value).getWeight() == size - 1 ){
+                            List<String> straightsdouble = new ArrayList<>();
+                            //判断需要的牌是否都存在2张以上
+                            for(int i = count ; i < count + size ; i++){
+                                if(countMap.get(valueList.get(i)) > 1){
+                                    straightsdouble.add(valueList.get(i));
+                                }
+                            }
+                            if(straightsdouble.size() == size){
+                                List<Poker> selected = new ArrayList<>();
+                                for(int i = 0 ; i < straightsdouble.size() ; i++){
+                                    int num = 0;
+                                    for(Poker p : pokers){
+                                        if(num < 2){
+                                            if(p.getValueEnum().getValue().equals(straightsdouble.get(i))){
+                                                selected.add(p);
+                                                num++;
+                                            }
+                                        }else break;
+                                    }
+                                }
+                                resultList.add(selected);
+                            }
+                        }
+                    }
+                    }
+                    
+            }
             //判断炸弹
             List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
             if(boomOrJokerBoom != null){
