@@ -624,4 +624,36 @@ public class PokerUtil {
         return resultList;
     }
 
+    /**
+     * 对牌的组合如C(5,2)=10种组合
+     * @param list 牌堆
+     * @param groupSize 组合单位的大小 
+     * @return 各种组合的List
+     */
+    private static List<List<Poker>> combinePokers(List<Poker> list,int groupSize){
+        List<List<Poker>> resultGroup=new ArrayList<>();
+        class CombineHelper{
+            public void dfs(List<Poker> groupList,int index){
+                if(groupList.size()==groupSize){
+                    List<Poker> copyList=new ArrayList<>(){{
+                        for(int i=0;i<groupSize;i++){
+                            add(null);
+                        }
+                    }};
+                    Collections.copy(copyList, groupList);
+                    resultGroup.add(copyList);
+                }
+                for(int i=index;i<list.size();i++){
+                    groupList.add(list.get(i));
+                    dfs(groupList, i+1);
+                    groupList.remove(list.get(i));
+                }
+            }
+        }   
+        CombineHelper combineHelper=new CombineHelper();
+        combineHelper.dfs(new ArrayList<>(),0);
+        return resultGroup;
+    }
+
+
 }
