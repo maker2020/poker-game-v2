@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.samay.game.Game;
+import com.samay.game.dto.MultipleDTO;
 import com.samay.game.dto.PutPokerDTO;
 import com.samay.game.dto.ReqBossDTO;
 import com.samay.game.entity.Player;
@@ -30,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TimerUtil {
 
-    private static final long time = 30;
     private static final TimeUnit timeUnit = TimeUnit.SECONDS;
 
     private static Map<String, Object> playerAct = new ConcurrentHashMap<>();
@@ -44,7 +44,7 @@ public class TimerUtil {
      * @param action 什么操作
      * @param ch     通道
      */
-    public static void checkTimeout(ActionEnum action, String playerID) throws Exception {
+    public static void checkTimeout(ActionEnum action, String playerID,long time) throws Exception {
         synchronized(playerID){
             if (playerID == null || action == null)
                 return;
@@ -113,6 +113,11 @@ public class TimerUtil {
                 putPokerDTO.setTendency(true);
             }
             ch.pipeline().fireChannelRead(putPokerDTO);
+        } else if(actionEnum==ActionEnum.MULTIPLE){
+            MultipleDTO multipleDTO=new MultipleDTO();
+            multipleDTO.setAction("unDouble");
+            multipleDTO.setTendency(false);
+            ch.pipeline().fireChannelRead(multipleDTO);
         }
     }
 

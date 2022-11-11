@@ -95,22 +95,22 @@ public class Player extends User implements Serializable{
         setFirstCall(true);
         reqBoss();
         // 操作相关逻辑调用该方法以消除 限时检测的阻塞
-        TimerUtil.checkTimeout(ActionEnum.CALL, getId());
+        TimerUtil.checkTimeout(ActionEnum.CALL, getId(), 30);
     }
 
     public void askBoss() throws Exception{
         reqBoss();
-        TimerUtil.checkTimeout(ActionEnum.ASK, getId());
+        TimerUtil.checkTimeout(ActionEnum.ASK, getId(), 30);
     }
 
     public void unCallBoss() throws Exception{
         refuseBoss();
-        TimerUtil.checkTimeout(ActionEnum.CALL, getId());
+        TimerUtil.checkTimeout(ActionEnum.CALL, getId(), 30);
     }
 
     public void unAskBoss() throws Exception{
         refuseBoss();
-        TimerUtil.checkTimeout(ActionEnum.ASK, getId());
+        TimerUtil.checkTimeout(ActionEnum.ASK, getId(), 30);
     }
 
     @Override

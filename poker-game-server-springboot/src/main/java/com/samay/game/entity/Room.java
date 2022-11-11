@@ -93,7 +93,9 @@ public class Room implements Serializable {
                     playerID=null;
                     game.setActingPlayer(boss.getId());
 
-                    TimerUtil.checkTimeout(ActionEnum.PUT, boss.getId());
+                    for(Player p:getPlayers()){
+                        TimerUtil.checkTimeout(ActionEnum.MULTIPLE, p.getId(), 5);
+                    }
                 }else{
                     playerID=players.get(pos).getId();
                 }
@@ -103,7 +105,7 @@ public class Room implements Serializable {
             game.setActingPlayer(playerID);
         
             // 每每轮到xx操作，即开启限时检测，在操作完后也需要调用以关闭
-            TimerUtil.checkTimeout(actionEnum, playerID);
+            TimerUtil.checkTimeout(actionEnum, playerID, 30);
         }
         return playerID;
     }

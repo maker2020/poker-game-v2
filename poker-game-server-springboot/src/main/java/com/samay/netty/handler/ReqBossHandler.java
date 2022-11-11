@@ -128,15 +128,18 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             ChannelId chID = ChannelHolder.uid_chidMap.get(boss.getId());
             group.find(chID).writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resortBossPokers)));
 
-            // 地主既然得出，action的应更新为put，而非turn下一个玩家ask。
-            // 更新result的action
-            ResultVO.updateResultMap(result, ActionEnum.PUT, boss.getId());
-
-            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
-            return;
+            // 地主既然得出，仅通知最后一名玩家的行为即可
+            // 更新result的action、turn
+            ResultVO.updateResultMap(result, null, null);
         }
 
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
+
+        if(boss!=null){
+            // 地主已选出，此处通知进入是否加注的选择阶段
+            Map<String,Object> multipleStatus=ResultVO.raiseStatus(false);
+            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multipleStatus)));
+        }
     }
 
 }

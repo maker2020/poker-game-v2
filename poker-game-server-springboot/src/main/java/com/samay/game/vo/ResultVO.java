@@ -117,7 +117,7 @@ public class ResultVO {
      * @param notification
      */
     public static void updateResultMap(Map<String,Object> resultVO,ActionEnum action,String turn){
-        resultVO.put("action", action.getAction());
+        resultVO.put("action", action==null?null:action.getAction());
         resultVO.put("turn", turn);
     }
 

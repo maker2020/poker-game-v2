@@ -59,7 +59,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
         PokerUtil.sortForPUT(putPokers);
         if (rule.valid()) {
 
-            TimerUtil.checkTimeout(ActionEnum.PUT, player.getId());
+            TimerUtil.checkTimeout(ActionEnum.PUT, player.getId(), 30);
 
             if (putPokers != null) {
                 player.removeAllPoker(putPokers);

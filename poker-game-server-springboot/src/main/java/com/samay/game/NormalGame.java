@@ -35,7 +35,7 @@ public class NormalGame extends Game {
     public synchronized void init() {
         if (getStatus() == GameStatusEnum.READY){
             handOutPokersTest();
-            // 发完牌进入加倍阶段
+            // 发完牌将状态设为 加注
             setStatus(GameStatusEnum.RAISE);
         }
     }

@@ -191,7 +191,9 @@ Page({
             })
         }
         this.setData({
-            myPokers: myPokers
+            myPokers: myPokers,
+            // 设置start阶段，从而渲染一些数据
+            status:'start',
         })
     },
     updateBossPokers(data) {
@@ -210,7 +212,7 @@ Page({
         }
         this.setData({
             boss: data.boss,
-            playerListRestPokerNum: playerListRestPokerNum
+            playerListRestPokerNum: playerListRestPokerNum,
         })
     },
     updateOpeatorStatus(data) {
@@ -263,18 +265,26 @@ Page({
     updateRaiseStatus(data){
         if(data.done){
             this.setData({
-                status:'start'
-            })
+                status:'start',
+                // 清除notificatoin
+                playerListNotice: []
+            })            
             return
         }
         this.setData({
             action:data.action,
             // 也意味着status=start
             status: 'multiple',
+            // 清除notificatoin
+            playerListNotice: [],
+            // 清除叫地主环节留下的turnFlag
+            turnFlag:''
         })
         this.setData({
-            second:10
+            second:5
         })
+        var context=this
+        clearInterval(this.data.timer)
         var timer=setInterval(function(){
             if(context.data.second && context.data.second>0){
                 context.setData({
@@ -690,7 +700,7 @@ Page({
     multipleN(){
         var params={
             "action": "noDouble",
-            "tendency": true
+            "tendency": false
         }
         wx.sendSocketMessage({
           data: JSON.stringify(params),
