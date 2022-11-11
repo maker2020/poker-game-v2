@@ -367,7 +367,70 @@ public class PokerUtil {
         //当上家出牌为飞机带单牌时,判断自己是否有比他大的飞机带单牌或者炸弹或者王炸
         if(ruleOld.getPokersType() == PokerTypeEnum.PLANE_SINGLE && pokers.size() >= size){
             //判断飞机带单牌
-
+            Iterator<String> it = countMap.keySet().iterator();
+            List<String> valueList = new ArrayList<>();
+            while (it.hasNext()) {
+                valueList.add(it.next());
+            }
+            Iterator<String> it1 = countMap.keySet().iterator();
+            int count = -1;
+            //飞机部分
+            int temp = 0;
+            if(size == 8){
+                //3 + 3 + 2
+                temp = 1;
+            }else if(size == 12){
+                //3 + 3 + 3 + 3
+                temp = 2;
+            }else if(size == 16){
+                //3 + 3 + 3 + 3 + 4
+                temp = 3;
+            }
+            while(it1.hasNext()){
+                String value = it.next();
+                if(countMap.get(value) > 2 && PokerValueEnum.getByValue(value).getWeight() > lastPutPokers.iterator().next().getValueEnum().getWeight()){
+                    if(count + temp < valueList.size()){
+                        if(PokerValueEnum.getByValue(valueList.get(count + temp)).getWeight() - PokerValueEnum.getByValue(value).getWeight() == temp){
+                            List<String> planeList = new ArrayList<>();
+                            //判断数量是否大于2，若大于2则存入list
+                            for(int i = count ; i <= count + temp ; i++){
+                                if(countMap.get(valueList.get(i)) > 2){
+                                    planeList.add(valueList.get(i));
+                                }
+                            }
+                            //list大小正确 则可提示出牌
+                            if(planeList.size() == temp + 1){
+                                List<Poker> selected = new ArrayList<>();
+                                for(int j = 0 ; j < planeList.size() ; j++){
+                                    int num = 0;
+                                    for(Poker p : pokers){
+                                        if(num < 3){
+                                            if(p.getValueEnum().getValue().equals(planeList.get(j))){
+                                                selected.add(p);
+                                                num++;
+                                            }
+                                        }else break;
+                                    }
+                                }
+                                //将List中已经是飞机的牌除去
+                                for(int i = 0; i < valueList.size() ; i++){
+                                    for(int j = 0; j < planeList.size(); j++){
+                                        if(valueList.get(i) == planeList.get(j)){
+                                            valueList.remove(i);
+                                        }
+                                    }
+                                }
+                                //取飞机的翅膀
+                                for(int i = 0; i < valueList.size(); i++){
+                                    //
+                                    
+                                }
+                                resultList.add(selected);
+                            }
+                        }
+                    }
+                }
+            }
             //判断炸弹
             List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
             if(boomOrJokerBoom != null){
@@ -377,7 +440,7 @@ public class PokerUtil {
         //当上家出牌为飞机带一对时,判断自己是否有比他大的飞机带一对或者炸弹或者王炸
         if(ruleOld.getPokersType() == PokerTypeEnum.PLANE_DOUBLE && pokers.size() >= size){
             //判断飞机带一对
-
+            
             //判断炸弹
             List<List<Poker>> boomOrJokerBoom = BoomOrJokerBoom(player);
             if(boomOrJokerBoom != null){
