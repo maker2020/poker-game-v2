@@ -139,14 +139,26 @@ Page({
         // 处理并绑定wxml页面三个玩家渲染的数据。
         var playerStatus = data.playerStatus
         var playerList = [{}, {}, {}]
+        // 维护逆时针顺序，所以保持[2](玩家自己)的右边是处于下标的下一个
+        var myIndex=-1
         for (var i = 0; i < playerStatus.length; i++) {
             if (playerStatus[i].playerID == app.globalData.userInfo.cloudID) {
                 playerList[2] = playerStatus[i]
-            } else {
-                if (playerList[0].playerID == undefined) {
-                    playerList[0] = playerStatus[i]
-                } else if (playerList[1].playerID == undefined) {
-                    playerList[1] = playerStatus[i]
+                myIndex=i
+                break;
+            }
+        }
+        for(var i=0;i<playerStatus.length;i++){
+            if(playerStatus[i].playerID!=playerList[2].playerID){
+                if(myIndex==playerList.length-1){
+                    if(i==0) playerList[1]=playerStatus[i]
+                    if(i==myIndex-1) playerList[0]=playerStatus[i]
+                }else if(myIndex==0){
+                    if(i==myIndex+1) playerList[1]=playerStatus[i]
+                    if(i==playerList.length-1) playerList[0]=playerStatus[i]
+                }else{
+                    if(i==myIndex+1) playerList[1]=playerStatus[i]
+                    if(i==myIndex-1) playerList[0]=playerStatus[i]
                 }
             }
         }

@@ -66,8 +66,10 @@ public class NormalGame extends Game {
                     end=seedNum;
                 }
                 for(int i=start;i<end;i++){
-                    Collections.swap(pokers, i, targetIndex++);
+                    Collections.swap(pokers, i, targetIndex);
+                    targetIndex=targetIndex>pokers.size()-2?1:targetIndex+1;
                 }
+                Collections.reverse(pokers);
             }
         }
 
@@ -85,12 +87,15 @@ public class NormalGame extends Game {
         List<Poker> pokerCollector = (LinkedList<Poker>) getPokerCollector();
         
         int shuffleTimes=0;
-        int maxTimes=new Random(System.currentTimeMillis()).nextInt(20,26);
+        int maxTimes=new Random(System.currentTimeMillis()).nextInt(8,13);
+        int seedNum=new Random(System.currentTimeMillis()).nextInt(17,34); // 这个参数专门从中间抽
+        int[] randomTargetIndex=new int[]{1,2,2,2,6,6,8,8,8,12,12,12,17,20,24,28,32,36,36,39,39,40,41,41,41,41,42,42,42,42,42,42,44,47,47,47,49,49,49,52}; // 插入概率分布
         while (shuffleTimes<maxTimes) { // 共插入洗动N次
             Random random=new Random(System.currentTimeMillis());
-            int groupSize=random.nextInt(1,54); // 每次a-b张捆绑洗动
-            int seedNum=random.nextInt(1,54);
-            Util.insertRandomWithGroup(groupSize, pokerCollector, 0,seedNum);  
+            int groupSize=random.nextInt(3,8); // 每次a-b张捆绑洗动
+            seedNum=seedNum+1>53?1:seedNum+1;
+            int targetIndex=randomTargetIndex[random.nextInt(0, randomTargetIndex.length)];
+            Util.insertRandomWithGroup(groupSize, pokerCollector, targetIndex,seedNum);  
             shuffleTimes++;  
         }
 
