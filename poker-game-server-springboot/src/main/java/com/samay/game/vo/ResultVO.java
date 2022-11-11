@@ -141,9 +141,41 @@ public class ResultVO {
         return map;
     }
 
-    public static Map<String,Object> mutiplying(int multiple){
+    /**
+     * 展示当前对局倍数
+     * @param multiple
+     * @return
+     */
+    public static Map<String,Object> multiplying(int multiple){
         Map<String,Object> map=new HashMap<>();
         map.put("multiple", multiple);
+        return map;
+    }
+
+    /**
+     * 展示加倍情况（包含了当前对局倍数结果）
+     * @param notification
+     * @param multiple
+     * @return
+     */
+    public static Map<String,Object> multipleResultMap(Notification notification,int multiple){
+        Map<String,Object> map=new HashMap<>();
+        map.put("notification", notification);
+        Map<String,Object> map2=multiplying(multiple);
+        map.putAll(map2);
+        return map;
+    }
+
+    /**
+     * 通知各玩家开始进行加注
+     * @param done 是否完成该阶段
+     * @return
+     */
+    public static Map<String,Object> raiseStatus(boolean done){
+        Map<String,Object> map=new HashMap<>();
+        map.put("action", ActionEnum.MULTIPLE.getAction());
+        map.put("turnAll", true);
+        map.put("done", done);
         return map;
     }
 

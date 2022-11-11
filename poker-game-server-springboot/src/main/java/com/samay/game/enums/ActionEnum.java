@@ -6,7 +6,13 @@ public enum ActionEnum {
     CALL("call"),
     ASK("ask"),
     PUT("put"),
-    TIP("tip");
+    TIP("tip"),
+
+    // 加注相关
+    MULTIPLE("multiple"),
+    DOUBLE("double"),
+    DOUBLE_PLUS("doublePlus"),
+    NO_DOUBLE("noDouble");
 
     private String action;
 

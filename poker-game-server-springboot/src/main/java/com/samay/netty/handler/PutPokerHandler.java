@@ -69,7 +69,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                 // 炸弹翻倍
                 if(rule.getPokersType()==PokerTypeEnum.BOOM){
                     game.setMultiple(game.getMultiple()*2);
-                    Map<String,Object> multiple=ResultVO.mutiplying(game.getMultiple());
+                    Map<String,Object> multiple=ResultVO.multiplying(game.getMultiple());
                     group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multiple)));
                 }
             }

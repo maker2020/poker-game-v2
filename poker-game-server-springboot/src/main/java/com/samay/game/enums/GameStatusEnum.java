@@ -3,7 +3,8 @@ package com.samay.game.enums;
 public enum GameStatusEnum {
     
     READY("ready",0),
-    START("start",1);
+    RAISE("raise",1),
+    START("start",2);
 
     private String status;
     private int code;

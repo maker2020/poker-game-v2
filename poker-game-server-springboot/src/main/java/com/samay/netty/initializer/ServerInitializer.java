@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.samay.netty.handler.GameReadyHandler;
+import com.samay.netty.handler.MultipleHandler;
 import com.samay.netty.handler.PutPokerHandler;
 import com.samay.netty.handler.ReqBossHandler;
 import com.samay.netty.handler.RoomReadyHandler;
@@ -56,6 +57,9 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     @Autowired
     private TipPokerHandler tipPokerHandler;
 
+    @Autowired
+    private MultipleHandler multipleHandler;
+
     @Value("${netty.websocket.max-frame-size}")
     private int maxFrameSize;
 
@@ -76,6 +80,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(reqBossHandler);
         pipeline.addLast(putPokerHandler);
         pipeline.addLast(tipPokerHandler);
+        pipeline.addLast(multipleHandler);
         pipeline.addLast(new IdleStateHandler(120, 120, 120));
         pipeline.addLast(new HeartHandler());
     }

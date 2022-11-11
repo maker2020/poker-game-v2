@@ -6,16 +6,16 @@
         <view class='btn' bindtap='ready'>准备</view>
     </view>
     <view class='top'>
-        <view class='basescore' wx:if='{{status=="start"}}'>
+        <view class='basescore' wx:if='{{status!="ready"}}'>
             <text class='txt'>底分</text>
             <text class='num'>{{baseScore}}</text>
         </view>
-        <view class='basehand' wx:if='{{status=="start"}}'>
+        <view class='basehand' wx:if='{{status!="ready"}}'>
             <image src='../../static/img/{{item.colorEnum}}_{{item.valueEnum}}.png' wx:key='index' mode="widthFix" wx:for='{{bossPokers}}'></image>
             <!-- <image src='../../static/img/SQUARE_TEN.png' mode="widthFix"></image>
             <image src='../../static/img/CLUB_TEN.png' mode="widthFix"></image> -->
         </view>
-        <view class='multiple' wx:if='{{status=="start"}}'>
+        <view class='multiple' wx:if='{{status!="ready"}}'>
             <text class='txt'>倍数</text>
             <text class='num'>x{{multiple}}</text>
         </view>
@@ -31,7 +31,7 @@
                     <text class='num'>{{playerList[0].freeMoney}}</text>
                 </view>
             </view>
-            <view class='brandShow' wx:if='{{status=="start"}}'>
+            <view class='brandShow' wx:if='{{status!="ready"}}'>
                 <image src='../../static/img/backside.png' mode='widthFix'></image>
                 <text class='num'>{{playerListRestPokerNum[0]==undefined?'17':playerListRestPokerNum[0]}}</text>
             </view>
@@ -50,10 +50,20 @@
                 <view wx:if="{{playerListNotice[0].type=='PUT'}}">
                     <text wx:if="{{!playerListNotice[0].choice}}">不要</text>
                 </view>
+
+                <view wx:if="{{playerListNotice[0].type=='DOUBLE_PLUS'}}">
+                    <text wx:if="{{playerListNotice[0].choice}}">超级加倍</text>
+                </view>
+                <view wx:if="{{playerListNotice[0].type=='DOUBLE'}}">
+                    <text wx:if="{{playerListNotice[0].choice}}">加倍</text>
+                </view>
+                <view wx:if="{{playerListNotice[0].type=='NO_DOUBLE'}}">
+                    <text wx:if="{{!playerListNotice[0].choice}}">不加倍</text>
+                </view>
             </view>
             
 
-            <view class='clock'  wx:if='{{turnFlag==playerList[0].playerID}}'>
+            <view class='clock'  wx:if='{{turnFlag==playerList[0].playerID || (playerListNotice[0]!=undefined && status=='multiple')}}'>
                 <image src='../../static/img/clock.png' mode='widthFix'></image>
                 <text class='num'>{{second}}</text>
             </view>
@@ -82,7 +92,7 @@
                     <text class='num'>{{playerList[1].freeMoney}}</text>
                 </view>
             </view>
-            <view class='brandShow' wx:if='{{status=="start"}}'>
+            <view class='brandShow' wx:if='{{status!="ready"}}'>
                 <image src='../../static/img/backside.png' mode='widthFix'></image>
                 <text class='num'>{{playerListRestPokerNum[1]==undefined?'17':playerListRestPokerNum[1]}}</text>
             </view>
@@ -101,10 +111,20 @@
                 <view wx:if="{{playerListNotice[1].type=='PUT'}}">
                     <text wx:if="{{!playerListNotice[1].choice}}">不要</text>
                 </view>
+
+                <view wx:if="{{playerListNotice[1].type=='DOUBLE_PLUS'}}">
+                    <text wx:if="{{playerListNotice[1].choice}}">超级加倍</text>
+                </view>
+                <view wx:if="{{playerListNotice[1].type=='DOUBLE'}}">
+                    <text wx:if="{{playerListNotice[1].choice}}">加倍</text>
+                </view>
+                <view wx:if="{{playerListNotice[1].type=='NO_DOUBLE'}}">
+                    <text wx:if="{{!playerListNotice[1].choice}}">不加倍</text>
+                </view>
             </view>
 
 
-            <view class='clock'  wx:if='{{turnFlag==playerList[1].playerID}}'>
+            <view class='clock'  wx:if='{{turnFlag==playerList[1].playerID || (playerListNotice[1]!=undefined && status=='multiple')}}'>
                 <image src='../../static/img/clock.png' mode='widthFix'></image>
                 <text class='num'>{{second}}</text>
             </view>
@@ -123,7 +143,7 @@
             </view>
         </view>
         
-        <view class='brandShows'  wx:if='{{status=="start"}}'>
+        <view class='brandShows'  wx:if='{{status!="ready"}}'>
             <view wx:for='{{myPokers}}' wx:key='index' class="brand {{item.selected?'active':''}}" data-brand='{{item.name}}' >
                 <image id="myPokerImage_{{index}}" bindtouchstart="touchStartPoker" bindtouchend="touchEndPoker" data-index='{{index}}' src='../../static/img/{{item.name}}.png' mode='heightFix' style='transform:translateZ({{index?index:0}})'></image>
             </view>
@@ -142,6 +162,16 @@
             </view>
             <view wx:if="{{playerListNotice[2].type=='PUT'}}">
                 <text wx:if="{{!playerListNotice[2].choice}}">不要</text>
+            </view>
+
+            <view wx:if="{{playerListNotice[2].type=='DOUBLE_PLUS'}}">
+                <text wx:if="{{playerListNotice[2].choice}}">超级加倍</text>
+            </view>
+            <view wx:if="{{playerListNotice[2].type=='DOUBLE'}}">
+                <text wx:if="{{playerListNotice[2].choice}}">加倍</text>
+            </view>
+            <view wx:if="{{playerListNotice[2].type=='NO_DOUBLE'}}">
+                <text wx:if="{{!playerListNotice[2].choice}}">不加倍</text>
             </view>
         </view>
 
@@ -166,12 +196,12 @@
             <view class='cancel btn' bindtap='askY'>抢地主</view>
             <view class='sure btn' bindtap='askN'>不抢</view>
         </view>
-        <view class='btnCon' wx:if='{{turnFlag==playerList[2].playerID && action=="multiple"}}'>
-            <view class='sure btn' bindtap='multipleD'>加倍</view>
+        <view class='btnCon' wx:if='{{action=="multiple" && playerListNotice[2]==undefined}}'>
             <view class='cancel btn' bindtap='multipleS'>超级加倍</view>
+            <view class='sure btn' bindtap='multipleD'>加倍</view>
             <view class='sure btn' bindtap='multipleN'>不加倍</view>
         </view>
-        <view class='clock' wx:if='{{turnFlag==playerList[2].playerID}}'>
+        <view class='clock' wx:if='{{turnFlag==playerList[2].playerID || (playerListNotice[2]!=undefined && status=='multiple')}}'>
             <image src='../../static/img/clock.png' mode='widthFix'></image>
             <text class='num'>{{second}}</text>
         </view>

@@ -33,11 +33,11 @@ public class NormalGame extends Game {
     }
 
     public synchronized void init() {
-        if (getStatus() == GameStatusEnum.START)
-            return;
-        if (getStatus() != GameStatusEnum.START)
+        if (getStatus() == GameStatusEnum.READY){
             handOutPokersTest();
-        setStatus(GameStatusEnum.START);
+            // 发完牌进入加倍阶段
+            setStatus(GameStatusEnum.RAISE);
+        }
     }
 
     /**
@@ -228,6 +228,7 @@ public class NormalGame extends Game {
             p.setBoss(false);
             p.setFirstCall(false);
             p.setReady(false);
+            p.setRaise(false);
             p.setRefuseBoss(false);
             p.setReqIndex(0);
             p.setReqTimes(0);
@@ -275,6 +276,19 @@ public class NormalGame extends Game {
                 }
             }
         }
+
+        // 根据loserList判断是否为春天
+        boolean spring=true;
+        for(Player player:loserList){
+            if(player.getPokers().size()<17){
+                spring=false;
+                break;
+            }
+        }
+        if(spring){
+            setMultiple(getMultiple()*2);
+        }
+        
 
         // 首先根据底分(该NormalGame是200) 扣去玩家入场费
         int baseScore = getBaseScore();

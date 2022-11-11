@@ -79,6 +79,10 @@ Page({
             if ((data.action == 'call' || data.action == 'ask' || data.action == 'put') && data.turn) {
                 context.updateOpeatorStatus(data)
             }
+            // 收到 轮到所有玩家 加注阶段
+            if(data.action== "multiple" && data.turnAll){
+                context.updateRaiseStatus(data)
+            }
             // 收到 id为xx的玩家 的操作行为
             if (data.notification) {
                 context.updateNotification(data)
@@ -187,9 +191,7 @@ Page({
             })
         }
         this.setData({
-            myPokers: myPokers,
-            // 也意味着status=start
-            status: 'start'
+            myPokers: myPokers
         })
     },
     updateBossPokers(data) {
@@ -255,6 +257,37 @@ Page({
         // 提示辅助变量 tipIndex重置
         this.setData({
             tipIndex:0
+        })
+    },
+    // 加注阶段(内含status变量的控制)
+    updateRaiseStatus(data){
+        if(data.done){
+            this.setData({
+                status:'start'
+            })
+            return
+        }
+        this.setData({
+            action:data.action,
+            // 也意味着status=start
+            status: 'multiple',
+        })
+        this.setData({
+            second:10
+        })
+        var timer=setInterval(function(){
+            if(context.data.second && context.data.second>0){
+                context.setData({
+                    second:context.data.second-1
+                })
+                if(context.data.second==0){
+                    clearInterval(timer)
+                }
+            }
+        },1000)
+        // 未结束计时如果进入玩家轮询阶段也会被清除，但前提必须将timer存入全局，operatorStatus才可以获取timer
+        this.setData({
+            timer:timer
         })
     },
     updateNotification(data) {
@@ -634,6 +667,33 @@ Page({
         }
         wx.sendSocketMessage({
             data: JSON.stringify(params),
+        })
+    },
+    multipleS(){
+        var params={
+            "action": "doublePlus",
+            "tendency": true
+        }
+        wx.sendSocketMessage({
+          data: JSON.stringify(params),
+        })
+    },
+    multipleD(){
+        var params={
+            "action": "double",
+            "tendency": true
+        }
+        wx.sendSocketMessage({
+          data: JSON.stringify(params),
+        })
+    },
+    multipleN(){
+        var params={
+            "action": "noDouble",
+            "tendency": true
+        }
+        wx.sendSocketMessage({
+          data: JSON.stringify(params),
         })
     },
 

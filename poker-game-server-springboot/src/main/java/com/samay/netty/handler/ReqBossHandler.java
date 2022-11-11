@@ -75,7 +75,7 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
 
                 // 倍数翻一番
                 game.setMultiple(game.getMultiple() * 2);
-                Map<String, Object> multipleResult = ResultVO.mutiplying(game.getMultiple());
+                Map<String, Object> multipleResult = ResultVO.multiplying(game.getMultiple());
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multipleResult)));
             }
         } else { // 拒绝

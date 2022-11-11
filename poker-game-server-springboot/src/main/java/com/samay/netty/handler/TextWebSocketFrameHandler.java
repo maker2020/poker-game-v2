@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
-
+import com.samay.game.dto.MultipleDTO;
 import com.samay.game.dto.PutPokerDTO;
 import com.samay.game.dto.ReqBossDTO;
 import com.samay.game.dto.RoomReadyDTO;
@@ -78,6 +78,15 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
             }
             case "tip" -> {
                 return TipPokerDTO.class;
+            }
+            case "double" -> {
+                return MultipleDTO.class;
+            }
+            case "doublePlus" -> {
+                return MultipleDTO.class;
+            }
+            case "noDouble" -> {
+                return MultipleDTO.class;
             }
             default -> {
                 return Object.class;

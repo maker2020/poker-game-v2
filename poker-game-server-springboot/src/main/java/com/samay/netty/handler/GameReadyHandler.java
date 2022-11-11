@@ -10,7 +10,6 @@ import com.alibaba.fastjson.JSON;
 import com.samay.game.Game;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
-import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.RoomStatusEnum;
 import com.samay.game.vo.ResultVO;
 import io.netty.buffer.Unpooled;
@@ -73,9 +72,11 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
                 }
             }
         }
-        Map<String, Object> msg = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(null,ActionEnum.CALL), null);
-        group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
-                
+        
+        // 牌下发完毕了，此处通知进入是否加注的选择阶段
+        Map<String,Object> result=ResultVO.raiseStatus(false);
+        group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
+
         // 至此结束，其他业务由其他handler从头处理
         ctx.fireChannelRead(Unpooled.EMPTY_BUFFER);
     }

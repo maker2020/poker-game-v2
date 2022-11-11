@@ -25,6 +25,10 @@ public class Player extends User implements Serializable{
     private List<Poker> pokers=new LinkedList<>();
     private boolean boss=false;
     private boolean ready;
+    /**
+     * 是否已加注过
+     */
+    private boolean raise;
 
     // 辅助变量，大多不会序列化(如使用jackson、jdk、msgpack、google等序列化框架)/传输这些字段
     /**
