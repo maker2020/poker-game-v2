@@ -19,7 +19,7 @@ import com.samay.game.rule.CommonRule;
 import com.samay.game.utils.PokerUtil;
 import com.samay.game.utils.TimerUtil;
 import com.samay.game.vo.Notification;
-import com.samay.game.vo.ResultVO;
+import com.samay.game.vo.RV;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -69,12 +69,12 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                 // 炸弹翻倍
                 if(rule.getPokersType()==PokerTypeEnum.BOOM){
                     game.setMultiple(game.getMultiple()*2);
-                    Map<String,Object> multiple=ResultVO.multiplying(game.getMultiple());
+                    Map<String,Object> multiple=RV.multiplying(game.getMultiple());
                     group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multiple)));
                 }
             }
 
-            Map<String, Object> result = ResultVO.resultMap(ActionEnum.PUT, room.turnPlayer(player,ActionEnum.PUT),
+            Map<String, Object> result = RV.resultMap(ActionEnum.PUT, room.turnPlayer(player,ActionEnum.PUT),
                     new Notification(ActionEnum.PUT, putPokers != null, player.getId()), putPokers,
                     player.getPokers().size());
             group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
@@ -83,7 +83,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                 log.info("ROOM["+room.getId()+"] 游戏已结束");
                 // 游戏结算
                 Map<String,Object> gameResult=game.settlement();
-                Map<String, Object> resultVO = ResultVO.gameResult(gameResult);
+                Map<String, Object> resultVO = RV.gameResult(gameResult);
                 // fastjson禁用引用重复检测（不禁用会导致同一对象被$.ref表示，从而不便于前端解析
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resultVO,SerializerFeature.DisableCircularReferenceDetect)));
             
@@ -94,7 +94,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
         } else { // 反馈不合法
                  // 此处仅提示操作者玩家，而非group
             Channel ch = group.find(ChannelHolder.uid_chidMap.get(player.getId()));
-            Map<String, Object> result = ResultVO.actionFail(ActionEnum.PUT);
+            Map<String, Object> result = RV.actionFail(ActionEnum.PUT);
             ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
         }
     }

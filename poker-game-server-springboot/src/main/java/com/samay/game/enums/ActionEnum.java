@@ -1,5 +1,8 @@
 package com.samay.game.enums;
 
+/**
+ * 动作枚举: 对应(客户端/前端)不同的(按钮/行为/动作)
+ */
 public enum ActionEnum {
     
     READY("ready"),

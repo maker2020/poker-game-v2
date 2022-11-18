@@ -4,9 +4,21 @@ package com.samay.game.enums;
  * 扑克花色枚举
  */
 public enum PokerColorEnum {
+    /**
+     * 方片
+     */
     SQUARE("♦",1),
+    /**
+     * 红桃
+     */
     HEART("♥",2),
+    /**
+     * 黑桃
+     */
     SPADE("♠",3),
+    /**
+     * 梅花
+     */
     CLUB("♣",4);
 
     private String color;

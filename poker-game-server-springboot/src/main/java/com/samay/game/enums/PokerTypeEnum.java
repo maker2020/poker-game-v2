@@ -5,18 +5,57 @@ package com.samay.game.enums;
  */
 public enum PokerTypeEnum {
     
+    /**
+     * 炸弹
+     */
     BOOM(0),
+    /**
+     * 单牌
+     */
     SINGLE(1),
+    /**
+     * 对子
+     */
     DOUBLE(2),
+    /**
+     * 三只
+     */
     TRIPLE(3),
+    /**
+     * 三带一
+     */
     TRIPLE_SINGLE(4),
+    /**
+     * 三带一对
+     */
     TRIPLE_DOUBLE(5),
+    /**
+     * 飞机不带翅膀
+     */
     PLANE_ALONE(6),
+    /**
+     * 飞机带两个单牌
+     */
     PLANE_SINGLE(7),
+    /**
+     * 飞机带两个对子
+     */
     PLANE_DOUBLE(8),
+    /**
+     * 炸弹带两个单牌
+     */
     BOOM_SINGLE(9),
+    /**
+     * 炸弹带两个对子
+     */
     BOOM_DOUBLE(10),
+    /**
+     * 顺子
+     */
     STRAIGHTS_SINGLE(11),
+    /**
+     * 连对
+     */
     STRAIGHTS_DOUBLE(12),
     /**
      * 同花顺

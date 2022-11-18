@@ -43,6 +43,9 @@ public class CommonRule implements GameRule {
         this.lastPutPokers = lastPutPokers;
     }
 
+    /**
+     * 验证出牌是否合法(手牌、对手牌等) <p>
+     */
     @Override
     public boolean valid() {
         return inputValid() && compareValid();

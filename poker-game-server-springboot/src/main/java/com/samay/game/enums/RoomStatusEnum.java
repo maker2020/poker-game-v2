@@ -1,7 +1,8 @@
 package com.samay.game.enums;
 
 /**
- * 房间状态枚举类
+ * 房间状态枚举类: <p>
+ * READY、START
  */
 public enum RoomStatusEnum {
     

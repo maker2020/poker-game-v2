@@ -15,7 +15,7 @@ import com.samay.game.dto.RoomReadyDTO;
 import com.samay.game.dto.TipPokerDTO;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
-import com.samay.game.vo.ResultVO;
+import com.samay.game.vo.RV;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -103,7 +103,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
             playerNameArr[i]=playerList.get(i).getId();
         }
 
-        Map<String,Object> msg=ResultVO.resultMap(room);
+        Map<String,Object> msg=RV.resultMap(room);
         TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JSON.toJSONString(msg));
         ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
         group.writeAndFlush(textWebSocketFrame);

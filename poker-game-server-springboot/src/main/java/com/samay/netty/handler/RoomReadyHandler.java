@@ -9,7 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.samay.game.dto.RoomReadyDTO;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
-import com.samay.game.vo.ResultVO;
+import com.samay.game.vo.RV;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -38,7 +38,7 @@ public class RoomReadyHandler extends SimpleChannelInboundHandler<RoomReadyDTO>{
             // 进入下一环节：游戏准备阶段(初始化NormalGame)
             Room room=ChannelHolder.attrRoom(ctx.channel());
 
-            Map<String,Object> msg=ResultVO.resultMap(room);
+            Map<String,Object> msg=RV.resultMap(room);
             group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
             
             ctx.fireChannelRead(room.getGame());

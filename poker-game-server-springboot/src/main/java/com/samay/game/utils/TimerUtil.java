@@ -41,6 +41,7 @@ public class TimerUtil {
      * <p>
      * 即在一定的时间内没有检测到玩家发起的相关action请求，系统将按照默认行为方式处理
      * 
+     * @param time 时限(单位: 秒)
      * @param action 什么操作
      * @param ch     通道
      */

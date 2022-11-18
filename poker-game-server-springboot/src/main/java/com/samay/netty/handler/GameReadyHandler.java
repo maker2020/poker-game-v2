@@ -12,7 +12,7 @@ import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.RoomStatusEnum;
-import com.samay.game.vo.ResultVO;
+import com.samay.game.vo.RV;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -67,7 +67,7 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
             Player p = ChannelHolder.attrPlayer(ch);
             for (int i = 0; i < game.getPlayers().size(); i++) {
                 if (p.getId().equals(game.getPlayers().get(i).getId())) {
-                    Map<String, Object> msg = ResultVO.resultMap(p.getId(), p.getPokers());
+                    Map<String, Object> msg = RV.resultMap(p.getId(), p.getPokers());
                     ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
                     break;
                 }
@@ -75,7 +75,7 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
         }
         
         // 随机选一名玩家叫地主
-        Map<String, Object> turnCallResult = ResultVO.resultMap(ActionEnum.CALL, room.turnPlayer(null,ActionEnum.CALL), null);
+        Map<String, Object> turnCallResult = RV.resultMap(ActionEnum.CALL, room.turnPlayer(null,ActionEnum.CALL), null);
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(turnCallResult)));
         
         // 至此结束，其他业务由其他handler从头处理

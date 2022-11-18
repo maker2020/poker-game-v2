@@ -12,7 +12,7 @@ import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
 import com.samay.game.entity.Room;
 import com.samay.game.utils.PokerUtil;
-import com.samay.game.vo.ResultVO;
+import com.samay.game.vo.RV;
 import com.samay.netty.handler.holder.ChannelHolder;
 
 import io.netty.channel.Channel;
@@ -37,10 +37,10 @@ public class TipPokerHandler extends SimpleChannelInboundHandler<TipPokerDTO> {
         Map<String,Object> result;
         if(resultList==null || resultList.size()==0){
             // 返回没有提示
-            result=ResultVO.tipResult(null, false);
+            result=RV.tipResult(null, false);
         }else{
             // 根据请求次数轮流选取resultList中的牌型组
-            result=ResultVO.tipResult(resultList.get(tipDTO.getTipIndex()%resultList.size()), true);
+            result=RV.tipResult(resultList.get(tipDTO.getTipIndex()%resultList.size()), true);
         }
         ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
     }

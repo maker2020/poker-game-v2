@@ -23,6 +23,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 @ToString
+@Deprecated
 public class HappyGame extends Game{
 
     public HappyGame(List<Player> players){
