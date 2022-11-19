@@ -1,7 +1,6 @@
 package com.samay.netty.handler;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -13,6 +12,7 @@ import com.samay.game.entity.Poker;
 import com.samay.game.entity.Room;
 import com.samay.game.utils.PokerUtil;
 import com.samay.game.vo.RV;
+import com.samay.game.vo.ResultVO;
 import com.samay.netty.handler.holder.ChannelHolder;
 
 import io.netty.channel.Channel;
@@ -34,7 +34,7 @@ public class TipPokerHandler extends SimpleChannelInboundHandler<TipPokerDTO> {
         if(!player.getId().equals(game.getActingPlayer())) return;
         if(game.getLastPutPokers()==null) return;
         List<List<Poker>> resultList=PokerUtil.tipPokers(player,game);
-        Map<String,Object> result;
+        ResultVO<?> result;
         if(resultList==null || resultList.size()==0){
             // 返回没有提示
             result=RV.tipResult(null, false);

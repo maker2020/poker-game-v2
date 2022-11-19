@@ -1,7 +1,5 @@
 package com.samay.netty.handler;
 
-import java.util.Map;
-
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -14,6 +12,7 @@ import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.utils.TimerUtil;
 import com.samay.game.vo.Notification;
 import com.samay.game.vo.RV;
+import com.samay.game.vo.ResultVO;
 import com.samay.netty.handler.holder.ChannelHolder;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -35,28 +34,28 @@ public class MultipleHandler extends SimpleChannelInboundHandler<MultipleDTO>{
         
         if(game.getStatus()!=GameStatusEnum.RAISE && !player.isRaise()) return;
 
-        Map<String,Object> resultMap=null;
+        ResultVO<?> resultVO=null;
         Notification notification=new Notification(player.getId());
         if(msg.isTendency()){
             notification.setChoice(true);
             if("double".equals(msg.getAction())){
                 game.setMultiple(game.getMultiple()*2);
                 notification.setType(ActionEnum.DOUBLE);
-                resultMap=RV.multipleResultMap(notification, game.getMultiple());
+                resultVO=RV.multipleResult(notification, game.getMultiple());
             }
             if("doublePlus".equals(msg.getAction())){
                 game.setMultiple(game.getMultiple()*4);
                 notification.setType(ActionEnum.DOUBLE_PLUS);
-                resultMap=RV.multipleResultMap(notification, game.getMultiple());
+                resultVO=RV.multipleResult(notification, game.getMultiple());
             }
         }else{
             notification.setChoice(false);
             notification.setType(ActionEnum.NO_DOUBLE);
-            resultMap=RV.multipleResultMap(notification, game.getMultiple());
+            resultVO=RV.multipleResult(notification, game.getMultiple());
         }
         player.setRaise(true);
         TimerUtil.checkTimeout(ActionEnum.MULTIPLE, player.getId(), 5);
-        group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resultMap)));
+        group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resultVO)));
 
         if(raiseDone(game)){
             game.setStatus(GameStatusEnum.START);
@@ -76,7 +75,7 @@ public class MultipleHandler extends SimpleChannelInboundHandler<MultipleDTO>{
             }
             if(boss==null) throw new Exception("不可能的异常");
             // 轮到地主出牌
-            Map<String,Object> putResult=RV.resultMap(ActionEnum.PUT, boss.getId(),null);
+            ResultVO<?> putResult=RV.actionTurn(ActionEnum.PUT, boss.getId(),null);
             TimerUtil.checkTimeout(ActionEnum.PUT, boss.getId(), 30);
             group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(putResult)));
         }

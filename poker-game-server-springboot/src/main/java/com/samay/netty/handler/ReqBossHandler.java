@@ -14,6 +14,8 @@ import com.samay.game.enums.ActionEnum;
 import com.samay.game.utils.PokerUtil;
 import com.samay.game.vo.Notification;
 import com.samay.game.vo.RV;
+import com.samay.game.vo.ResultVO;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -56,13 +58,13 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         game.getTurnCallIndex().incrementAndGet();
         player.setReqIndex(game.getTurnCallIndex().get());
 
-        Map<String, Object> result = null;
+        ResultVO<Map<String,Object>> result = null;
         if (msg.isTendency()) {
             if ("call".equals(msg.getAction())) {
 
                 player.callBoss();
 
-                result = RV.resultMap(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
+                result = RV.actionTurn(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
                         new Notification(ActionEnum.CALL, true, player.getId()));
 
 
@@ -70,12 +72,12 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
 
                 player.askBoss();
 
-                result = RV.resultMap(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
+                result = RV.actionTurn(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
                         new Notification(ActionEnum.ASK, true, player.getId()));
 
                 // 倍数翻一番
                 game.setMultiple(game.getMultiple() * 2);
-                Map<String, Object> multipleResult = RV.multiplying(game.getMultiple());
+                ResultVO<?> multipleResult = RV.multipleInfo(game.getMultiple());
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multipleResult)));
             }
         } else { // 拒绝
@@ -83,14 +85,14 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
 
                 player.unCallBoss();
 
-                result = RV.resultMap(ActionEnum.CALL, room.turnPlayer(player, ActionEnum.CALL),
+                result = RV.actionTurn(ActionEnum.CALL, room.turnPlayer(player, ActionEnum.CALL),
                         new Notification(ActionEnum.CALL, false, player.getId()));
 
             } else if ("ask".equals(msg.getAction())) {
 
                 player.unAskBoss();
 
-                result = RV.resultMap(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
+                result = RV.actionTurn(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
                         new Notification(ActionEnum.ASK, false, player.getId()));
 
             }
@@ -114,30 +116,30 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         // 尝试获得地主
         Player boss = game.getBossInstantly();
         if (boss != null) {
-            Map<String, Object> result2 = RV.resultMap(boss.getId());
-            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result2)));
+            ResultVO<?> bossVO = RV.boss(boss.getId());
+            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(bossVO)));
 
             // 广播地主牌
-            Map<String, Object> bossPokersResult = RV.resultMap(game.getPokerBossCollector());
+            ResultVO<?> bossPokersResult = RV.bossPoker(game.getPokerBossCollector());
             group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(bossPokersResult)));
 
             // 给地主整理新加入的牌并单独发送给地主
             boss.addAllPoker(game.getPokerBossCollector());
             PokerUtil.sort(boss.getPokers());
-            Map<String, Object> resortBossPokers = RV.resultMap(boss.getId(), boss.getPokers());
+            ResultVO<?> resortBossPokers = RV.handoutResult(boss.getId(), boss.getPokers());
             ChannelId chID = ChannelHolder.uid_chidMap.get(boss.getId());
             group.find(chID).writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resortBossPokers)));
 
             // 地主既然得出，仅通知最后一名玩家的行为即可
             // 更新result的action、turn
-            RV.updateResultMap(result, null, null);
+            RV.updateActionTurn(result, null, null);
         }
 
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
 
         if(boss!=null){
             // 地主已选出，此处通知进入是否加注的选择阶段
-            Map<String,Object> multipleStatus=RV.raiseStatus(false);
+            ResultVO<?> multipleStatus=RV.raiseStatus(false);
             group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multipleStatus)));
         }
     }

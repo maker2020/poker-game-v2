@@ -1,7 +1,6 @@
 package com.samay.netty.handler;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -16,6 +15,8 @@ import com.samay.game.dto.TipPokerDTO;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.vo.RV;
+import com.samay.game.vo.ResultVO;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -103,8 +104,8 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
             playerNameArr[i]=playerList.get(i).getId();
         }
 
-        Map<String,Object> msg=RV.resultMap(room);
-        TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JSON.toJSONString(msg));
+        ResultVO<?> resultVO=RV.roomInfo(room);
+        TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JSON.toJSONString(resultVO));
         ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
         group.writeAndFlush(textWebSocketFrame);
     }
