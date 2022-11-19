@@ -59,8 +59,8 @@ Page({
             fail: (res) => {},
             complete: (res) => {}
         })
-        wx.onSocketMessage((result) => {
-            var data = JSON.parse(result.data);
+        wx.onSocketMessage((resp) => {
+            var data=JSON.parse(resp.data).data
             // 此处逻辑大多为监听服务器的数据（以及过滤），并更新该页面的状态变量，从而更新页面渲染（双向绑定）
             if (data.roomID && data.playerStatus) {
                 // 该方法块主要是负责绑定： 某玩家进入房间后其座位的相关信息

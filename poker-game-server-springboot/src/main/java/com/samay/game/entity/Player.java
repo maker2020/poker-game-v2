@@ -22,6 +22,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class Player extends User implements Serializable{
     
+    private static final long serialVersionUID = 1L;
+
     private List<Poker> pokers=new LinkedList<>();
     private boolean boss=false;
     private boolean ready;

@@ -173,7 +173,7 @@ public class RV {
      */
     public static ResultVO<Map<String,Object>> raiseStatus(boolean done){
         Map<String,Object> data=new HashMap<>();
-        data.put("action", ActionEnum.MULTIPLE);
+        data.put("action", ActionEnum.MULTIPLE.getAction());
         data.put("turnAll", true);
         data.put("done", done);
         return new ResultVO<>(0,"通知玩家处于加注阶段",data);
