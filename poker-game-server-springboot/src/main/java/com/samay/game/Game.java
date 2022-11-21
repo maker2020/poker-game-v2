@@ -27,9 +27,9 @@ public abstract class Game implements Serializable {
     
     private static final long serialVersionUID=1L;
 
-    private Collection<Poker> pokerCollector;
-    private Collection<Poker> pokerBossCollector;
-    private List<Player> players=new CopyOnWriteArrayList<>();
+    private transient Collection<Poker> pokerCollector;
+    private transient Collection<Poker> pokerBossCollector;
+    private transient List<Player> players=new CopyOnWriteArrayList<>();
     private GameStatusEnum status=GameStatusEnum.READY;
     
     /**
@@ -62,7 +62,7 @@ public abstract class Game implements Serializable {
     /**
      * 地主请求轮询的序号
      */
-    private AtomicInteger turnCallIndex=new AtomicInteger(0);
+    private transient AtomicInteger turnCallIndex=new AtomicInteger(0);
     
 
     // 以下变量暂时保留

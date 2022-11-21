@@ -32,7 +32,7 @@ public class Room implements Serializable {
     private String id;
     private RoomStatusEnum status=RoomStatusEnum.READY;
     private List<Player> players=new CopyOnWriteArrayList<>();
-    private Game game;
+    private transient Game game;
 
     // 辅助<叫地主逻辑>的变量
 
