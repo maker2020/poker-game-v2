@@ -1,4 +1,4 @@
-package com.samay.game.vo;
+package com.samay.game.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +10,8 @@ import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
+import com.samay.game.vo.Notification;
+import com.samay.game.vo.ResultVO;
 
 /**
  * Netty服务器所有返回给前端的VO对象模板类
@@ -17,10 +19,26 @@ import com.samay.game.enums.ActionEnum;
 public class RV {
     
     /**
+     * 房间内所有与游戏相关的数据<p>
+     * (同时针对玩家过滤掉敏感数据：如只能看到自己的手牌。)
+     * 
+     * @return
+     */
+    public static ResultVO<Map<String,Object>> roomData(Room room){
+        ResultVO<Map<String,Object>> resultVO=new ResultVO<>(0, "room game data");
+        Map<String,Object> data=new HashMap<>();
+        data.put("room", room);
+        data.put("game", room.getGame());
+        resultVO.setData(data);
+        return resultVO;
+    }
+
+    /**
      * 返回地主是谁
      * @param boss
      * @return
      */
+    @Deprecated
     public static ResultVO<Map<String,Object>> boss(String boss){
         Map<String,Object> data=new HashMap<>();
         data.put("boss", boss);
@@ -32,6 +50,7 @@ public class RV {
      * @param pokers
      * @return
      */
+    @Deprecated
     public static ResultVO<Map<String,Object>> bossPoker(Collection<Poker> pokers){
         Map<String,Object> data=new HashMap<>();
         data.put("bossPokers",pokers);
@@ -44,6 +63,7 @@ public class RV {
      * @param room
      * @return
      */
+    @Deprecated
     public static ResultVO<Map<String,Object>> roomInfo(Room room){
         Map<String,Object> data=new HashMap<>();
         List<Map<String,Object>> playerInfoList=new ArrayList<>();
@@ -72,6 +92,7 @@ public class RV {
      * @param pokers
      * @return
      */
+    @Deprecated
     public static ResultVO<Map<String,Object>> handoutResult(String user,List<Poker> pokers){
         Map<String,Object> data=new HashMap<>();
         data.put("playerID", user);
@@ -87,6 +108,7 @@ public class RV {
      * @param notification
      * @return
      */
+    @Deprecated
     public static ResultVO<Map<String,Object>> actionTurn(ActionEnum actionEnum,String turn,Notification notification){
         Map<String,Object> data=new HashMap<>();
         data.put("action", actionEnum.getAction());
@@ -96,6 +118,7 @@ public class RV {
         return resultVO;
     }
 
+    @Deprecated
     public static ResultVO<Map<String,Object>> putResult(ActionEnum actionEnum,String turn,Notification notification,List<Poker> putPokers,int restPokerNum){
         Map<String,Object> data=new HashMap<>();
         data.put("action", actionEnum.getAction());
@@ -113,6 +136,7 @@ public class RV {
      * @param action
      * @param turn
      */
+    @Deprecated
     public static void updateActionTurn(ResultVO<Map<String,Object>> resultVO,ActionEnum action,String turn){
         Map<String,Object> data=resultVO.getData();
         data.put("action", action==null?null:action.getAction());
@@ -146,6 +170,7 @@ public class RV {
      * @param multiple
      * @return
      */
+    @Deprecated
     public static ResultVO<Map<String,Object>> multipleInfo(int multiple){
         Map<String,Object> data=new HashMap<>();
         data.put("multiple", multiple);
@@ -158,6 +183,7 @@ public class RV {
      * @param multiple
      * @return
      */
+    @Deprecated
     public static ResultVO<Map<String,Object>> multipleResult(Notification notification,int multiple){
         Map<String,Object> data=new HashMap<>();
         data.put("notification", notification);
@@ -171,6 +197,7 @@ public class RV {
      * @param done 是否完成了加注阶段
      * @return
      */
+    @Deprecated
     public static ResultVO<Map<String,Object>> raiseStatus(boolean done){
         Map<String,Object> data=new HashMap<>();
         data.put("action", ActionEnum.MULTIPLE.getAction());

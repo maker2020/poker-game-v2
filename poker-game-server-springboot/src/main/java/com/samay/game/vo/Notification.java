@@ -1,39 +1,34 @@
 package com.samay.game.vo;
 
+import java.io.Serializable;
+import java.util.List;
+
+import com.samay.game.entity.Poker;
 import com.samay.game.enums.ActionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * group通知的消息
- * <p>
- * 字段通常为
- * <ul>
- * <li>type(action)</li>
- * <li>choice(tendency)</li>
- * <li>playerID</li>
- * </ul>
+ * 记录玩家的操作类
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Notification {
+public class Notification implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    // 基本字段
     private ActionEnum type;
     private boolean choice;
-    /**
-     * user唯一标识(可以是username、id等)
-     */
-    private String playerID;
 
-    public Notification(String playerID){
-        this.playerID=playerID;
+    public Notification(ActionEnum type,boolean choice){
+        this.type=type;
+        this.choice=choice;
     }
 
-    public Notification(String playerID, ActionEnum type) {
-        this.playerID = playerID;
-        this.type = type;
-    }
+    // 额外字段
+    private List<Poker> putPokers;
 
 }

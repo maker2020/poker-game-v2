@@ -1,7 +1,5 @@
 package com.samay.netty.handler;
 
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -12,10 +10,8 @@ import com.samay.game.dto.PutPokerDTO;
 import com.samay.game.dto.ReqBossDTO;
 import com.samay.game.dto.RoomReadyDTO;
 import com.samay.game.dto.TipPokerDTO;
-import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
-import com.samay.game.vo.RV;
-import com.samay.game.vo.ResultVO;
+import com.samay.game.utils.RV;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -25,6 +21,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import com.samay.netty.handler.holder.ChannelHolder;
 import com.samay.netty.handler.http.HttpRequestHandler;
+import com.samay.netty.handler.utils.WriteUtil;
 
 @SuppressWarnings("deprecation")
 @Component
@@ -97,17 +94,8 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
 
     private void onJoined(ChannelHandlerContext ctx) {
         Room room = ChannelHolder.attrRoom(ctx.channel());
-
-        List<Player> playerList=room.getPlayers();
-        String[] playerNameArr=new String[playerList.size()];
-        for(int i=0;i<playerList.size();i++){
-            playerNameArr[i]=playerList.get(i).getId();
-        }
-
-        ResultVO<?> resultVO=RV.roomInfo(room);
-        TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JSON.toJSONString(resultVO));
         ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
-        group.writeAndFlush(textWebSocketFrame);
+        WriteUtil.writeAndFlushTextWebSocketFrame(group, RV.roomData(room));
     }
 
 }

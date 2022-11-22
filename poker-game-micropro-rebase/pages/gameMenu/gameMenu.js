@@ -17,7 +17,7 @@ Page({
 
     randomMatch(){
         wx.redirectTo({
-          url: '/pages/gameRoom/gameRoom',
+          url: '/pages/gameRoomTest/gameRoomTest',
           roomType: 'randomType'
         })
     },

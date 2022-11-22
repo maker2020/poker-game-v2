@@ -46,6 +46,8 @@ public class TimerUtil {
      * @param ch     通道
      */
     public static void checkTimeout(ActionEnum action, String playerID,long time) throws Exception {
+        int t=0;
+        if(t==0) return;
         synchronized(playerID){
             if (playerID == null || action == null)
                 return;

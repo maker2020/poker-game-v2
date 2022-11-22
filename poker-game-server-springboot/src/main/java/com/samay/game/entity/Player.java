@@ -1,12 +1,12 @@
 package com.samay.game.entity;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.utils.TimerUtil;
+import com.samay.game.vo.Notification;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,10 +20,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Player extends User implements Serializable{
+public class Player extends User {
     
-    private static final long serialVersionUID = 1L;
-
     private List<Poker> pokers=new LinkedList<>();
     private boolean boss=false;
     private boolean ready;
@@ -31,6 +29,11 @@ public class Player extends User implements Serializable{
      * 是否已加注过
      */
     private boolean raise;
+
+    /**
+     * 记录玩家的操作
+     */
+    private Notification notification;
 
     // 辅助变量，大多不会序列化(如使用jackson、jdk、msgpack、google等序列化框架)/传输这些字段
     /**
@@ -59,7 +62,7 @@ public class Player extends User implements Serializable{
      * 是否pass
      */
     @Deprecated
-    private boolean pass;
+    private transient boolean pass;
 
     /**
      * 按照玩家唯一标识(cloudID/id等)
@@ -96,23 +99,53 @@ public class Player extends User implements Serializable{
     public void callBoss() throws Exception{
         setFirstCall(true);
         reqBoss();
+        setNotification(new Notification(ActionEnum.CALL, true));
         // 操作相关逻辑调用该方法以消除 限时检测的阻塞
         TimerUtil.checkTimeout(ActionEnum.CALL, getId(), 30);
     }
 
     public void askBoss() throws Exception{
         reqBoss();
+        setNotification(new Notification(ActionEnum.ASK, true));
         TimerUtil.checkTimeout(ActionEnum.ASK, getId(), 30);
     }
 
     public void unCallBoss() throws Exception{
         refuseBoss();
+        setNotification(new Notification(ActionEnum.CALL, false));
         TimerUtil.checkTimeout(ActionEnum.CALL, getId(), 30);
     }
 
     public void unAskBoss() throws Exception{
         refuseBoss();
+        setNotification(new Notification(ActionEnum.ASK, false));
         TimerUtil.checkTimeout(ActionEnum.ASK, getId(), 30);
+    }
+
+    public void doubleMulti() throws Exception{
+        setRaise(true);
+        TimerUtil.checkTimeout(ActionEnum.MULTIPLE, getId(), 5);
+        setNotification(new Notification(ActionEnum.DOUBLE, true));
+    }
+
+    public void doublePlusMulti() throws Exception{
+        setRaise(true);
+        TimerUtil.checkTimeout(ActionEnum.MULTIPLE, getId(), 5);
+        setNotification(new Notification(ActionEnum.DOUBLE_PLUS, true));
+    }
+
+    public void refuseDouble() throws Exception{
+        setRaise(true);
+        TimerUtil.checkTimeout(ActionEnum.MULTIPLE, getId(), 5);
+        setNotification(new Notification(ActionEnum.NO_DOUBLE, false));
+    }
+
+    public void putPokers(List<Poker> putPokers) throws Exception{
+        if(putPokers!=null){
+            removeAllPoker(putPokers);
+        }
+        TimerUtil.checkTimeout(ActionEnum.PUT, getId(), 30);
+        setNotification(new Notification(ActionEnum.PUT, putPokers!=null, putPokers));
     }
 
     @Override

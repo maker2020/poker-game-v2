@@ -1,28 +1,20 @@
 package com.samay.netty.handler;
 
-import java.util.Iterator;
-
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
-
 import com.samay.game.Game;
-import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.RoomStatusEnum;
-import com.samay.game.vo.RV;
-import com.samay.game.vo.ResultVO;
 
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.group.ChannelGroup;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 import com.samay.netty.handler.holder.ChannelHolder;
+import com.samay.netty.handler.utils.WriteUtil;
 
 /**
  * 游戏准备阶段:
@@ -61,7 +53,7 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
         // 初始化游戏、准备发牌
         game = initGame(game);
         // 发牌至玩家(只有一个线程处理，所以需要分发group里的channel)
-        // 注：这里嵌套循环数量级不大，并不影响性能，没必要在game实现类中建立维护hash结构存储变量提升性能。
+        /* // 注：这里嵌套循环数量级不大，并不影响性能，没必要在game实现类中建立维护hash结构存储变量提升性能。
         Iterator<Channel> it = group.iterator();
         while (it.hasNext()) {
             Channel ch = it.next();
@@ -73,12 +65,13 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
                     break;
                 }
             }
-        }
+        } */
         
         // 随机选一名玩家叫地主
-        ResultVO<?> turnCallResult = RV.actionTurn(ActionEnum.CALL, room.turnPlayer(null,ActionEnum.CALL), null);
-        group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(turnCallResult)));
-        
+        room.turnPlayer(null, ActionEnum.CALL);
+
+        WriteUtil.writeAndFlushRoomDataByFilter(group);
+
         // 至此结束，其他业务由其他handler从头处理
         ctx.fireChannelRead(Unpooled.EMPTY_BUFFER);
     }

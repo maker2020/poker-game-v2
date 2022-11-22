@@ -1,5 +1,9 @@
 package com.samay.game.entity;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
@@ -7,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.samay.game.Game;
 import com.samay.game.enums.ActionEnum;
+import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.RoomStatusEnum;
 import com.samay.game.utils.TimerUtil;
 
@@ -43,7 +48,10 @@ public class Room implements Serializable {
 
     /**
      * 传入一个player，获取下一个player ID<p>
-     * 若传null,则随机选一个player
+     * 若传null,则随机选一个player<p>
+     * 
+     * 该方法会更新游戏对象的actingPlayer和currentAction这两个状态变量
+     * 
      * @param player 当前的player，用来辅助得到下一个playerID
      * @return playerID,null
      */
@@ -89,10 +97,13 @@ public class Room implements Serializable {
                     pos=pos==players.size()-1?0:pos+1;
                 }
                 Player boss=game.getBossInstantly();
-                if(boss!=null){ // 这说明地主已经可以选出，下一个人应该轮到地主操作，所以更新setActing为地主玩家
+                if(boss!=null){ // 这说明地主已经可以选出，下一个人应该轮到所有人加注以及地主操作，所以更新setActing为所有人(ALL)
                     playerID=null;
-                    game.setActingPlayer(boss.getId());
-
+                    // 可以进行加注阶段了
+                    game.setStatus(GameStatusEnum.RAISE);
+                    game.setActingPlayer("ALL");
+                    game.setCurrentAction(ActionEnum.MULTIPLE);
+                    
                     for(Player p:getPlayers()){
                         TimerUtil.checkTimeout(ActionEnum.MULTIPLE, p.getId(), 5);
                     }
@@ -103,7 +114,7 @@ public class Room implements Serializable {
         }
         if(playerID!=null){
             game.setActingPlayer(playerID);
-        
+            game.setCurrentAction(actionEnum);
             // 每每轮到xx操作，即开启限时检测，在操作完后也需要调用以关闭
             TimerUtil.checkTimeout(actionEnum, playerID, 30);
         }
@@ -119,6 +130,22 @@ public class Room implements Serializable {
             if(p.isBoss()) return true;
         }
         return false;
+    }
+
+    /**
+     * 深克隆房间
+     * @return
+     */
+    public Room deepClone() throws Exception{
+        ByteArrayOutputStream bout=new ByteArrayOutputStream();
+        ObjectOutputStream oout=new ObjectOutputStream(bout);
+        oout.writeObject(this);
+        byte[] data=bout.toByteArray();
+        ByteArrayInputStream bin=new ByteArrayInputStream(data);
+        ObjectInputStream oin=new ObjectInputStream(bin);
+        Room copyRoom=(Room)oin.readObject();
+        copyRoom.setGame(getGame());
+        return copyRoom;
     }
 
 }

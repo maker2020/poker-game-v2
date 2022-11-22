@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
+import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.GameStatusEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,6 +46,14 @@ public abstract class Game implements Serializable {
      * (本来不需要该状态变量，但这种情况: 客户端恶意请求，若没有该状态变量维护，任何人任何时刻都可以出牌)
      */
     private String actingPlayer;
+    /**
+     * 当前正操作的类型
+     */
+    private ActionEnum currentAction;
+    /**
+     * 地主三只牌(应该和pokerBossCollector同一个引用指向)
+     */
+    private Collection<Poker> bossPokers;
 
     /**
      * 底分

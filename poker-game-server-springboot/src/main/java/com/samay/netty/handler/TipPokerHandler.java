@@ -11,7 +11,7 @@ import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
 import com.samay.game.entity.Room;
 import com.samay.game.utils.PokerUtil;
-import com.samay.game.vo.RV;
+import com.samay.game.utils.RV;
 import com.samay.game.vo.ResultVO;
 import com.samay.netty.handler.holder.ChannelHolder;
 

@@ -1,10 +1,6 @@
 package com.samay.netty.handler;
 
-import java.util.Map;
-
 import org.springframework.stereotype.Component;
-
-import com.alibaba.fastjson.JSON;
 
 import com.samay.game.Game;
 import com.samay.game.dto.ReqBossDTO;
@@ -12,19 +8,16 @@ import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.utils.PokerUtil;
-import com.samay.game.vo.Notification;
-import com.samay.game.vo.RV;
-import com.samay.game.vo.ResultVO;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.group.ChannelGroup;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 
 import com.samay.netty.handler.holder.ChannelHolder;
+import com.samay.netty.handler.utils.RoomUtil;
+import com.samay.netty.handler.utils.WriteUtil;
 
 /**
  * <b>叫地主/抢地主处理器</b>
@@ -48,7 +41,7 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         Game game = room.getGame();
 
         // 针对客户端请求出牌不合规的校验
-        if (!game.getActingPlayer().equals(player.getId())) {
+        if (!game.getActingPlayer().equals(player.getId()) || !game.getCurrentAction().getAction().equals(msg.getAction())) {
             log.warn("player [" + player.getId() + "] 不合规请求已被拦截处理");
             return;
         }
@@ -58,50 +51,24 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
         game.getTurnCallIndex().incrementAndGet();
         player.setReqIndex(game.getTurnCallIndex().get());
 
-        ResultVO<Map<String,Object>> result = null;
         if (msg.isTendency()) {
-            if ("call".equals(msg.getAction())) {
-
+            if (game.getCurrentAction()==ActionEnum.CALL) {
                 player.callBoss();
-
-                result = RV.actionTurn(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
-                        new Notification(ActionEnum.CALL, true, player.getId()));
-
-
-            } else if ("ask".equals(msg.getAction())) {
-
+            } else if (game.getCurrentAction()==ActionEnum.ASK) {
                 player.askBoss();
-
-                result = RV.actionTurn(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
-                        new Notification(ActionEnum.ASK, true, player.getId()));
-
                 // 倍数翻一番
                 game.setMultiple(game.getMultiple() * 2);
-                ResultVO<?> multipleResult = RV.multipleInfo(game.getMultiple());
-                group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multipleResult)));
             }
+            room.turnPlayer(player, ActionEnum.ASK);
         } else { // 拒绝
-            if ("call".equals(msg.getAction())) {
-
+            if (game.getCurrentAction()==ActionEnum.CALL) {
                 player.unCallBoss();
-
-                result = RV.actionTurn(ActionEnum.CALL, room.turnPlayer(player, ActionEnum.CALL),
-                        new Notification(ActionEnum.CALL, false, player.getId()));
-
-            } else if ("ask".equals(msg.getAction())) {
-
+                room.turnPlayer(player, ActionEnum.CALL);
+            } else if (game.getCurrentAction()==ActionEnum.ASK) {
                 player.unAskBoss();
-
-                result = RV.actionTurn(ActionEnum.ASK, room.turnPlayer(player, ActionEnum.ASK),
-                        new Notification(ActionEnum.ASK, false, player.getId()));
-
+                room.turnPlayer(player, ActionEnum.ASK);
             }
         }
-
-        //
-        if (result == null)
-            throw new Exception("ReqBossDTO msg 消息异常");
-
 
         // 判断是否重发
         boolean reHandout = true;
@@ -113,35 +80,20 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             GameReadyHandler.gameStart(game, group, room, ctx);
             return;
         }
+
         // 尝试获得地主
         Player boss = game.getBossInstantly();
         if (boss != null) {
-            ResultVO<?> bossVO = RV.boss(boss.getId());
-            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(bossVO)));
-
-            // 广播地主牌
-            ResultVO<?> bossPokersResult = RV.bossPoker(game.getPokerBossCollector());
-            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(bossPokersResult)));
-
-            // 给地主整理新加入的牌并单独发送给地主
+            // 给地主整理新加入的牌
             boss.addAllPoker(game.getPokerBossCollector());
             PokerUtil.sort(boss.getPokers());
-            ResultVO<?> resortBossPokers = RV.handoutResult(boss.getId(), boss.getPokers());
-            ChannelId chID = ChannelHolder.uid_chidMap.get(boss.getId());
-            group.find(chID).writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resortBossPokers)));
-
-            // 地主既然得出，仅通知最后一名玩家的行为即可
-            // 更新result的action、turn
-            RV.updateActionTurn(result, null, null);
+            // 此时可以赋值到bossPoker中对所有玩家透明了
+            game.setBossPokers(game.getPokerBossCollector());
+            
+            RoomUtil.clearPlayerNotification(room);
         }
 
-        group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
-
-        if(boss!=null){
-            // 地主已选出，此处通知进入是否加注的选择阶段
-            ResultVO<?> multipleStatus=RV.raiseStatus(false);
-            group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(multipleStatus)));
-        }
+        WriteUtil.writeAndFlushRoomDataByFilter(group);
     }
 
 }

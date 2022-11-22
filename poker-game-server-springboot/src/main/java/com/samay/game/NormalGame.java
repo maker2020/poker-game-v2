@@ -133,6 +133,11 @@ public class NormalGame extends Game {
      * @return
      */
     public Player getBossInstantly() {
+        // 直接通过变量来拿
+        for(Player p:getPlayers()){
+            if(p.isBoss()) return p;
+        }
+        // 其他方式
         if (getTurnCallIndex().get() < 3)
             return null;
         Player player = null;

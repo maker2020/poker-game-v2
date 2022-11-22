@@ -1,5 +1,7 @@
 package com.samay.game.entity;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,10 +18,12 @@ import lombok.ToString;
 // record User
 @EqualsAndHashCode(of = "id")
 @ToString
-public class User {
+public class User implements Serializable {
     
+    private static final long serialVersionUID = 1L;
+
     private String id;
-    private String phone;
+    private transient String phone;
     /**
      * 玩家展示的昵称
      */
@@ -35,7 +39,7 @@ public class User {
     /**
      * 游戏需重置货币
      */
-    private long payMoney;
+    private transient long payMoney;
     /**
      * 胜场
      */
