@@ -655,6 +655,8 @@ Page({
         })
     },
 
+    // 很多功能可以通过监听data变化实现
+
     tip(){
         var params={
             "action":"tip",

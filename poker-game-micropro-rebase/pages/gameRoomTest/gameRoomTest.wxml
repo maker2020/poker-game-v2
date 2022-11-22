@@ -63,7 +63,7 @@
             </view>
             
 
-            <view class='clock'  wx:if='{{game.actingPlayer==room.players[0].id || game.actingPlayer=="ALL"}}'>
+            <view class='clock'  wx:if='{{game.actingPlayer==room.players[0].id || (game.actingPlayer=="ALL" && !room.players[0].raise)}}'>
                 <image src='../../static/img/clock.png' mode='widthFix'></image>
                 <text class='num'>{{second}}</text>
             </view>
@@ -124,7 +124,7 @@
             </view>
 
 
-            <view class='clock'  wx:if='{{actingPlayer==room.players[1].id || game.actingPlayer=="ALL"}}'>
+            <view class='clock'  wx:if='{{actingPlayer==room.players[1].id || (game.actingPlayer=="ALL" && !room.players[1].raise)}}'>
                 <image src='../../static/img/clock.png' mode='widthFix'></image>
                 <text class='num'>{{second}}</text>
             </view>
@@ -201,7 +201,7 @@
             <view class='sure btn' bindtap='multipleD'>加倍</view>
             <view class='sure btn' bindtap='multipleN'>不加倍</view>
         </view>
-        <view class='clock' wx:if='{{game.actingPlayer==room.players[2].id || game.actingPlayer=="ALL"}}'>
+        <view class='clock' wx:if='{{game.actingPlayer==room.players[2].id || (game.actingPlayer=="ALL" && !room.players[2].raise)}}'>
             <image src='../../static/img/clock.png' mode='widthFix'></image>
             <text class='num'>{{second}}</text>
         </view>

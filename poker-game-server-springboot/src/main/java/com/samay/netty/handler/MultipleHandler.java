@@ -9,8 +9,8 @@ import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.utils.TimerUtil;
+import com.samay.netty.handler.aop.test.NotificationUtil;
 import com.samay.netty.handler.holder.ChannelHolder;
-import com.samay.netty.handler.utils.RoomUtil;
 import com.samay.netty.handler.utils.WriteUtil;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -54,7 +54,7 @@ public class MultipleHandler extends SimpleChannelInboundHandler<MultipleDTO>{
 
             // 缓1.5s便于玩家看清最后一名玩家是否加倍
             Thread.sleep(1000);
-            RoomUtil.clearPlayerNotification(room);
+            NotificationUtil.clearPlayerNotification(room);
 
             WriteUtil.writeAndFlushRoomDataByFilter(group);
         

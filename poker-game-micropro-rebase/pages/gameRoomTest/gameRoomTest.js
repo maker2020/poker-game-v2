@@ -47,10 +47,15 @@ Page({
             fail: (res) => {},
             complete: (res) => {}
         })
-        wx.onSocketMessage((resp) => {
-            var data=JSON.parse(resp.data).data
+        wx.onSocketMessage((result) => {
+            var resp=JSON.parse(result.data)
+            var data=resp.data
+            var code=resp.code
             console.log(data)
-            context.updateRoomData(data)
+            if(code==-1)
+                context.failHandle(data)
+            if(code==0)
+                context.updateRoomData(data)
         })
     },
 
@@ -98,6 +103,24 @@ Page({
         })
     },
 
+    failHandle(data){
+        // 只按一种情况处理（不合法出牌），其余不合法也给予同样的反馈
+        // 还原选中的牌
+        var myPokers=this.data.room.players[2].pokers
+        myPokers.forEach(function (item, i) {
+            item.selected = false
+        })
+        var room=this.data.room
+        room.players[2].pokers=myPokers
+        this.setData({
+            room:room
+        })
+        wx.showToast({
+            title: '您打出的牌不符合规则！',
+            icon: 'none',
+            duration: 1500
+        })
+    },
 
     touchStartPoker(e) {
         // 记录点击的牌的位置

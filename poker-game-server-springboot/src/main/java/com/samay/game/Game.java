@@ -17,10 +17,7 @@ import lombok.NoArgsConstructor;
 /**
  * 游戏抽象层<p>
  * 该类以下字段/方法、保留的v1版本辅助变量/方法。
- * <ul>
- *  <li>handOut</li>
- *  <li>init()</li>
- * </ul>
+ *
  */
 @Data
 @NoArgsConstructor

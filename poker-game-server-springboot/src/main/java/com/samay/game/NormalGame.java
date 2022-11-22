@@ -7,6 +7,7 @@ import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerValueEnum;
 import com.samay.game.rule.CommonRule;
 import com.samay.game.utils.PokerUtil;
+import com.samay.netty.handler.aop.test.NotificationUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -226,27 +227,28 @@ public class NormalGame extends Game {
     public void restart() {
         this.setPokerBossCollector(null);
         this.setPokerCollector(null);
-        this.setStatus(GameStatusEnum.READY);
-        this.getTurnCallIndex().set(0);
         // 玩家于游戏中的一些状态变量的重置
         for (Player p : getPlayers()) {
+            p.getPokers().clear();
             p.setBoss(false);
-            p.setFirstCall(false);
             p.setReady(false);
             p.setRaise(false);
+            p.setNotification(null);
+            p.setReqTimes(0);
             p.setRefuseBoss(false);
             p.setReqIndex(0);
-            p.setReqTimes(0);
-            p.getPokers().clear();
+            p.setFirstCall(false);
         }
-
+        this.setStatus(GameStatusEnum.READY);
         this.setLastPutPokers(null);
         this.setLastPlayerID("");
         this.setActingPlayer("");
-
+        this.setCurrentAction(null);
+        this.setBossPokers(null);
         this.setBaseScore(200);
-        this.setCardinality(2);
         this.setMultiple(2);
+        this.setCardinality(2);
+        this.getTurnCallIndex().set(0);
     }
 
     /**
@@ -335,6 +337,12 @@ public class NormalGame extends Game {
         result.put("resultTable", resultList);
         result.put("players", getPlayers());
         return result;
+    }
+
+    @Override
+    public void setActingPlayer(String playerID){
+        super.setActingPlayer(playerID);
+        NotificationUtil.setActingPlayerAfter(this);
     }
 
 }

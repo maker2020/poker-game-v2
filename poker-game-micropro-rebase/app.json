@@ -3,7 +3,7 @@
         "pages/gamePermit/gamePermit",
         "pages/gameMenu/gameMenu",
         
-        "pages/gameRoom/gameRoom",
+        "pages/gameRoom/gameRoomOld",
         "pages/gameRoomTest/gameRoomTest",
 
         "pages/aloneRoom/aloneRoom",

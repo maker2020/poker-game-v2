@@ -15,8 +15,8 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.group.ChannelGroup;
 import lombok.extern.slf4j.Slf4j;
 
+import com.samay.netty.handler.aop.test.NotificationUtil;
 import com.samay.netty.handler.holder.ChannelHolder;
-import com.samay.netty.handler.utils.RoomUtil;
 import com.samay.netty.handler.utils.WriteUtil;
 
 /**
@@ -90,7 +90,7 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
             // 此时可以赋值到bossPoker中对所有玩家透明了
             game.setBossPokers(game.getPokerBossCollector());
             
-            RoomUtil.clearPlayerNotification(room);
+            NotificationUtil.clearPlayerNotification(room);
         }
 
         WriteUtil.writeAndFlushRoomDataByFilter(group);

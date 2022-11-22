@@ -71,7 +71,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                     game.setMultiple(game.getMultiple()*2);
                 }
             }
-
+            room.turnPlayer(player, ActionEnum.PUT);
             WriteUtil.writeAndFlushRoomDataByFilter(group);
 
             if (player.getPokers().size() == 0) {
