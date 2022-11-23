@@ -36,7 +36,7 @@ public class RV {
      */
     public static ResultVO<Map<String,Object>> gameResult(Map<String,Object> data){
         // 其他数据
-        return new ResultVO<>(0, "游戏结算相关数据", data);
+        return new ResultVO<>(3, "游戏结算相关数据", data);
     }
 
     /**
@@ -60,9 +60,8 @@ public class RV {
     public static ResultVO<Map<String,Object>> tipResult(List<Poker> pokers,boolean exist){
         Map<String,Object> data=new HashMap<>();
         data.put("tipPokers", pokers);
-        data.put("exist", exist);
-        data.put("tipMsg", "none");
-        return new ResultVO<Map<String,Object>>(0, "返回服务器给出的出牌提示", data);
+        data.put("existTip", exist);
+        return new ResultVO<Map<String,Object>>(2, "返回服务器给出的出牌提示", data);
     }
 
 }

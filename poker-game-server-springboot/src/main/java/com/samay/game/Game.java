@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
+import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.GameStatusEnum;
 import lombok.Data;
@@ -94,7 +95,7 @@ public abstract class Game implements Serializable {
     /**
      * 游戏结算
      */
-    public abstract Map<String,Object> settlement();
+    public abstract Map<String,Object> settlement(Room room);
 
     /**
      * 重置游戏状态/初始化游戏状态

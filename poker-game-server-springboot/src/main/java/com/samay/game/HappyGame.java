@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
+import com.samay.game.entity.Room;
 import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerValueEnum;
@@ -96,7 +97,7 @@ public class HappyGame extends Game{
     }
 
     @Override
-    public Map<String,Object> settlement() {
+    public Map<String,Object> settlement(Room room) {
         return null;        
     }
 

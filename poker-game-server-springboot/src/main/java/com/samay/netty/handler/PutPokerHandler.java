@@ -76,13 +76,14 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
 
             if (player.getPokers().size() == 0) {
                 log.info("ROOM["+room.getId()+"] 游戏已结束");
+                game.setStatus(GameStatusEnum.OVER);
                 // 游戏结算
-                Map<String,Object> gameResult=game.settlement();
+                Map<String,Object> gameResult=game.settlement(room);
                 ResultVO<?> resultVO = RV.gameResult(gameResult);
                 // fastjson禁用引用重复检测（不禁用会导致同一对象被$.ref表示，从而不便于前端解析
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resultVO,SerializerFeature.DisableCircularReferenceDetect)));
             
-                // 游戏重置
+                // 游戏重置 (点继续游戏重置，此处不用)
                 game.restart();
             }
 

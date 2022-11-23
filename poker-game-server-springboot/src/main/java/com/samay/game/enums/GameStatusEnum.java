@@ -21,7 +21,11 @@ public enum GameStatusEnum {
     /**
      * 开始阶段
      */
-    START("start",3);
+    START("start",3),
+    /**
+     * 结算阶段
+     */
+    OVER("over",4);
 
     private String status;
     private int code;

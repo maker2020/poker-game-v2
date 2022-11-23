@@ -1,5 +1,6 @@
 // pages/gameRoom/gameRoom.js
 const app = getApp();
+var curApp
 Page({
 
     /**
@@ -33,6 +34,7 @@ Page({
      * 将websocket连接与消息通道放置该方法，于这里初始化
      */
     onLoad(options) {
+        curApp=this
         // 发送用户个人信息等参数，向服务器的请求连接
         var cloudID = encodeURI(app.globalData.userInfo.cloudID);
         var nickName = encodeURI(app.globalData.userInfo.nickName);
@@ -47,6 +49,8 @@ Page({
             fail: (res) => {},
             complete: (res) => {}
         })
+        // 注册监听数据、回调方法
+        app.setWatcher(this.data,this.watch)
         wx.onSocketMessage((result) => {
             var resp=JSON.parse(result.data)
             var data=resp.data
@@ -54,14 +58,54 @@ Page({
             console.log(data)
             if(code==-1)
                 context.failHandle(data)
-            if(code==0)
-                context.updateRoomData(data)
+            if(code==0){
+                if(this.data.room.players!=undefined && !this.data.room.players[2]!=undefined && !this.data.room.players[2].ready && this.data.game.status=='OVER'){
+                    // 精准针对了这种情况(游戏开始了，但却没有准备，只会发生在结算的时候，该玩家没点击继续，所以ready为false，屏蔽了房间消息，继续保持结算面板)
+                    var player // 定位服务器中玩家信息，以获取ready状态
+                    for(var i=0;i<data.room.players.length;i++){
+                        if(data.room.players[i].id==app.globalData.userInfo.cloudID){
+                            player=data.room.players[i]
+                            break;
+                        }
+                    }
+                    if(player==undefined) return
+                    // 若收到玩家自身的准备(继续游戏)即可更新数据
+                    if(player.ready) context.updateRoomData(data)
+                }else{
+                    context.updateRoomData(data)
+                }
+            }
+            if(code==2)
+                context.tipResult(data)
+            if(code==3)
+                context.settlementResult(data)
+        })
+    },
+
+    reset(){
+        this.setData({
+            gameResultTable:[],
+            timer:{}
         })
     },
 
     updateRoomData(data){
         var room=data.room
         var game=data.game
+        this.sortPlayerPos(room)
+        this.resolvePokersToDom(room)
+        // 最后：总更新
+        this.setData({
+            room: room,
+            game: game
+        })
+    },
+
+    /**
+     * 排玩家座位
+     * @param {房间} room 
+     */
+    sortPlayerPos(room){
         var player
         var playerIndex
         for(var i=0;i<room.players.length;i++){
@@ -87,6 +131,14 @@ Page({
             sortedPlayers[0]=players[1]
         }
         room.players=sortedPlayers
+    },
+
+    /**
+     * 将服务器的pokers增加额外属性,以便于dom操作或EL表达式渲染
+     * @param {*} room 
+     */
+    resolvePokersToDom(room){
+        var player=room.players[2]
         // 处理一下玩家手牌
         var domPokers = []
         player.pokers.forEach(function (item, i) {
@@ -96,11 +148,33 @@ Page({
             })
         })
         player.pokers=domPokers
-        // 最后：总更新
-        this.setData({
-            room: room,
-            game: game
-        })
+    },
+
+    tipResult(data){
+        if(data.existTip){
+            var tipPokers=data.tipPokers
+            // 消除已选中，弹出提示的牌
+            var myPokers=this.data.room.players[2].pokers
+            myPokers.forEach(function (item, i) {
+                item.selected = false
+                for(var j=0;j<tipPokers.length;j++){
+                    if((tipPokers[j].colorEnum+'_'+tipPokers[j].valueEnum)==item.name){
+                        item.selected=true
+                    }
+                }
+            })
+            var room=this.data.room
+            room.players[2].pokers=myPokers
+            this.setData({
+                room:room
+            })
+        }else{
+            wx.showToast({
+                title: '没有打的过的牌！',
+                icon: 'none',
+                duration: 1500
+            })
+        }
     },
 
     failHandle(data){
@@ -119,6 +193,68 @@ Page({
             title: '您打出的牌不符合规则！',
             icon: 'none',
             duration: 1500
+        })
+    },
+
+    settlementResult(data){
+        clearInterval(this.data.timer)
+        var room=data.room;
+        var game=data.game;
+        this.sortPlayerPos(room)
+        this.resolvePokersToDom(room)
+        // 结算面板数据
+        var gameResultTable=data.resultTable
+        for(var i=0;i<gameResultTable.length;i++){
+            if(gameResultTable[i].playerID==room.players[2].id){
+                // 交换位置方便wxml结果展示输赢图片及结果（始终把当前玩家放在第一个)
+                var temp=gameResultTable[0]
+                gameResultTable[0]=gameResultTable[i]
+                gameResultTable[i]=temp
+                break;
+            }
+        }
+        this.setData({
+            gameResultTable:gameResultTable,
+            room:room,
+            game:game
+        })
+    },
+
+    // 利用监听松耦合
+    watch: {
+        game:function(newValue){
+            curApp.onActingPlayerChanged(newValue)
+        }
+    },
+
+    // 当actingPlayer变化时，重置tipIndex为0，并且清空计时开始新的计时
+    onActingPlayerChanged(game){
+        clearInterval(this.data.timer)
+        // 根据不同的acting类型，设置不同的限时
+        var second
+        if(game.currentAction=='PUT'){
+            second=this.data.putTime
+        }else if(game.currentAction=='ASK' || game.currentAction=='CALL'){
+            second=this.data.callTime
+        }else{ // action=='RAISE'
+            second=this.data.raiseTime
+        }
+        this.setData({
+            second:second
+        })
+        // 倒计时
+        var context=this
+        var timer=setInterval(function(){
+            if(context.data.second&&context.data.second>0){
+                context.setData({
+                    second:context.data.second-1
+                })
+                if(context.data.second==0) clearInterval(timer)
+            }
+        },1000)
+        this.setData({
+            tipIndex:0,
+            timer:timer
         })
     },
 
@@ -244,7 +380,7 @@ Page({
 
     // 准备
     ready() {
-        // this.reset() // 重置房间
+        this.reset() // 重置房间的一些需要前端重置的东西
         var params = {
             "action": "ready",
             "tendency": true

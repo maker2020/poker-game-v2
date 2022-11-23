@@ -14,6 +14,27 @@ App({
     })
   },
 
+  setWatcher(data,watch){
+    Object.keys(watch).forEach(v=>{
+        this.observe(data,v,watch[v]);
+    })
+  },
+
+  observe(obj,key,watchFun){
+    var val = obj[key]; // 给该属性设默认值
+    Object.defineProperty(obj, key, {
+        configurable: true,
+        enumerable: true,
+        set: function(value) {
+            val = value;
+            watchFun(value,val); // 赋值(set)时，调用对应函数
+        },
+        get: function() {
+            return val;
+        }
+    })
+  },
+
   globalData: {
     userInfo: null,
   }

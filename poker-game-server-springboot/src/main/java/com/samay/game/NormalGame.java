@@ -2,6 +2,7 @@ package com.samay.game;
 
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
+import com.samay.game.entity.Room;
 import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerValueEnum;
@@ -252,10 +253,16 @@ public class NormalGame extends Game {
     }
 
     /**
-     * 结算（未考虑货币不够的情况，直接为负数）
+     * 结算（未考虑货币不够的情况，直接为负数）<p>
+     * 注意的是: 结算settlement和restart()不一样，restart是完全重置。<p>
+     * settlement更注重结算展示:如表格、摊牌、ActingPlayer等需要清空的状态，
+     * 并且是需要提前清除便于给客户端展示。在发送完结算数据后，会调用restart()清空状态
      */
     @Override
-    public Map<String, Object> settlement() {
+    public Map<String, Object> settlement(Room room) {
+        NotificationUtil.showdown(this);
+        setActingPlayer(null);
+        setCurrentAction(null);
         List<Player> winnerList = new ArrayList<>();
         List<Player> loserList = new ArrayList<>();
         for (Player p : getPlayers()) {
@@ -318,6 +325,7 @@ public class NormalGame extends Game {
             result.put("baseScore", getBaseScore());
             result.put("multiple", getMultiple());
             result.put("earning", actualEarn);
+            result.put("boss", p.isBoss());
             result.put("win", true);
             resultList.add(result);
         }
@@ -330,12 +338,19 @@ public class NormalGame extends Game {
             result.put("baseScore", getBaseScore());
             result.put("multiple", getMultiple());
             result.put("earning", -actualEarn);
+            result.put("boss", p.isBoss());
             result.put("win", false);
             resultList.add(result);
         }
         Map<String, Object> result = new HashMap<>();
         result.put("resultTable", resultList);
-        result.put("players", getPlayers());
+        for(Player p:getPlayers()){
+            p.getPokers().clear();
+            // 这个状态为什么一起和结算更改，为了让没有继续游戏(准备)的玩家好有屏蔽其他玩家消息的状态，以此保持结算面板
+            p.setReady(false);
+        }
+        result.put("room", room);
+        result.put("game", this);
         return result;
     }
 
