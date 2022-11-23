@@ -6,12 +6,12 @@ import java.util.Map;
 import com.samay.common.enums.ResultEnum;
 
 /**
- * Web控制器层VO
+ * Web服务返回对象(VO)的常用模板
  */
 public class ResultVO {
     
     /**
-     * 返回失败的结果
+     * 返回结果
      * @param resultEnum
      * @return
      */
@@ -19,7 +19,6 @@ public class ResultVO {
         Map<String,Object> result=new HashMap<>();
         result.put("code", resultEnum.getCode());
         result.put("message", resultEnum.getMessage());
-        result.put("success", false);
         return result;
     }
 

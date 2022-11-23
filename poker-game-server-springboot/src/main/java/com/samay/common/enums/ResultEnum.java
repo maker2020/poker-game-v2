@@ -1,7 +1,7 @@
 package com.samay.common.enums;
 
 /**
- * <b>Web返回结果枚举类</b>
+ * <b>WEB常规的返回结果枚举类</b>
  * <p>
  * 根据具体需要增加
  */

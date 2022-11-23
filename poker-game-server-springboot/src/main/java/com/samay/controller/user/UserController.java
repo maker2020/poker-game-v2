@@ -23,8 +23,8 @@ public class UserController {
     @Autowired
     private ItemService itemService;
 
-    @RequestMapping("/load")
-    public Map<String,Object> load(String userID){
+    @RequestMapping("/loadInfo")
+    public Map<String,Object> loadInfo(String userID){
         User user=userService.findUserById(userID);
         if(user==null) return ResultVO.fail(ResultEnum.USER_NOT_FOUND);
         Map<String,Object> result=new HashMap<>();

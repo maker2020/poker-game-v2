@@ -1,4 +1,4 @@
-package com.samay.netty.handler.encrypt;
+package com.samay.common.utils;
 
 import java.security.KeyFactory;
 import java.security.KeyPair;
