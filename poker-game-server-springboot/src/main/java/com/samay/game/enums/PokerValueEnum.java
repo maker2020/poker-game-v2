@@ -18,7 +18,9 @@ public enum PokerValueEnum {
     Q("Q",12,10),
     K("K",13,11),
     Queen("X",14,15),
-    King("Y",15,16);
+    King("Y",15,16),
+    
+    BLANK("*",-1,-1);
 
     private String value;
     private int code;

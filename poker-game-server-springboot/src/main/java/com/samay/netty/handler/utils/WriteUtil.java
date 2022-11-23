@@ -1,12 +1,16 @@
 package com.samay.netty.handler.utils;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.samay.game.entity.Player;
+import com.samay.game.entity.Poker;
 import com.samay.game.entity.Room;
+import com.samay.game.enums.PokerColorEnum;
+import com.samay.game.enums.PokerValueEnum;
 import com.samay.game.utils.RV;
 import com.samay.netty.handler.holder.ChannelHolder;
 
@@ -36,7 +40,8 @@ public class WriteUtil {
             for(Player p:players){
                 if(!p.getId().equals(player.getId())){
                     // 屏蔽其他玩家的手牌 (移除/或用无效数据)
-                    p.removeAllPoker(p.getPokers());
+                    List<Poker> list=p.getPokers();
+                    Collections.fill(list, new Poker(PokerColorEnum.HEART, PokerValueEnum.BLANK));
                 }
             }
             ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(RV.roomData(copyRoom),SerializerFeature.DisableCircularReferenceDetect))); 

@@ -33,7 +33,7 @@
             </view>
             <view class='brandShow' wx:if='{{game.status!="READY"}}'>
                 <image src='../../static/img/backside.png' mode='widthFix'></image>
-                <text class='num'>{{playerListRestPokerNum[0]==undefined?'17':playerListRestPokerNum[0]}}</text>
+                <text class='num'>{{room.players[0].pokers.length}}</text>
             </view>
 
             <!--操作状态的显示-->
@@ -94,7 +94,7 @@
             </view>
             <view class='brandShow' wx:if='{{game.status!="READY"}}'>
                 <image src='../../static/img/backside.png' mode='widthFix'></image>
-                <text class='num'>{{playerListRestPokerNum[1]==undefined?'17':playerListRestPokerNum[1]}}</text>
+                <text class='num'>{{room.players[1].pokers.length}}</text>
             </view>
 
             <!--操作状态的显示-->
