@@ -101,42 +101,42 @@ public class Player extends User {
         reqBoss();
         setNotification(new Notification(ActionEnum.CALL, true));
         // 操作相关逻辑调用该方法以消除 限时检测的阻塞
-        TimerUtil.checkTimeout(ActionEnum.CALL, getId(), 30);
+        TimerUtil.checkTimeout(ActionEnum.CALL, getId());
     }
 
     public void askBoss() throws Exception{
         reqBoss();
         setNotification(new Notification(ActionEnum.ASK, true));
-        TimerUtil.checkTimeout(ActionEnum.ASK, getId(), 30);
+        TimerUtil.checkTimeout(ActionEnum.ASK, getId());
     }
 
     public void unCallBoss() throws Exception{
         refuseBoss();
         setNotification(new Notification(ActionEnum.CALL, false));
-        TimerUtil.checkTimeout(ActionEnum.CALL, getId(), 30);
+        TimerUtil.checkTimeout(ActionEnum.CALL, getId());
     }
 
     public void unAskBoss() throws Exception{
         refuseBoss();
         setNotification(new Notification(ActionEnum.ASK, false));
-        TimerUtil.checkTimeout(ActionEnum.ASK, getId(), 30);
+        TimerUtil.checkTimeout(ActionEnum.ASK, getId());
     }
 
     public void doubleMulti() throws Exception{
         setRaise(true);
-        TimerUtil.checkTimeout(ActionEnum.MULTIPLE, getId(), 5);
+        TimerUtil.checkTimeout(ActionEnum.MULTIPLE, getId());
         setNotification(new Notification(ActionEnum.DOUBLE, true));
     }
 
     public void doublePlusMulti() throws Exception{
         setRaise(true);
-        TimerUtil.checkTimeout(ActionEnum.MULTIPLE, getId(), 5);
+        TimerUtil.checkTimeout(ActionEnum.MULTIPLE, getId());
         setNotification(new Notification(ActionEnum.DOUBLE_PLUS, true));
     }
 
     public void refuseDouble() throws Exception{
         setRaise(true);
-        TimerUtil.checkTimeout(ActionEnum.MULTIPLE, getId(), 5);
+        TimerUtil.checkTimeout(ActionEnum.MULTIPLE, getId());
         setNotification(new Notification(ActionEnum.NO_DOUBLE, false));
     }
 
@@ -144,7 +144,7 @@ public class Player extends User {
         if(putPokers!=null){
             removeAllPoker(putPokers);
         }
-        TimerUtil.checkTimeout(ActionEnum.PUT, getId(), 30);
+        TimerUtil.checkTimeout(ActionEnum.PUT, getId());
         setNotification(new Notification(ActionEnum.PUT, putPokers!=null, putPokers));
     }
 

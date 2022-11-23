@@ -26,8 +26,9 @@ App({
         configurable: true,
         enumerable: true,
         set: function(value) {
+            var oldVal=JSON.parse(JSON.stringify(val))
             val = value;
-            watchFun(value,val); // 赋值(set)时，调用对应函数
+            watchFun(value,oldVal); // 赋值(set)时，调用对应函数
         },
         get: function() {
             return val;

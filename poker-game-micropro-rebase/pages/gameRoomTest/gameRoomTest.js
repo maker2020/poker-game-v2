@@ -20,7 +20,7 @@ Page({
         tipIndex:0,
 
         // 常量
-        putTime:30, // 出牌操作时间
+        putTime:25, // 出牌操作时间
         callTime: 10, // 叫地主抢地主操作时间
         raiseTime: 5, // 加注时间
 
@@ -222,8 +222,10 @@ Page({
 
     // 利用监听松耦合
     watch: {
-        game:function(newValue){
-            curApp.onActingPlayerChanged(newValue)
+        game:function(newValue,oldValue){
+            if(newValue.actingPlayer!=oldValue.actingPlayer){
+                curApp.onActingPlayerChanged(newValue)
+            }
         }
     },
 
@@ -236,8 +238,10 @@ Page({
             second=this.data.putTime
         }else if(game.currentAction=='ASK' || game.currentAction=='CALL'){
             second=this.data.callTime
-        }else{ // action=='RAISE'
+        }else if(game.currentAction=='MULTIPLE'){ // status=='RAISE'
             second=this.data.raiseTime
+        }else{
+            return
         }
         this.setData({
             second:second

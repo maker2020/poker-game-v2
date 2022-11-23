@@ -59,7 +59,7 @@ public class MultipleHandler extends SimpleChannelInboundHandler<MultipleDTO>{
             WriteUtil.writeAndFlushRoomDataByFilter(group);
         
             // 地主出牌限时
-            TimerUtil.checkTimeout(ActionEnum.PUT, boss.getId(), 30);
+            TimerUtil.checkTimeout(ActionEnum.PUT, boss.getId());
         }
 
     }
