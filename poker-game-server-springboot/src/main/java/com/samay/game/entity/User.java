@@ -38,7 +38,7 @@ public class User implements Serializable {
     /**
      * 0:未设置，1:男，2:女
      */
-    private char sex='1';
+    private char sex='0';
     /**
      * 国家
      */

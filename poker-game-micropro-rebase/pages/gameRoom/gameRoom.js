@@ -62,7 +62,7 @@ Page({
                     // 精准针对了这种情况(游戏开始了，但却没有准备，只会发生在结算的时候，该玩家没点击继续，所以ready为false，屏蔽了房间消息，继续保持结算面板)
                     var player // 定位服务器中玩家信息，以获取ready状态
                     for(var i=0;i<data.room.players.length;i++){
-                        if(data.room.players[i].id==app.globalData.userInfo.cloudID){
+                        if(data.room.players[i].id==app.globalData.userInfo.id){
                             player=data.room.players[i]
                             break;
                         }
@@ -108,7 +108,7 @@ Page({
         var player
         var playerIndex
         for(var i=0;i<room.players.length;i++){
-            if(room.players[i].id==app.globalData.userInfo.cloudID){
+            if(room.players[i].id==app.globalData.userInfo.id){
                 player=room.players[i]
                 playerIndex=i
                 break

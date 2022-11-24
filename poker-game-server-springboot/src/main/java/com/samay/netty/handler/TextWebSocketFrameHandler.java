@@ -33,7 +33,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
             // 基于http发送的ws协议请求完成连接后，即可移除处理http请求的handler，之后专门处理游戏内消息。
             ctx.pipeline().remove(HttpRequestHandler.class);
-            // ctx.pipeline().remove(UserDetailHandler.class);
+            ctx.pipeline().remove(UserDetailHandler.class);
             // 完成握手后的获取用户、房间相关信息
             onJoined(ctx);
         } else {

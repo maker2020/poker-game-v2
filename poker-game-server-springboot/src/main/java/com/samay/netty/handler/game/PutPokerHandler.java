@@ -88,7 +88,9 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                 game.setStatus(GameStatusEnum.OVER);
                 // 游戏结算
                 Map<String,Object> gameResult=game.settlement(room);
-                userService.updateUser(player);
+                for(Player p:room.getPlayers()){
+                    userService.updatePlayer(p);                    
+                }
                 ResultVO<?> resultVO = RV.gameResult(gameResult);
                 // fastjson禁用引用重复检测（不禁用会导致同一对象被$.ref表示，从而不便于前端解析
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resultVO,SerializerFeature.DisableCircularReferenceDetect)));

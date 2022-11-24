@@ -319,6 +319,7 @@ public class NormalGame extends Game {
             // 更新player
             long actualEarn = p.isBoss() ? earning * 2 : earning;
             p.setFreeMoney(p.getFreeMoney() + actualEarn);
+            p.setWinCount(p.getWinCount()+1);
             // 结果存入
             result.put("playerID", p.getId());
             result.put("nickName", p.getNickName());
@@ -333,6 +334,7 @@ public class NormalGame extends Game {
             Map<String, Object> result = new HashMap<>();
             long actualEarn = p.isBoss() ? earning * 2 : earning;
             p.setFreeMoney(p.getFreeMoney() - actualEarn);
+            p.setLoseCount(p.getLoseCount()+1);
             result.put("playerID", p.getId());
             result.put("nickName", p.getNickName());
             result.put("baseScore", getBaseScore());
