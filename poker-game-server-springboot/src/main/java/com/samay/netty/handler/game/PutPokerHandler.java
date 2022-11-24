@@ -1,9 +1,10 @@
-package com.samay.netty.handler;
+package com.samay.netty.handler.game;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -31,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.samay.netty.handler.holder.ChannelHolder;
 import com.samay.netty.handler.utils.WriteUtil;
+import com.samay.service.UserService;
 
 /**
  * <b>游戏进行过程中的出牌处理器</b>
@@ -41,6 +43,13 @@ import com.samay.netty.handler.utils.WriteUtil;
 @Component
 @Slf4j
 public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
+
+    private UserService userService;
+
+    @Autowired
+    public PutPokerHandler(UserService userService){
+        this.userService=userService;
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, PutPokerDTO msg) throws Exception {
@@ -79,10 +88,11 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
                 game.setStatus(GameStatusEnum.OVER);
                 // 游戏结算
                 Map<String,Object> gameResult=game.settlement(room);
+                userService.updateUser(player);
                 ResultVO<?> resultVO = RV.gameResult(gameResult);
                 // fastjson禁用引用重复检测（不禁用会导致同一对象被$.ref表示，从而不便于前端解析
                 group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resultVO,SerializerFeature.DisableCircularReferenceDetect)));
-            
+                
                 // 游戏重置 (点继续游戏重置，此处不用)
                 game.restart();
             }

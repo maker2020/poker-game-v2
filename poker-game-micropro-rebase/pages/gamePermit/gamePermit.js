@@ -26,8 +26,9 @@ Page({
                     if(res){
                         // cloudID在正式上线之前使用虚拟id（用户唯一标识）
                         res.userInfo.cloudID=utils.getRandomUID()
+                        var userInfo=this.encodeURIUserInfo(res.userInfo)
                         app.globalData={
-                            userInfo:res.userInfo
+                            userInfo:userInfo
                         }
                         wx.redirectTo({
                             url: '/pages/gameMenu/gameMenu',
@@ -46,6 +47,20 @@ Page({
                 title:'请先勾选协议'
             })
         }
+    },
+
+    encodeURIUserInfo(userInfo){
+        var userInfo={
+            avatarUrl:encodeURI(userInfo.avatarUrl),
+            city:encodeURI(userInfo.city),
+            id:encodeURI(userInfo.cloudID),
+            country:encodeURI(userInfo.country),
+            sex:encodeURI(userInfo.gender),
+            language:encodeURI(userInfo.language),
+            nickName:encodeURI(userInfo.nickName),
+            province:encodeURI(userInfo.province)
+        }
+        return userInfo        
     },
 
     /**

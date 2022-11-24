@@ -13,13 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.samay.netty.handler.GameReadyHandler;
-import com.samay.netty.handler.MultipleHandler;
-import com.samay.netty.handler.PutPokerHandler;
-import com.samay.netty.handler.ReqBossHandler;
-import com.samay.netty.handler.RoomReadyHandler;
 import com.samay.netty.handler.TextWebSocketFrameHandler;
-import com.samay.netty.handler.TipPokerHandler;
+import com.samay.netty.handler.UserDetailHandler;
+import com.samay.netty.handler.game.GameReadyHandler;
+import com.samay.netty.handler.game.MultipleHandler;
+import com.samay.netty.handler.game.PutPokerHandler;
+import com.samay.netty.handler.game.ReqBossHandler;
+import com.samay.netty.handler.game.RoomReadyHandler;
+import com.samay.netty.handler.game.TipPokerHandler;
 import com.samay.netty.handler.heart.HeartHandler;
 import com.samay.netty.handler.http.HttpRequestHandler;
 
@@ -38,6 +39,9 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
 
     @Value("${netty.websocket.path}")
     private String wsUri;
+
+    @Autowired
+    private UserDetailHandler userDetailHandler;
 
     @Autowired
     private TextWebSocketFrameHandler textWebSocketFrameHandler;
@@ -73,6 +77,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new ChunkedWriteHandler()); // 解决粘包/拆包
         pipeline.addLast(new HttpObjectAggregator(maxFrameSize));
         pipeline.addLast(new HttpRequestHandler(wsUri));
+        pipeline.addLast(userDetailHandler);
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws",true));
         pipeline.addLast(textWebSocketFrameHandler);
         pipeline.addLast(roomReadyHandler);

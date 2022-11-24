@@ -36,11 +36,10 @@ Page({
     onLoad(options) {
         curApp=this
         // 发送用户个人信息等参数，向服务器的请求连接
-        var cloudID = encodeURI(app.globalData.userInfo.cloudID);
-        var nickName = encodeURI(app.globalData.userInfo.nickName);
+        var userInfo=app.globalData.userInfo
         var context = this;
         wx.connectSocket({
-            url: 'ws://localhost:8888/ws?cloudID=' + cloudID + '&nickName=' + nickName,
+            url: 'ws://localhost:8888/ws?user=' + JSON.stringify(userInfo),
             header: {
                 'content-type': 'application/json'
             },

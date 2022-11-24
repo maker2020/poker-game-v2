@@ -34,6 +34,31 @@ public class Player extends User {
      * 记录玩家的操作
      */
     private Notification notification;
+    
+    
+    // 游戏数据相关(user_data)
+
+    /**
+     * 游戏普通货币
+     */
+    private long freeMoney;
+    /**
+     * 游戏需充钱的货币
+     */
+    private transient long payMoney;
+    /**
+     * 胜场
+     */
+    private long winCount;
+    /**
+     * 败场
+     */
+    private long loseCount;
+    /**
+     * 经验(换算等级、称谓)
+     */
+    private long exp;
+
 
     // 辅助变量，大多不会序列化(如使用jackson、jdk、msgpack、google等序列化框架)/传输这些字段
     /**

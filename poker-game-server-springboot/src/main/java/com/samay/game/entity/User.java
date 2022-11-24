@@ -23,7 +23,14 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String id;
+    /**
+     * 手机号
+     */
     private transient String phone;
+    /**
+     * 头像地址
+     */
+    private String avatarUrl;
     /**
      * 玩家展示的昵称
      */
@@ -33,24 +40,25 @@ public class User implements Serializable {
      */
     private char sex='1';
     /**
-     * 游戏普通货币
+     * 国家
      */
-    private long freeMoney;
+    private transient String country;
     /**
-     * 游戏需重置货币
+     * 省份
      */
-    private transient long payMoney;
+    private transient String province;
     /**
-     * 胜场
+     * 城市
      */
-    private long winCount;
+    private String city;
     /**
-     * 败场
+     * 语言
      */
-    private long loseCount;
-    /**
-     * 经验(换算等级、称谓)
-     */
-    private long exp;
+    private transient String language;
+
+    public User(String id,String nickName){
+        this.id=id;
+        this.nickName=nickName;
+    }
 
 }

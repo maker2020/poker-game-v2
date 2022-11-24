@@ -3,11 +3,32 @@
 <mapper namespace="com.samay.dao.UserDao">
 
     <insert id="register" parameterType="User">
-        insert into user values(#{id},#{phone},#{nickname},#{sex},#{freeMoney},#{payMoney},#{winCount},#{loseCount},#{exp})
+        insert into user values(#{id},#{phone},#{avatarUrl},#{nickName},#{sex},#{country},#{province},#{city},#{language})
     </insert>
 
-    <select id="findUserByID">
+    <update id="updateUser" parameterType="User">
+        update user set id=#{id},phone=#{phone},avatarUrl=#{avatarUrl},nickName=#{nickName},sex=#{sex},country=#{country},province=#{province},city=#{city},language=#{language}
+        where id=#{id}
+    </update>
+
+    <select id="findUserByID" resultType="User">
         select * from user where id=#{id}
     </select>
+
+    <select id="findPlayerByID" resultType="Player">
+        SELECT
+            * 
+        FROM
+            USER u,
+            user_data ud 
+        WHERE
+            u.id = ud.userid 
+            AND u.id = #{id}
+    </select>
+
+    <update id="updateUserData" parameterType="UserData">
+        update user_data set userid=#{userid},freeMoney=#{freeMoney},payMoney=#{payMoney},winCount=#{winCount},loseCount=#{loseCount},exp=#{exp}
+        where userid=#{userid}
+    </update>
 
 </mapper>

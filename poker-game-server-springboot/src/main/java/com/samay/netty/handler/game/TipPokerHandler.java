@@ -1,4 +1,4 @@
-package com.samay.netty.handler;
+package com.samay.netty.handler.game;
 
 import java.util.List;
 
