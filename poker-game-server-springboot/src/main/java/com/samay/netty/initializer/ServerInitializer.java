@@ -79,6 +79,9 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new HttpRequestHandler(wsUri));
         pipeline.addLast(userDetailHandler);
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws",true));
+        // 以上inboundhandler不需要解码，因此放在这里可以忽略以上handler的写数据
+        // pipeline.addLast(textWebSocketFrameEncoder);
+
         pipeline.addLast(textWebSocketFrameHandler);
         pipeline.addLast(roomReadyHandler);
         pipeline.addLast(gameReadyHandler);

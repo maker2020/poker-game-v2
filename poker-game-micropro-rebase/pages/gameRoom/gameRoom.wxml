@@ -1,12 +1,12 @@
 <!--pages/gameRoom/gameRoom.wxml-->
 <view class='gamecontainer' > 
     <view class='out' bindtap='out'></view>
-    <view class='room'>房间号：{{room.id}}</view>
+    <view class='room' wx:if="{{room.id!=undefined}}">房间号：{{room.id}}</view>
     <view class='readyBtn btnCon' wx:if='{{!room.players[2].ready && game.status=="READY"}}'>
         <view class='btn' bindtap='ready'>准备</view>
     </view>
     <view class='top'>
-        <view class='basescore' wx:if='{{game.status!="READY"}}'>
+        <view class='basescore' wx:if='{{game.status!=undefined && game.status!="READY"}}'>
             <text class='txt'>底分</text>
             <text class='num'>{{game.baseScore}}</text>
         </view>
@@ -15,7 +15,7 @@
             <!-- <image src='../../static/img/SQUARE_TEN.png' mode="widthFix"></image>
             <image src='../../static/img/CLUB_TEN.png' mode="widthFix"></image> -->
         </view>
-        <view class='multiple' wx:if='{{game.status!="READY"}}'>
+        <view class='multiple' wx:if='{{game.status!=undefined && game.status!="READY"}}'>
             <text class='txt'>倍数</text>
             <text class='num'>x{{game.multiple}}</text>
         </view>

@@ -23,10 +23,12 @@ Page({
         putTime:25, // 出牌操作时间
         callTime: 10, // 叫地主抢地主操作时间
         raiseTime: 5, // 加注时间
+        maxTryTimes:3, // 最大重连次数
 
         timer:{}, // 全局定时器
 
         gameResultTable:[],
+
     },
 
     /**
@@ -35,19 +37,8 @@ Page({
      */
     onLoad(options) {
         curApp=this
-        // 发送用户个人信息等参数，向服务器的请求连接
-        var userInfo=app.globalData.userInfo
         var context = this;
-        wx.connectSocket({
-            url: 'ws://localhost:8888/ws?user=' + JSON.stringify(userInfo),
-            header: {
-                'content-type': 'application/json'
-            },
-            method: 'post',
-            success: (res) => {},
-            fail: (res) => {},
-            complete: (res) => {}
-        })
+        this.connectServer('正在加载...')
         // 注册监听数据、回调方法
         app.setWatcher(this.data,this.watch)
         wx.onSocketMessage((result) => {
@@ -78,6 +69,35 @@ Page({
                 context.tipResult(data)
             if(code==3)
                 context.settlementResult(data)
+        })
+        wx.onSocketOpen((result) => {
+            wx.hideLoading()
+        })
+        wx.onSocketError((result) => {})
+        wx.onSocketClose((result) => {
+            // 当失去与服务器的连接时，持续一定次数的重连
+            if(this.data.maxTryTimes>0){
+                this.connectServer('正在重连...')
+                this.data.maxTryTimes=this.data.maxTryTimes-1
+            }
+        })
+    },
+
+    connectServer(tip){
+        wx.showLoading({
+          title: tip,
+        })
+        // 发送用户个人信息等参数，向服务器的请求连接
+        var userInfo=app.globalData.userInfo
+        wx.connectSocket({
+            url: 'ws://localhost:8888/ws?user=' + JSON.stringify(userInfo),
+            header: {
+                'content-type': 'application/json'
+            },
+            method: 'post',
+            success: (res) => {},
+            fail: (res) => {},
+            complete: (res) => {},
         })
     },
 
@@ -171,7 +191,6 @@ Page({
             wx.showToast({
                 title: '没有打的过的牌！',
                 icon: 'none',
-                duration: 1500
             })
         }
     },
@@ -191,7 +210,6 @@ Page({
         wx.showToast({
             title: '您打出的牌不符合规则！',
             icon: 'none',
-            duration: 1500
         })
     },
 
@@ -467,8 +485,21 @@ Page({
     },
 
     out() {
-        wx.redirectTo({
-            url: '/pages/gameMenu/gameMenu',
+        wx.hideLoading()
+        wx.showModal({
+          title: '',
+          content: '是否退出该房间? (将由人机代打)',
+          complete: (res) => {
+            if (res.cancel) {
+              
+            }
+            if (res.confirm) {
+                wx.hideLoading()
+                wx.redirectTo({
+                    url: '/pages/gameMenu/gameMenu',
+                })
+            }
+          }
         })
     },
 
