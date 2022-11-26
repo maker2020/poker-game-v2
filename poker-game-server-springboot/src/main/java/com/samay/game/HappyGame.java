@@ -92,8 +92,7 @@ public class HappyGame extends Game{
 
     @Override
     public void restart() {
-        // TODO Auto-generated method stub
-        
+
     }
 
     @Override

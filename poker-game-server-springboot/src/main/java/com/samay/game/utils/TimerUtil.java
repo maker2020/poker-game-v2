@@ -74,7 +74,7 @@ public class TimerUtil {
                         if (e instanceof TimeoutException) {
                             log.info("player [" + playerID + "]/" + action.getAction() + " 已超时，被系统默认处理");
                             // 根据action，做出默认操作
-                            defaultAction(action, ChannelHolder.getByPlayerID(playerID));
+                            defaultAction(action, ChannelHolder.getChannel(playerID));
                         } else {
                             log.error("超时检测异常", e);
                         }

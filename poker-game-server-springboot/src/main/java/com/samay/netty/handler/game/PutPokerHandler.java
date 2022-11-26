@@ -54,7 +54,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, PutPokerDTO msg) throws Exception {
         Player player = ChannelHolder.attrPlayer(ctx.channel());
-        ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
+        ChannelGroup group = ChannelHolder.getGroup(ctx.channel());
         Room room = ChannelHolder.attrRoom(ctx.channel());
         Game game = room.getGame();
         // 针对客户端请求出牌不合规的校验
@@ -101,7 +101,7 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
 
         } else { // 反馈不合法
                  // 此处仅提示操作者玩家，而非group
-            Channel ch = group.find(ChannelHolder.uid_chidMap.get(player.getId()));
+            Channel ch = ChannelHolder.getChannel(group, player.getId());
             ResultVO<?> result = RV.actionFail(ActionEnum.PUT);
             ch.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(result)));
         }

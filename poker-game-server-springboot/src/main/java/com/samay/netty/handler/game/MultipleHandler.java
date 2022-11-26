@@ -24,7 +24,7 @@ public class MultipleHandler extends SimpleChannelInboundHandler<MultipleDTO>{
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MultipleDTO msg) throws Exception {
-        ChannelGroup group=ChannelHolder.groupMap.get(ctx.channel());
+        ChannelGroup group=ChannelHolder.getGroup(ctx.channel());
         Room room=ChannelHolder.attrRoom(ctx.channel());
         Game game=room.getGame();
         Player player=ChannelHolder.attrPlayer(ctx.channel());

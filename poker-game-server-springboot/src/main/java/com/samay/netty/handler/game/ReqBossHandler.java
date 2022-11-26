@@ -37,7 +37,7 @@ public class ReqBossHandler extends SimpleChannelInboundHandler<ReqBossDTO> {
     protected void channelRead0(ChannelHandlerContext ctx, ReqBossDTO msg) throws Exception {
         Room room = ChannelHolder.attrRoom(ctx.channel());
         Player player = ChannelHolder.attrPlayer(ctx.channel());
-        ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
+        ChannelGroup group = ChannelHolder.getGroup(ctx.channel());
         Game game = room.getGame();
 
         // 针对客户端请求出牌不合规的校验

@@ -31,7 +31,7 @@ public class GameReadyHandler extends SimpleChannelInboundHandler<Game> {
         if (!canStart(game))
             return;
         // 游戏发牌阶段: 仅最后一个进入的线程处理发牌工作
-        ChannelGroup group = ChannelHolder.groupMap.get(ctx.channel());
+        ChannelGroup group = ChannelHolder.getGroup(ctx.channel());
         Room room = ChannelHolder.attrRoom(ctx.channel());
         log.info("RoomID[" + room.getId() + "]:ready to start");
 

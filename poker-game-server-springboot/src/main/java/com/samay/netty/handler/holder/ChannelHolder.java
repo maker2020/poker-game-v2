@@ -1,14 +1,11 @@
 package com.samay.netty.handler.holder;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelId;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.util.AttributeKey;
 
@@ -17,52 +14,74 @@ import io.netty.util.AttributeKey;
  * 包含通道相关的快速访问以及相关属性
  */
 public class ChannelHolder {
-    
-    /**
-     * 通道->group的映射
-     */
-    public static Map<Channel,ChannelGroup> groupMap=new ConcurrentHashMap<>();
 
     /**
-     * <b>玩家唯一标识->ChannelID映射</b><p>
-     * 维护目的：快速从group定位玩家channel
-     */
-    public static Map<String,ChannelId> uid_chidMap=new ConcurrentHashMap<>();
-
-    /**
-     * 获取通道绑定的玩家。<p>
-     * 方法实现封装了Channel.attr(AttributeKey.valueOf()).get()
+     * 获取channel绑定的玩家。<p>
+     * 
      * @param ch
      * @return 玩家
      */
     public static Player attrPlayer(Channel ch){
-        Player player=(Player)(ch.attr(AttributeKey.valueOf("player")).get());
-        return player;
+        Object obj=ch.attr(AttributeKey.valueOf("player")).get();
+        if(obj instanceof Player){
+            Player player=(Player)obj;
+            return player;
+        }
+        return null;
     }
 
     /**
-     * 获取通道绑定的房间。<p>
-     * 方法实现封装了Channel.attr(AttributeKey.valueOf()).get()
+     * 获取channel绑定的房间。<p>
+     * 
      * @param ch
      * @return
      */
     public static Room attrRoom(Channel ch){
-        Room room=(Room)(ch.attr(AttributeKey.valueOf("room")).get());
-        return room;
+        Object obj=ch.attr(AttributeKey.valueOf("room")).get();
+        if(obj instanceof Room){
+            Room room=(Room)obj;
+            return room;
+        }
+        return null;
     }
 
     /**
-     * 通过playerID获取Channel
+     * 获取channel对应的group
+     * @param ch
+     * @return
+     */
+    public static ChannelGroup getGroup(Channel ch){
+        Room room=attrRoom(ch);
+        return RoomManager.roomChannelGroup.get(room);
+    }
+
+    /**
+     * 获取该playerID对应的Channel<p>
+     * 
+     * 注意服务器已维护channel->player(hash)，但反向若不做hash表，查找复杂度为O(n)。
+     * <b>另外由于ChannelGroup是Set的多态实现，可以复用getChannel(Set<Channel>,String)</b>
      * @param playerID
      * @return
      */
-    public static Channel getByPlayerID(String playerID){
-        ChannelId chid=uid_chidMap.get(playerID);
-        Set<Channel> channelSet=groupMap.keySet();
-        Iterator<Channel> chIt=channelSet.iterator();
-        while (chIt.hasNext()) {
-            Channel ch=chIt.next();
-            if(ch.id().equals(chid)){
+    public static Channel getChannel(String playerID){
+        Set<Channel> channels=RoomManager.getAllChannels();
+        return getChannel(channels, playerID);
+    }
+
+    /**
+     * 通过指定group范围，查找playerID对应的Channel<p>
+     * 
+     * 注意观察发现ChannelGroup就是Set的子类
+     * @param group
+     * @param playerID
+     * @return
+     */
+    public static Channel getChannel(Set<Channel> group,String playerID){
+        Iterator<Channel> it=group.iterator();
+        while (it.hasNext()) {
+            Channel ch=it.next();
+            Player p=attrPlayer(ch);
+            if(p!=null && p.getId().equals(playerID)){
                 return ch;
             }
         }

@@ -26,7 +26,7 @@ public class RoomReadyHandler extends SimpleChannelInboundHandler<RoomReadyDTO>{
     protected void channelRead0(ChannelHandlerContext ctx, RoomReadyDTO dto) throws Exception {
         if(dto.isTendency()){
             Player player=ChannelHolder.attrPlayer(ctx.channel());
-            ChannelGroup group=ChannelHolder.groupMap.get(ctx.channel());
+            ChannelGroup group=ChannelHolder.getGroup(ctx.channel());
             player.setReady(true);
             // 设计问题记录：先准备的玩家channel陷入阻塞，将无法read消息，造成延迟显示数据
             // 解决：不再用并发包的阻塞，始终不阻塞(放行)，通过count人数来放行

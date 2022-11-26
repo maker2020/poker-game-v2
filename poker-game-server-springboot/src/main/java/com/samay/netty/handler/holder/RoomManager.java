@@ -1,15 +1,19 @@
 package com.samay.netty.handler.holder;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import com.samay.game.NormalGame;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
+
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -18,7 +22,8 @@ import io.netty.util.concurrent.ImmediateEventExecutor;
 import com.samay.netty.exception.OverLoadException;
 
 /**
- * <b>游戏房间管理器</b> (内存管理/回收的重点类对象)<p>
+ * <b>游戏房间管理器</b> (内存管理/回收的重点类对象)
+ * <p>
  * 包含玩家加入房间、初始化的相关参数绑定
  */
 public class RoomManager {
@@ -26,7 +31,7 @@ public class RoomManager {
     /**
      * 房间->ChannelGroup 的映射
      */
-    private static Map<Room, ChannelGroup> roomChannelGroup = new ConcurrentHashMap<>();
+    protected static Map<Room, ChannelGroup> roomChannelGroup = new ConcurrentHashMap<>();
 
     /**
      * 房间Set->ChannelGroup 的映射
@@ -100,15 +105,35 @@ public class RoomManager {
         room.addPlayer(player);
         room.getGame().addPlayer(player);
 
-
-        // 通道范围 的绑定
-
         // 将通道与房间绑定
         ctx.channel().attr(AttributeKey.valueOf("room")).set(room);
-        // 通道与group绑定
-        ChannelHolder.groupMap.put(ctx.channel(), group);
-        // 玩家唯一标识与ChannelID绑定
-        ChannelHolder.uid_chidMap.put(player.getId(), ctx.channel().id());
+    }
+
+    /**
+     * 获取服务器中 pokergame所有的房间
+     * 
+     * @return
+     */
+    public static Set<Room> getAllRooms() {
+        return roomChannelGroup.keySet();
+    }
+
+    /**
+     * 获取服务器中 pokergame所有的连接通道(channel)
+     * 
+     * @return
+     */
+    public static Set<Channel> getAllChannels() {
+        Set<Room> rooms = getAllRooms();
+        Set<Channel> allChannels = new HashSet<>();
+        Iterator<Room> it = rooms.iterator();
+        while (it.hasNext()) {
+            Room room = it.next();
+            ChannelGroup group = roomChannelGroup.get(room);
+            Set<Channel> channels = group.stream().collect(Collectors.toSet());
+            allChannels.addAll(channels);
+        }
+        return allChannels;
     }
 
 }
