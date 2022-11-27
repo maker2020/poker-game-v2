@@ -25,7 +25,7 @@ Page({
                     console.log(res);
                     if(res){
                         // cloudID在正式上线之前使用虚拟id（用户唯一标识）
-                        res.userInfo.cloudID=utils.getRandomUID()
+                        res.userInfo.cloudID=utils.getRandomUID(res.userInfo.nickName)
                         var userInfo=this.encodeURIUserInfo(res.userInfo)
                         app.globalData={
                             userInfo:userInfo

@@ -99,4 +99,12 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         WriteUtil.writeAndFlushTextWebSocketFrame(group, RV.roomData(room));
     }
 
+    /**
+     * 玩家主动或被动断开连接时触发该方法
+     */
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        
+    }
+
 }

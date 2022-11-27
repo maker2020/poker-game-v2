@@ -22,6 +22,7 @@ public class ChannelHolder {
      * @return 玩家
      */
     public static Player attrPlayer(Channel ch){
+        if(ch==null) return null;
         Object obj=ch.attr(AttributeKey.valueOf("player")).get();
         if(obj instanceof Player){
             Player player=(Player)obj;
@@ -37,6 +38,7 @@ public class ChannelHolder {
      * @return
      */
     public static Room attrRoom(Channel ch){
+        if(ch==null) return null;
         Object obj=ch.attr(AttributeKey.valueOf("room")).get();
         if(obj instanceof Room){
             Room room=(Room)obj;
@@ -56,7 +58,7 @@ public class ChannelHolder {
     }
 
     /**
-     * 获取该playerID对应的Channel<p>
+     * 从所有Channel中查找,并获取该playerID对应的Channel<p>
      * 
      * 注意服务器已维护channel->player(hash)，但反向若不做hash表，查找复杂度为O(n)。
      * <b>另外由于ChannelGroup是Set的多态实现，可以复用getChannel(Set<Channel>,String)</b>

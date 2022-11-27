@@ -14,7 +14,8 @@ const formatNumber = n => {
   return n[1] ? n : `0${n}`
 }
 
-const getRandomUID = function(){
+const getRandomUID = function(nickName){
+    if(nickName=='Samay') return '7799'
     return parseInt(Math.random()*10000)+''
 }
 
