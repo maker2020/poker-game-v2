@@ -53,7 +53,7 @@ public class WriteUtil {
      * 
      * @param message
      */
-    public static void writeAndFlushTextWebSocketFrame(ChannelGroup group,Object message){
+    public static void writeAndFlushTextWebSocketFrame(ChannelGroup group,Object message) throws Exception{
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(message,SerializerFeature.DisableCircularReferenceDetect)));
     }
 

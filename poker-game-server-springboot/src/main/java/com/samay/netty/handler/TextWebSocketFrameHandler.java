@@ -93,7 +93,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         }
     }
 
-    private void onJoined(ChannelHandlerContext ctx) {
+    private void onJoined(ChannelHandlerContext ctx) throws Exception{
         Room room = ChannelHolder.attrRoom(ctx.channel());
         ChannelGroup group = ChannelHolder.getGroup(ctx.channel());
         WriteUtil.writeAndFlushTextWebSocketFrame(group, RV.roomData(room));
