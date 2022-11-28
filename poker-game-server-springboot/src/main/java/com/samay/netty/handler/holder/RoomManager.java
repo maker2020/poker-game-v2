@@ -70,6 +70,15 @@ public class RoomManager {
             ChannelGroup group=roomChannelGroup.get(unfinishedGameRoom);
             // 之前断开的channel会被unregistered、释放
             group.add(ctx.channel());
+            Player pastPlayer=null;
+            for(Player p:unfinishedGameRoom.getPlayers()){
+                if(p.getId().equals(player.getId())){
+                    pastPlayer=p;
+                    break;
+                }
+            }
+            // 将对局中的player赋值给channel
+            ctx.channel().attr(AttributeKey.valueOf("player")).set(pastPlayer);
             ctx.channel().attr(AttributeKey.valueOf("room")).set(unfinishedGameRoom);
             return;
         }

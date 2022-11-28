@@ -3,6 +3,7 @@ package com.samay.game;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
 import com.samay.game.entity.Room;
+import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerValueEnum;
@@ -17,6 +18,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,6 +34,9 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = false)
 @ToString
 public class NormalGame extends Game {
+
+    private transient ScheduledExecutorService service=Executors.newSingleThreadScheduledExecutor();
+    private transient ScheduledFuture<?> future;
 
     public NormalGame() {
         restart();
@@ -239,6 +247,7 @@ public class NormalGame extends Game {
             p.setRefuseBoss(false);
             p.setReqIndex(0);
             p.setFirstCall(false);
+            p.setDisconnected(false);
         }
         this.setStatus(GameStatusEnum.READY);
         this.setLastPutPokers(null);
@@ -250,6 +259,8 @@ public class NormalGame extends Game {
         this.setMultiple(2);
         this.setCardinality(2);
         this.getTurnCallIndex().set(0);
+
+        setRemainingTime(0);
     }
 
     /**
@@ -360,6 +371,23 @@ public class NormalGame extends Game {
     public void setActingPlayer(String playerID){
         super.setActingPlayer(playerID);
         NotificationUtil.setActingPlayerAfter(this);
+        ActionEnum action=getCurrentAction();
+        if(action!=null && playerID!=null && !"".equals(playerID)){
+            long time = switch (action) {
+                case ASK -> 10;
+                case CALL -> 10;
+                case MULTIPLE -> 5;
+                case PUT -> 25;
+                default -> 0;
+            };
+            setRemainingTime(time);
+            if(future!=null && !future.isCancelled()) {
+                future.cancel(true);
+            }
+            future=service.scheduleAtFixedRate(()->{
+                setRemainingTime(getRemainingTime()-1);
+            }, 0, 1, TimeUnit.SECONDS);
+        }
     }
 
 }

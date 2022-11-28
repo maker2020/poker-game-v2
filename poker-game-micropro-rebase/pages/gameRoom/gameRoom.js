@@ -20,9 +20,6 @@ Page({
         tipIndex:0,
 
         // 常量
-        putTime:25, // 出牌操作时间
-        callTime: 10, // 叫地主抢地主操作时间
-        raiseTime: 5, // 加注时间
         maxTryTimes:3, // 最大重连次数
 
         timer:{}, // 全局定时器
@@ -104,7 +101,6 @@ Page({
     reset(){
         this.setData({
             gameResultTable:[],
-            timer:{}
         })
     },
 
@@ -248,21 +244,12 @@ Page({
 
     // 当actingPlayer变化时，重置tipIndex为0，并且清空计时开始新的计时
     onActingPlayerChanged(game){
-        clearInterval(this.data.timer)
         // 根据不同的acting类型，设置不同的限时
-        var second
-        if(game.currentAction=='PUT'){
-            second=this.data.putTime
-        }else if(game.currentAction=='ASK' || game.currentAction=='CALL'){
-            second=this.data.callTime
-        }else if(game.currentAction=='MULTIPLE'){ // status=='RAISE'
-            second=this.data.raiseTime
-        }else{
-            return
-        }
+        var second=game.remainingTime
         this.setData({
             second:second
         })
+        clearInterval(this.data.timer)
         // 倒计时
         var context=this
         var timer=setInterval(function(){

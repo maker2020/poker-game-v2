@@ -101,8 +101,8 @@ public class Room implements Serializable {
                     playerID=null;
                     // 可以进行加注阶段了
                     game.setStatus(GameStatusEnum.RAISE);
-                    game.setActingPlayer("ALL");
                     game.setCurrentAction(ActionEnum.MULTIPLE);
+                    game.setActingPlayer("ALL");
                     
                     for(Player p:getPlayers()){
                         TimerUtil.checkTimeout(ActionEnum.MULTIPLE, p.getId());
@@ -113,8 +113,8 @@ public class Room implements Serializable {
             }
         }
         if(playerID!=null){
-            game.setActingPlayer(playerID);
             game.setCurrentAction(actionEnum);
+            game.setActingPlayer(playerID);
             // 每每轮到xx操作，即开启限时检测，在操作完后也需要调用以关闭
             TimerUtil.checkTimeout(actionEnum, playerID);
         }

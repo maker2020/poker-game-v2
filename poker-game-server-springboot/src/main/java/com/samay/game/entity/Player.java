@@ -58,7 +58,10 @@ public class Player extends User {
      * 经验(换算等级、称谓)
      */
     private long exp;
-
+    /**
+     * 是否断连(掉线)
+     */
+    private boolean disconnected;
 
     // 辅助变量，大多不会序列化(如使用jackson、jdk、msgpack、google等序列化框架)/传输这些字段
     /**

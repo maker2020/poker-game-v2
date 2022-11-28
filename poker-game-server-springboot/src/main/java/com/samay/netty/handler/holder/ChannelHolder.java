@@ -58,6 +58,15 @@ public class ChannelHolder {
     }
 
     /**
+     * 获取room对应的group
+     * @param room
+     * @return
+     */
+    public static ChannelGroup getGroup(Room room){
+        return RoomManager.roomChannelGroup.get(room);
+    }
+
+    /**
      * 从所有Channel中查找,并获取该playerID对应的Channel<p>
      * 
      * 注意服务器已维护channel->player(hash)，但反向若不做hash表，查找复杂度为O(n)。

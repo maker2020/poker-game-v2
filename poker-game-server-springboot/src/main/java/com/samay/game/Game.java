@@ -49,6 +49,10 @@ public abstract class Game implements Serializable {
      */
     private ActionEnum currentAction;
     /**
+     * 剩余操作时间
+     */
+    private long remainingTime;
+    /**
      * 地主三只牌(应该和pokerBossCollector同一个引用指向)
      */
     private Collection<Poker> bossPokers;

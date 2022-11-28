@@ -26,8 +26,10 @@ import com.samay.game.enums.ActionEnum;
 import com.samay.netty.handler.holder.ChannelHolder;
 import com.samay.netty.handler.holder.RoomManager;
 import com.samay.netty.handler.service.GameService;
+import com.samay.netty.handler.utils.WriteUtil;
 
 import io.netty.channel.Channel;
+import io.netty.channel.group.ChannelGroup;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -177,6 +179,7 @@ public class TimerUtil {
             }
         }
         if(game==null || player==null || room==null) throw new Exception("超时默认操作异常：玩家或游戏不存在");
+        ChannelGroup group=ChannelHolder.getGroup(room);
         if (actionEnum == ActionEnum.CALL) {
             ReqBossDTO reqBossDTO = new ReqBossDTO();
             reqBossDTO.setAction("call");
@@ -207,6 +210,7 @@ public class TimerUtil {
             multipleDTO.setTendency(false);
             gameService.raise(player, room, multipleDTO);
         }
+        WriteUtil.writeAndFlushRoomDataByFilter(group);
     }
 
 }
