@@ -74,6 +74,7 @@ public class RoomManager {
             for(Player p:unfinishedGameRoom.getPlayers()){
                 if(p.getId().equals(player.getId())){
                     pastPlayer=p;
+                    pastPlayer.setDisconnected(false);
                     break;
                 }
             }

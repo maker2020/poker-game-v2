@@ -49,8 +49,8 @@ public class TimerUtil {
     private static GameService gameService;
 
     @Autowired
-    public TimerUtil(GameService gameService){
-        TimerUtil.gameService=gameService;
+    public TimerUtil(GameService gameService) {
+        TimerUtil.gameService = gameService;
     }
 
     /**
@@ -86,7 +86,12 @@ public class TimerUtil {
                 });
                 exec.submit(() -> {
                     try {
-                        future.get(time, timeUnit);
+                        long t=time;
+                        // 判断玩家是否离线
+                        if(isDisconnected(playerID)){
+                            t=0;
+                        }
+                        future.get(t, timeUnit);
                     } catch (Exception e) {
                         if (e instanceof TimeoutException) {
                             log.info("player [" + playerID + "]/" + action.getAction() + " 已超时，被系统默认处理");
@@ -120,9 +125,9 @@ public class TimerUtil {
     }
 
     private static void defaultAction(ActionEnum actionEnum, String playerID) throws Exception {
-        Channel ch=ChannelHolder.getChannel(playerID);
-        if(ch==null){
-            defaultActionOffline(actionEnum,playerID);
+        Channel ch = ChannelHolder.getChannel(playerID);
+        if (ch == null) {
+            defaultActionOffline(actionEnum, playerID);
             return;
         }
         Room room = ChannelHolder.attrRoom(ch);
@@ -160,26 +165,27 @@ public class TimerUtil {
         }
     }
 
-    private static void defaultActionOffline(ActionEnum actionEnum,String playerID) throws Exception{
-        Game game=null;
-        Player player=null;
-        Room room=null;
-        Set<Room> roomSet=RoomManager.getAllRooms();
-        Iterator<Room> it=roomSet.iterator();
-        done:while (it.hasNext()) {
-            Room r=it.next();
-            List<Player> players=r.getPlayers();
-            for(Player p:players){
-                if(p.getId().equals(playerID)){
-                    game=r.getGame();
-                    player=p;
-                    room=r;
+    private static void defaultActionOffline(ActionEnum actionEnum, String playerID) throws Exception {
+        Game game = null;
+        Player player = null;
+        Room room = null;
+        Set<Room> roomSet = RoomManager.getAllRooms();
+        Iterator<Room> it = roomSet.iterator();
+        done: while (it.hasNext()) {
+            Room r = it.next();
+            List<Player> players = r.getPlayers();
+            for (Player p : players) {
+                if (p.getId().equals(playerID)) {
+                    game = r.getGame();
+                    player = p;
+                    room = r;
                     break done;
                 }
             }
         }
-        if(game==null || player==null || room==null) throw new Exception("超时默认操作异常：玩家或游戏不存在");
-        ChannelGroup group=ChannelHolder.getGroup(room);
+        if (game == null || player == null || room == null)
+            throw new Exception("超时默认操作异常：玩家或游戏不存在");
+        ChannelGroup group = ChannelHolder.getGroup(room);
         if (actionEnum == ActionEnum.CALL) {
             ReqBossDTO reqBossDTO = new ReqBossDTO();
             reqBossDTO.setAction("call");
@@ -211,6 +217,25 @@ public class TimerUtil {
             gameService.raise(player, room, multipleDTO);
         }
         WriteUtil.writeAndFlushRoomDataByFilter(group);
+    }
+
+    /**
+     * 判断玩家是否离线
+     * 
+     * @return
+     */
+    private static boolean isDisconnected(String playerID) throws Exception {
+        Set<Room> roomSet=RoomManager.getAllRooms();
+        Iterator<Room> it=roomSet.iterator();
+        while (it.hasNext()) {
+            Room room=it.next();
+            for(Player p:room.getPlayers()){
+                if(p.getId().equals(playerID)){
+                    return p.isDisconnected();
+                }
+            }
+        }
+        throw new Exception("玩家不存在");
     }
 
 }

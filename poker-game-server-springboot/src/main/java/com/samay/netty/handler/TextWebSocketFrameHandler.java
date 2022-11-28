@@ -10,6 +10,7 @@ import com.samay.game.dto.PutPokerDTO;
 import com.samay.game.dto.ReqBossDTO;
 import com.samay.game.dto.RoomReadyDTO;
 import com.samay.game.dto.TipPokerDTO;
+import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.utils.RV;
 
@@ -104,7 +105,9 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        
+        // 更改player的状态为离线
+        Player player=ChannelHolder.attrPlayer(ctx.channel());
+        player.setDisconnected(true);
     }
 
 }
