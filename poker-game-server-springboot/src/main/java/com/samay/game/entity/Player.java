@@ -37,7 +37,10 @@ public class Player extends User {
     
     
     // 游戏数据相关(user_data)
-
+    /**
+     * 游戏道具(超级加倍、记牌器)
+     */
+    private List<Item> items;
     /**
      * 游戏普通货币
      */

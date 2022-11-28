@@ -2,6 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.samay.dao.UserDao">
 
+    <resultMap id="playerData" type="Player">
+        <id column="id" property="id"/>
+        <result column="phone" property="phone"/>
+        <result column="avatarUrl" property="avatarUrl"/>
+        <result column="nickName" property="nickName"/>
+        <result column="sex" property="sex"/>
+        <result column="country" property="country"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="language" property="language"/>
+        <result column="freeMoney" property="freeMoney"/>
+        <result column="payMoney" property="payMoney"/>
+        <result column="winCount" property="winCount"/>
+        <result column="loseCount" property="loseCount"/>
+        <result column="exp" property="exp"/>
+        <collection property="items" ofType="Item">
+            <id column="userid" property="userid"/>
+            <id column="name" property="name"/>
+            <result column="count" property="count"/>
+        </collection>
+    </resultMap>
+
     <insert id="register" parameterType="User">
         insert into user values(#{id},#{phone},#{avatarUrl},#{nickName},#{sex},#{country},#{province},#{city},#{language})
     </insert>
@@ -15,15 +37,15 @@
         select * from user where id=#{id}
     </select>
 
-    <select id="findPlayerByID" resultType="Player">
+    <select id="findPlayerByID" resultMap="playerData">
         SELECT
             * 
         FROM
-            USER u,
-            user_data ud 
+            USER u
+            LEFT JOIN user_data d ON u.id = d.userid
+            LEFT JOIN item i ON u.id = i.userid 
         WHERE
-            u.id = ud.userid 
-            AND u.id = #{id}
+            u.id = #{id}
     </select>
 
     <update id="updateUserData" parameterType="UserData">

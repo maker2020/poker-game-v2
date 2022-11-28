@@ -197,7 +197,7 @@
             <view class='sure btn' bindtap='askN'>不抢</view>
         </view>
         <view class='btnCon' wx:if='{{game.actingPlayer=="ALL" && game.currentAction=="MULTIPLE" && !room.players[2].raise}}'>
-            <view class='cancel btn' bindtap='multipleS'>超级加倍</view>
+            <view wx:if="{{room.players[2].items.length>0}}" class='cancel btn' bindtap='multipleS'><icon class="count">{{room.players[2].items.length}}</icon>超级加倍</view>
             <view class='sure btn' bindtap='multipleD'>加倍</view>
             <view class='sure btn' bindtap='multipleN'>不加倍</view>
         </view>

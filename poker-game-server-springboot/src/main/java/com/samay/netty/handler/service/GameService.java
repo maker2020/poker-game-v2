@@ -3,16 +3,19 @@ package com.samay.netty.handler.service;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.samay.game.Game;
 import com.samay.game.dto.MultipleDTO;
 import com.samay.game.dto.PutPokerDTO;
 import com.samay.game.dto.ReqBossDTO;
+import com.samay.game.entity.Item;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Poker;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
+import com.samay.game.enums.GameItems;
 import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.PokerTypeEnum;
 import com.samay.game.enums.RoomStatusEnum;
@@ -20,6 +23,7 @@ import com.samay.game.rule.CommonRule;
 import com.samay.game.utils.PokerUtil;
 import com.samay.game.utils.TimerUtil;
 import com.samay.netty.handler.aop.test.NotificationUtil;
+import com.samay.service.ItemService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,16 +33,25 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class GameService {
-    
+
+    private ItemService itemService;
+
+    @Autowired
+    public GameService(ItemService itemService) {
+        this.itemService = itemService;
+    }
+
     /**
      * 玩家player，准备的业务方法
+     * 
      * @param player 玩家(操作者)
-     * @param room 玩家所在房间
+     * @param room   玩家所在房间
      */
-    public boolean ready(Player player,Room room){
-        if(player!=null && room!=null && room.getPlayers()!=null && room.getGame().getStatus()==GameStatusEnum.READY){
-            for(Player p:room.getPlayers()){
-                if(p.getId().equals(player.getId())){
+    public boolean ready(Player player, Room room) {
+        if (player != null && room != null && room.getPlayers() != null
+                && room.getGame().getStatus() == GameStatusEnum.READY) {
+            for (Player p : room.getPlayers()) {
+                if (p.getId().equals(player.getId())) {
                     p.setReady(true);
                     return true;
                 }
@@ -49,13 +62,14 @@ public class GameService {
 
     /**
      * 游戏开始及初始化的业务方法: 发牌、随机开始询问开始叫地主。（其他的业务不在这里）
+     * 
      * @param game
      * @param group
      * @param room
      * @param ctx
      * @throws Exception
      */
-    public void gameStart(Game game,Room room) throws Exception{
+    public void gameStart(Game game, Room room) throws Exception {
         // 更新房间 (此更新操作是明确的，没有线程安全问题)
         room.setStatus(RoomStatusEnum.START);
         // 初始化游戏、准备发牌
@@ -67,8 +81,10 @@ public class GameService {
     }
 
     /**
-     * 叫地主抢地主业务方法<p>
+     * 叫地主抢地主业务方法
+     * <p>
      * 注：业务方法原则上不应该包含传输层对象如channel或group等
+     * 
      * @param room
      * @param player
      * @param msg
@@ -134,34 +150,47 @@ public class GameService {
 
     /**
      * 加注阶段业务
+     * 
      * @param player
      * @param room
      * @param msg
      * @return -1:不合法, 1:加注已完成, 0:加注处理成功
      * @throws Exception
      */
-    public int raise(Player player,Room room,MultipleDTO msg) throws Exception{
-        if(player==null || room==null || msg==null){
+    public int raise(Player player, Room room, MultipleDTO msg) throws Exception {
+        if (player == null || room == null || msg == null) {
             return -1;
         }
-        Game game=room.getGame();
-        if(game==null || game.getStatus()!=GameStatusEnum.RAISE || player.isRaise() || game.getCurrentAction()!=ActionEnum.MULTIPLE){
+        Game game = room.getGame();
+        if (game == null || game.getStatus() != GameStatusEnum.RAISE || player.isRaise()
+                || game.getCurrentAction() != ActionEnum.MULTIPLE) {
             return -1;
         }
-        if(msg.isTendency()){
-            if("double".equals(msg.getAction())){
-                game.setMultiple(game.getMultiple()*2);
+        if (msg.isTendency()) {
+            if ("double".equals(msg.getAction())) {
+                game.setMultiple(game.getMultiple() * 2);
                 player.doubleMulti();
             }
-            if("doublePlus".equals(msg.getAction())){
-                game.setMultiple(game.getMultiple()*4);
+            if ("doublePlus".equals(msg.getAction())) {
+                List<Item> items = itemService.listItems(player.getId());
+                for (Item item : items) {
+                    if (item.getName() == GameItems.SUPER_DOUBLED) {
+                        if (item.getCount() < 1)
+                            return -1;
+                        else {
+                            boolean success=itemService.decreaseItem(player.getId(), GameItems.SUPER_DOUBLED);
+                            if(!success) throw new Exception("更新玩家道具异常: 更新失败");
+                        }
+                    }
+                }
+                game.setMultiple(game.getMultiple() * 4);
                 player.doublePlusMulti();
             }
-        }else{
+        } else {
             player.refuseDouble();
         }
-        if(raiseDone(game)){
-            Player boss=game.getBossInstantly();
+        if (raiseDone(game)) {
+            Player boss = game.getBossInstantly();
             game.setStatus(GameStatusEnum.START);
             game.setCurrentAction(ActionEnum.PUT);
             game.setActingPlayer(boss.getId());
@@ -173,56 +202,57 @@ public class GameService {
         return 0;
     }
 
-
     /**
      * 出牌业务方法
+     * 
      * @param player
      * @param room
      * @param msg
      * @return -1:不合法, 0:出牌不合法, 1:正常出牌, 2:正常出牌且游戏结束
      * @throws Exception
      */
-    public int putPoker(Player player,Room room,PutPokerDTO msg) throws Exception{
-        if(player==null || room==null || msg==null){
+    public int putPoker(Player player, Room room, PutPokerDTO msg) throws Exception {
+        if (player == null || room == null || msg == null) {
             return -1;
         }
-        Game game=room.getGame();
-        if(game==null || !game.getActingPlayer().equals(player.getId()) || game.getCurrentAction()!=ActionEnum.PUT || game.getStatus()!=GameStatusEnum.START){
+        Game game = room.getGame();
+        if (game == null || !game.getActingPlayer().equals(player.getId()) || game.getCurrentAction() != ActionEnum.PUT
+                || game.getStatus() != GameStatusEnum.START) {
             return -1;
         }
         List<Poker> putPokers = msg.getPutPokers();
-        Collection<Poker> lastPutPokers=game.getLastPutPokers();        
-        if(game.getLastPlayerID().equals(player.getId())) lastPutPokers=null; // 清除本身压制
+        Collection<Poker> lastPutPokers = game.getLastPutPokers();
+        if (game.getLastPlayerID().equals(player.getId()))
+            lastPutPokers = null; // 清除本身压制
         // 防止恶心请求:出了牌但choice为false,于是choice参数通过实际putPoker得出，因此该参数暂时不用
         CommonRule rule = new CommonRule(putPokers, lastPutPokers);
         PokerUtil.sortForPUT(putPokers);
         if (rule.valid()) {
 
             player.putPokers(putPokers);
-            
+
             if (putPokers != null) {
                 game.setLastPutPokers(putPokers);
                 game.setLastPlayerID(player.getId());
-                
+
                 // 炸弹翻倍
-                if(rule.getPokersType()==PokerTypeEnum.BOOM){
-                    game.setMultiple(game.getMultiple()*2);
+                if (rule.getPokersType() == PokerTypeEnum.BOOM) {
+                    game.setMultiple(game.getMultiple() * 2);
                 }
             }
             room.turnPlayer(player, ActionEnum.PUT);
 
             if (player.getPokers().size() == 0) {
-                log.info("ROOM["+room.getId()+"] 游戏已结束");
+                log.info("ROOM[" + room.getId() + "] 游戏已结束");
                 game.setStatus(GameStatusEnum.OVER);
                 return 2;
             }
-        }else{
+        } else {
             return 0;
         }
         return 1;
     }
 
-    
     /**
      * 初始化游戏相关
      * 
@@ -240,12 +270,14 @@ public class GameService {
 
     /**
      * 是否已经完成加注阶段
+     * 
      * @return
      */
-    private boolean raiseDone(Game game){
-        boolean raiseDone=true;
-        for(Player p:game.getPlayers()){ // CopyOnWriteArrayList
-            if(!p.isRaise()) raiseDone=false;
+    private boolean raiseDone(Game game) {
+        boolean raiseDone = true;
+        for (Player p : game.getPlayers()) { // CopyOnWriteArrayList
+            if (!p.isRaise())
+                raiseDone = false;
         }
         return raiseDone;
     }

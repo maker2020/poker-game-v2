@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.samay.dao.ItemDao;
 import com.samay.game.entity.Item;
+import com.samay.game.enums.GameItems;
 import com.samay.service.ItemService;
 
 /**
@@ -25,6 +26,11 @@ public class ItemServiceImpl implements ItemService{
     public List<Item> listItems(String userID) {
         List<Item> list=itemDao.listItems(userID);
         return list;
+    }
+
+    @Override
+    public boolean decreaseItem(String userID, GameItems item) {
+        return itemDao.decreaseItem(userID, item);
     }
     
 }

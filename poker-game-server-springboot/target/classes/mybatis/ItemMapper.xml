@@ -6,4 +6,8 @@
         select * from item where userid=#{id}
     </select>
 
+    <update id="decreaseItem">
+        update item set count=count-1 where userid=#{userid} and name=#{name}
+    </update>
+
 </mapper>
