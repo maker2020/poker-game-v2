@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 /**
  * Entity(user)<p>
@@ -17,7 +16,6 @@ import lombok.ToString;
 @NoArgsConstructor
 // record User
 @EqualsAndHashCode(of = "id")
-@ToString
 public class User implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -59,6 +57,11 @@ public class User implements Serializable {
     public User(String id,String nickName){
         this.id=id;
         this.nickName=nickName;
+    }
+
+    @Override
+    public String toString(){
+        return "user["+getNickName()+"]@"+getId();
     }
 
 }

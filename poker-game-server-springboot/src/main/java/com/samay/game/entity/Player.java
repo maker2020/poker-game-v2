@@ -181,6 +181,6 @@ public class Player extends User {
 
     @Override
     public String toString(){
-        return "player[id:"+getId()+"]";
+        return "player["+getNickName()+"]@"+getId();
     }
 }

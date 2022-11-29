@@ -12,6 +12,7 @@ import com.samay.game.dto.RoomReadyDTO;
 import com.samay.game.dto.TipPokerDTO;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
+import com.samay.game.enums.RoomStatusEnum;
 import com.samay.game.utils.RV;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -108,6 +109,15 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         // 更改player的状态为离线
         Player player=ChannelHolder.attrPlayer(ctx.channel());
         player.setDisconnected(true);
+        // 判断当前对局是否开始，若未开始，将玩家从房间清除(而非仅仅channel从group清除)
+        Room room=ChannelHolder.attrRoom(ctx.channel());
+        if(room.getStatus()!=RoomStatusEnum.START){
+            room.removePlayer(player);
+            ChannelGroup group=ChannelHolder.getGroup(ctx.channel());
+            if(group!=null){
+                WriteUtil.writeAndFlushRoomDataByFilter(group);
+            }// 房间被系统解散因此group==null
+        }
     }
 
 }

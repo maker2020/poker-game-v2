@@ -41,9 +41,37 @@ public class Room implements Serializable {
 
     // 辅助<叫地主逻辑>的变量
 
-
+    /**
+     * 添加Player。包含了添加到game
+     * 
+     * @param player
+     */
     public void addPlayer(Player player){
         players.add(player);
+        game.getPlayers().add(player);
+    }
+
+    /**
+     * 清除Players。game中的players一同清理
+     */
+    public void clearPlayers(){
+        players.clear();
+        game.getPlayers().clear();
+    }
+
+    /**
+     * 包含了游戏中玩家的移除
+     * 
+     * @param player
+     */
+    public void removePlayer(Player player){
+        players.remove(player);
+        game.getPlayers().remove(player);
+    }
+
+    public void setPlayers(List<Player> players){
+        this.players=players;
+        game.setPlayers(players);
     }
 
     /**

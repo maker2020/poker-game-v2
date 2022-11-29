@@ -73,7 +73,7 @@ public class UserDetailHandler extends SimpleChannelInboundHandler<FullHttpReque
         // 客户端登入的用户信息
         User user=JSON.parseObject(userInfo,User.class);
         if(user==null) return;
-        log.info("player["+user.getNickName()+"]@"+user.getId()+" log in");
+        log.info(user.toString()+" log in");
         // 初次实例化玩家
         Player player=initPlayerData(user);
         // 将通道与玩家绑定

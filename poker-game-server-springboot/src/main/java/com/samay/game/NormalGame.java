@@ -7,6 +7,7 @@ import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerValueEnum;
+import com.samay.game.enums.RoomStatusEnum;
 import com.samay.game.rule.CommonRule;
 import com.samay.game.utils.PokerUtil;
 import com.samay.netty.handler.aop.test.NotificationUtil;
@@ -364,6 +365,7 @@ public class NormalGame extends Game {
         }
         result.put("room", room);
         result.put("game", this);
+        room.setStatus(RoomStatusEnum.READY);
         return result;
     }
 

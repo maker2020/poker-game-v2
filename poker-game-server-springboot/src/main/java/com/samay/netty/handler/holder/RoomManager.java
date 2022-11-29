@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -15,13 +18,17 @@ import com.samay.game.NormalGame;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.Room;
 import com.samay.game.enums.GameStatusEnum;
+import com.samay.game.enums.RoomStatusEnum;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.ImmediateEventExecutor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.samay.netty.exception.OverLoadException;
 
 /**
@@ -34,7 +41,10 @@ import com.samay.netty.exception.OverLoadException;
  * <li>Room -> Group, Group -> Channel ,(RoomID->Group)</li>
  * <li>Channel -> Room</li>
  * </ul>
+ * 
+ * 另外,内置守护线程间隔性清理非运行状态的房间
  */
+@Slf4j
 public class RoomManager {
 
     /**
@@ -54,6 +64,42 @@ public class RoomManager {
      */
     public static final long MAX_ROOM_LENGTH = 20000L;
     public static AtomicLong currentRoomNums = new AtomicLong(0);
+
+    static {
+        Thread roomClearThread=new Thread(()->{
+            log.info("room manager cleaner is running.");
+            while (true && !Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(20000);
+                    Set<Room> roomSet=getAllRooms();
+                    Iterator<Room> it=roomSet.iterator();
+                    while (it.hasNext()) {
+                        Room room=it.next();
+                        if(room.getStatus()!=RoomStatusEnum.START){ // 房间并没有在进行游戏
+                            // 指定时间后再次判断该房间状态，若仍未开始，则释放
+                            long time=room.getPlayers().size()>0?30:5;
+                            ScheduledExecutorService service=Executors.newSingleThreadScheduledExecutor();
+                            service.schedule(()->{
+                                if(room.getStatus()!=RoomStatusEnum.START){
+                                    // 断开玩家的连接
+                                    disconnectPlayers(room);
+                                    // 清除房间
+                                    releaseRoom(room);
+                                }
+                            }, time, TimeUnit.SECONDS);
+                            service.shutdown(); // 拒绝新任务
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            log.info("room manager cleaner is closing.");
+        });
+        roomClearThread.setDaemon(true);
+        roomClearThread.setName("Room-Cleaner");
+        roomClearThread.start();
+    }
 
     /**
      * 伪随机加入房间(默认按Map的key字符串字典排序)
@@ -132,7 +178,6 @@ public class RoomManager {
         }
         // 公共
         room.addPlayer(player);
-        room.getGame().addPlayer(player);
 
         // 将通道与房间绑定
         ctx.channel().attr(AttributeKey.valueOf("room")).set(room);
@@ -187,6 +232,41 @@ public class RoomManager {
             allChannels.addAll(channels);
         }
         return allChannels;
+    }
+
+    /**
+     * 断开房间玩家的连接
+     * 
+     * @param room
+     */
+    private static void disconnectPlayers(Room room){
+        ChannelGroup group=roomChannelGroup.get(room);
+        if(group!=null){
+            group.forEach((ch)->{
+                Player player=ChannelHolder.attrPlayer(ch);
+                ChannelFuture future=ch.close();
+                future.addListener((res)->{
+                    if(res.isSuccess()){
+                        log.info(player.toString()+" 已被服务器断开连接.");
+                    }
+                });
+            });
+        }
+    }
+
+    /**
+     * 释放房间相关资源
+     * 
+     * @param room
+     */
+    private static void releaseRoom(Room room){
+        log.info("room["+room.getId()+"] is releasing.");
+        // 释放玩家: 清除玩家对象在服务器中被生命周期较长的引用(容器)所指向
+        room.clearPlayers();
+        // 释放group(当调用remove时，mapping关系会被断开，map会释放key与value的地址的引用)
+        roomChannelGroup.remove(room);
+        roomIDMapChannelGroup.remove(room.getId());
+        log.info("room["+room.getId()+"] has been released.");
     }
 
 }

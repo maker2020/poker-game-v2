@@ -73,9 +73,13 @@ Page({
         wx.onSocketError((result) => {})
         wx.onSocketClose((result) => {
             // 当失去与服务器的连接时，持续一定次数的重连
-            if(this.data.maxTryTimes>0){
+            if(this.data.maxTryTimes>0 && this.data.game.status=='START'){
                 this.connectServer('正在重连...')
                 this.data.maxTryTimes=this.data.maxTryTimes-1
+            }else{
+                wx.redirectTo({
+                  url: '/pages/gameMenu/gameMenu',
+                })
             }
         })
     },
@@ -482,6 +486,8 @@ Page({
             }
             if (res.confirm) {
                 wx.hideLoading()
+                this.data.maxTryTimes=0 // 不然被重连
+                wx.closeSocket()
                 wx.redirectTo({
                     url: '/pages/gameMenu/gameMenu',
                 })
