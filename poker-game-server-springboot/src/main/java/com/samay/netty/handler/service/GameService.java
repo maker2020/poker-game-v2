@@ -172,14 +172,14 @@ public class GameService {
                 player.doubleMulti();
             }
             if ("doublePlus".equals(msg.getAction())) {
-                List<Item> items = itemService.listItems(player.getId());
-                for (Item item : items) {
+                for (Item item : player.getItems()) {
                     if (item.getName() == GameItems.SUPER_DOUBLED) {
                         if (item.getCount() < 1)
                             return -1;
                         else {
                             boolean success=itemService.decreaseItem(player.getId(), GameItems.SUPER_DOUBLED);
                             if(!success) throw new Exception("更新玩家道具异常: 更新失败");
+                            item.setCount(item.getCount()-1);
                         }
                     }
                 }
@@ -189,15 +189,18 @@ public class GameService {
         } else {
             player.refuseDouble();
         }
-        if (raiseDone(game)) {
-            Player boss = game.getBossInstantly();
-            game.setStatus(GameStatusEnum.START);
-            game.setCurrentAction(ActionEnum.PUT);
-            game.setActingPlayer(boss.getId());
-            NotificationUtil.clearPlayerNotification(room);
-            // 地主出牌限时
-            TimerUtil.checkTimeout(ActionEnum.PUT, boss.getId());
-            return 1;
+        // 第二个条件防止其他线程(默认操作重复处理)
+        synchronized(game){
+            if (raiseDone(game) && game.getStatus()!=GameStatusEnum.START) {
+                Player boss = game.getBossInstantly();
+                game.setStatus(GameStatusEnum.START);
+                game.setCurrentAction(ActionEnum.PUT);
+                game.setActingPlayer(boss.getId());
+                NotificationUtil.clearPlayerNotification(room);
+                // 地主出牌限时
+                TimerUtil.checkTimeout(ActionEnum.PUT, boss.getId());
+                return 1;
+            }
         }
         return 0;
     }
@@ -240,12 +243,12 @@ public class GameService {
                     game.setMultiple(game.getMultiple() * 2);
                 }
             }
-            room.turnPlayer(player, ActionEnum.PUT);
-
             if (player.getPokers().size() == 0) {
                 log.info("ROOM[" + room.getId() + "] 游戏已结束");
                 game.setStatus(GameStatusEnum.OVER);
                 return 2;
+            }else{
+                room.turnPlayer(player, ActionEnum.PUT);
             }
         } else {
             return 0;

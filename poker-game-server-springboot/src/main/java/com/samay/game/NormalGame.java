@@ -261,7 +261,8 @@ public class NormalGame extends Game {
         this.setCardinality(2);
         this.getTurnCallIndex().set(0);
 
-        setRemainingTime(0);
+        this.setRemainingTime(0);
+        this.future=null;
     }
 
     /**
@@ -275,6 +276,7 @@ public class NormalGame extends Game {
         NotificationUtil.showdown(this);
         setActingPlayer(null);
         setCurrentAction(null);
+        future.cancel(true);
         List<Player> winnerList = new ArrayList<>();
         List<Player> loserList = new ArrayList<>();
         for (Player p : getPlayers()) {
@@ -387,7 +389,9 @@ public class NormalGame extends Game {
                 future.cancel(true);
             }
             future=service.scheduleAtFixedRate(()->{
-                setRemainingTime(getRemainingTime()-1);
+                if(getRemainingTime()>0){
+                    setRemainingTime(getRemainingTime()-1);
+                }
             }, 0, 1, TimeUnit.SECONDS);
         }
     }

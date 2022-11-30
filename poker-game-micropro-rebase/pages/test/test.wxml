@@ -1,0 +1,9 @@
+<!--pages/test.wxml-->
+<view style="margin-bottom: 50px;"></view>
+<view class='btnCon'>
+    <view class='cancel btn' bindtap='multipleS'>
+        <view class="count">3</view>超级加倍
+    </view>
+    <view class='sure btn' bindtap='multipleD'>加倍</view>
+    <view class='sure btn' bindtap='multipleN'>不加倍</view>
+</view>

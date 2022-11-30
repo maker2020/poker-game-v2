@@ -440,13 +440,13 @@
 
 .count {
     position: absolute;
-    top: 9%;
-    left: 32%;
+    top: 12%;
+    left: 45%;
     height: 14px;
     line-height: 14px;
     color: #fff;
     background-color: #e60012;
     padding: 0 5px;
     border-radius: 7px 7px 7px 0;
-}
+  }
   

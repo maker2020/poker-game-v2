@@ -2,14 +2,12 @@
     "pages": [
         "pages/gamePermit/gamePermit",
         "pages/gameMenu/gameMenu",
-        
         "pages/gameRoom/gameRoom",
         "pages/gameRoomOld/gameRoomOld",
-
         "pages/aloneRoom/aloneRoom",
-        
         "pages/index/index",
-        "pages/logs/logs"
+        "pages/logs/logs",
+        "pages/test/test"
     ],
     "window": {
         "backgroundTextStyle": "light",
