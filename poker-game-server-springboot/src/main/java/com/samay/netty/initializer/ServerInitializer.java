@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.samay.netty.handler.TextWebSocketFrameHandler;
 import com.samay.netty.handler.UserDetailHandler;
+import com.samay.netty.handler.filter.DoSFilter;
 import com.samay.netty.handler.game.GameReadyHandler;
 import com.samay.netty.handler.game.MultipleHandler;
 import com.samay.netty.handler.game.PutPokerHandler;
@@ -39,6 +40,9 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
 
     @Value("${netty.websocket.path}")
     private String wsUri;
+
+    @Autowired
+    private DoSFilter doSFilter;
 
     @Autowired
     private UserDetailHandler userDetailHandler;
@@ -73,6 +77,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     @Override
     protected void initChannel(Channel ch) throws Exception {
         ChannelPipeline pipeline=ch.pipeline();
+        pipeline.addLast(doSFilter);
         pipeline.addLast(new HttpServerCodec()); // http解码
         pipeline.addLast(new ChunkedWriteHandler()); // 解决粘包/拆包
         pipeline.addLast(new HttpObjectAggregator(maxFrameSize));

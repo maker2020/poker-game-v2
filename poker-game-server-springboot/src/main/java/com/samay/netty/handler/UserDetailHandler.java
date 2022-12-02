@@ -6,9 +6,11 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import com.samay.game.entity.Player;
 import com.samay.game.entity.User;
+import com.samay.netty.handler.holder.ChannelHolder;
 import com.samay.netty.handler.holder.RoomManager;
 import com.samay.service.UserService;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,8 +46,9 @@ public class UserDetailHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        handleParams(ctx, request);
-        ctx.fireChannelRead(request.retain());
+        boolean isContinue=handleParams(ctx, request);
+        if(isContinue)
+            ctx.fireChannelRead(request.retain());
     }    
 
     /**
@@ -59,7 +62,7 @@ public class UserDetailHandler extends SimpleChannelInboundHandler<FullHttpReque
      * @param ctx
      * @param request
      */
-    private void handleParams(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+    private boolean handleParams(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
         String userInfo = decoder.parameters().get("user").get(0);
         if (userInfo == null || "".equals(userInfo) || !request.decoderResult().isSuccess()
@@ -68,11 +71,20 @@ public class UserDetailHandler extends SimpleChannelInboundHandler<FullHttpReque
                     HttpResponseStatus.BAD_REQUEST);
             ChannelFuture future = ctx.channel().writeAndFlush(response);
             future.addListener(ChannelFutureListener.CLOSE);
-            return;
+            return false;
         }
         // 客户端登入的用户信息
         User user=JSON.parseObject(userInfo,User.class);
-        if(user==null) return;
+        if(user==null) return false;
+        Channel historyCh=ChannelHolder.getChannel(user.getId());
+        if(null!=historyCh){
+            Player p=ChannelHolder.attrPlayer(historyCh);
+            if(!p.isDisconnected()){
+                log.info(user.toString()+" 重复建立连接,已被禁止(该脏连接即将被清除");
+                ctx.channel().close();
+                return false;
+            }
+        }
         log.info(user.toString()+" log in");
         // 初次实例化玩家
         Player player=initPlayerData(user);
@@ -81,6 +93,7 @@ public class UserDetailHandler extends SimpleChannelInboundHandler<FullHttpReque
         
         // 将该玩家随机加入一个房间
         RoomManager.randomJoinRoom(ctx);
+        return true;
     }
 
     /**

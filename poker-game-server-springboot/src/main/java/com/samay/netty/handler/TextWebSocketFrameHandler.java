@@ -108,6 +108,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         // 更改player的状态为离线
         Player player=ChannelHolder.attrPlayer(ctx.channel());
+        if(player==null) return; // 无效连接(脏连接)
         player.setDisconnected(true);
         // 判断当前对局是否开始，若未开始，将玩家从房间清除(而非仅仅channel从group清除)
         Room room=ChannelHolder.attrRoom(ctx.channel());

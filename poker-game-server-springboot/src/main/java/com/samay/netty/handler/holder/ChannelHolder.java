@@ -54,6 +54,7 @@ public class ChannelHolder {
      */
     public static ChannelGroup getGroup(Channel ch){
         Room room=attrRoom(ch);
+        if(room==null) return null;
         return RoomManager.roomChannelGroup.get(room);
     }
 
@@ -63,6 +64,7 @@ public class ChannelHolder {
      * @return
      */
     public static ChannelGroup getGroup(Room room){
+        if(room==null) return null;
         return RoomManager.roomChannelGroup.get(room);
     }
 
