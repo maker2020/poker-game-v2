@@ -3,8 +3,9 @@ package com.samay.netty.handler.holder;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.samay.game.entity.Player;
-import com.samay.game.entity.Room;
+import com.samay.game.bo.Player;
+import com.samay.game.bo.Room;
+
 import io.netty.channel.Channel;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.util.AttributeKey;

@@ -2,7 +2,7 @@ package com.samay.dao;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.samay.game.entity.Player;
+import com.samay.game.bo.Player;
 import com.samay.game.entity.User;
 import com.samay.game.entity.UserData;
 

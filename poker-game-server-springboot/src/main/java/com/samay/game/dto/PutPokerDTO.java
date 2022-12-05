@@ -2,7 +2,8 @@ package com.samay.game.dto;
 
 import java.util.List;
 
-import com.samay.game.entity.Poker;
+import com.samay.game.bo.Poker;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 
 import com.samay.game.Game;
 import com.samay.game.NormalGame;
-import com.samay.game.entity.Player;
-import com.samay.game.entity.Room;
+import com.samay.game.bo.Player;
+import com.samay.game.bo.Room;
 import com.samay.game.enums.GameStatusEnum;
 import com.samay.game.enums.RoomStatusEnum;
 

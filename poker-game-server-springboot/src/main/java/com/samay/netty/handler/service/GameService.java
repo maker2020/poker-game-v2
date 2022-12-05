@@ -7,13 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.samay.game.Game;
+import com.samay.game.bo.Player;
+import com.samay.game.bo.Poker;
+import com.samay.game.bo.Room;
 import com.samay.game.dto.MultipleDTO;
 import com.samay.game.dto.PutPokerDTO;
 import com.samay.game.dto.ReqBossDTO;
 import com.samay.game.entity.Item;
-import com.samay.game.entity.Player;
-import com.samay.game.entity.Poker;
-import com.samay.game.entity.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.enums.GameItems;
 import com.samay.game.enums.GameStatusEnum;

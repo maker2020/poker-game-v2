@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.samay.dao.UserDao;
-import com.samay.game.entity.Player;
+import com.samay.game.bo.Player;
 import com.samay.game.entity.User;
 import com.samay.game.entity.UserData;
 import com.samay.service.UserService;

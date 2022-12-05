@@ -3,9 +3,9 @@ package com.samay.netty.handler.game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.samay.game.bo.Player;
+import com.samay.game.bo.Room;
 import com.samay.game.dto.ReqBossDTO;
-import com.samay.game.entity.Player;
-import com.samay.game.entity.Room;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

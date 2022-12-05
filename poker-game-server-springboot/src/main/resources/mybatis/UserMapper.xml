@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.samay.dao.UserDao">
 
-    <resultMap id="playerData" type="Player">
+    <resultMap id="playerData" type="com.samay.game.bo.Player">
         <id column="id" property="id"/>
         <result column="phone" property="phone"/>
         <result column="avatarUrl" property="avatarUrl"/>

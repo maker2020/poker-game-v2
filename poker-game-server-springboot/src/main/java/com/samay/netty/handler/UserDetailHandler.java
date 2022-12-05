@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
-import com.samay.game.entity.Player;
+import com.samay.game.bo.Player;
 import com.samay.game.entity.User;
 import com.samay.netty.handler.holder.ChannelHolder;
 import com.samay.netty.handler.holder.RoomManager;

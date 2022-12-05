@@ -1,6 +1,9 @@
 // pages/gameRoom/gameRoom.js
 const app = getApp();
 var curApp
+// 语音 音频
+const audioUtil=require('../../utils/AudioUtil')
+
 Page({
 
     /**

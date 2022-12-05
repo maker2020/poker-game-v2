@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.rabbitmq.client.Channel;
-import com.samay.game.entity.Poker;
+import com.samay.game.bo.Poker;
 import com.samay.service.ConsumerReceiver;
 
 import lombok.extern.slf4j.Slf4j;

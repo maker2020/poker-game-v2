@@ -1,9 +1,11 @@
-package com.samay.game.entity;
+package com.samay.game.bo;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.samay.game.entity.Item;
+import com.samay.game.entity.User;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.utils.TimerUtil;
 import com.samay.game.vo.Notification;

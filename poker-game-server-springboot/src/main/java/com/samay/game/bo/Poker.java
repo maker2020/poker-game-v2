@@ -1,4 +1,4 @@
-package com.samay.game.entity;
+package com.samay.game.bo;
 
 import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerValueEnum;

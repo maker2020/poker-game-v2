@@ -32,7 +32,7 @@ public enum PokerTypeEnum {
     /**
      * 飞机不带翅膀
      */
-    PLANE_ALONE(6),
+    PLANE(6),
     /**
      * 飞机带两个单牌
      */

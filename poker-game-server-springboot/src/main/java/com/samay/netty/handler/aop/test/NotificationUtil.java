@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.samay.game.Game;
-import com.samay.game.entity.Player;
-import com.samay.game.entity.Poker;
-import com.samay.game.entity.Room;
+import com.samay.game.bo.Player;
+import com.samay.game.bo.Poker;
+import com.samay.game.bo.Room;
 import com.samay.game.enums.ActionEnum;
 import com.samay.game.vo.Notification;
 

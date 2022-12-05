@@ -3,7 +3,7 @@ package com.samay.game.vo;
 import java.io.Serializable;
 import java.util.List;
 
-import com.samay.game.entity.Poker;
+import com.samay.game.bo.Poker;
 import com.samay.game.enums.ActionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;

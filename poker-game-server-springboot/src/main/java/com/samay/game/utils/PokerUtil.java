@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.samay.game.Game;
-import com.samay.game.entity.Player;
-import com.samay.game.entity.Poker;
-import com.samay.game.entity.Poker.PokerComparator;
+import com.samay.game.bo.Player;
+import com.samay.game.bo.Poker;
+import com.samay.game.bo.Poker.PokerComparator;
 import com.samay.game.rule.CommonRule;
 import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerTypeEnum;
@@ -297,7 +297,7 @@ public class PokerUtil {
                     }
                 }
                 //当上家出牌为飞机(不带牌)时,判断自己是否有比他大的飞机(不带牌)或者炸弹或者王炸
-                if(ruleOld.getPokersType() == PokerTypeEnum.PLANE_ALONE && pokers.size() >= size){
+                if(ruleOld.getPokersType() == PokerTypeEnum.PLANE && pokers.size() >= size){
                     //判断飞机(不带牌)
                     Iterator<String> it = countMap.keySet().iterator();
                     List<String> valueList = new ArrayList<>();

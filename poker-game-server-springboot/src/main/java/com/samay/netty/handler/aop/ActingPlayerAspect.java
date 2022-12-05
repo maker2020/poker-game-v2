@@ -9,7 +9,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 import com.samay.game.Game;
-import com.samay.game.entity.Player;
+import com.samay.game.bo.Player;
 
 /**
  * game中玩家action行为的切面<p>

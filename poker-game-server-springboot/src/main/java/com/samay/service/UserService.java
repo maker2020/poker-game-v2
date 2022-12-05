@@ -1,6 +1,6 @@
 package com.samay.service;
 
-import com.samay.game.entity.Player;
+import com.samay.game.bo.Player;
 import com.samay.game.entity.User;
 
 public interface UserService {

@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.samay.game.entity.Poker;
+import com.samay.game.bo.Poker;
 import com.samay.game.enums.PokerColorEnum;
 import com.samay.game.enums.PokerTypeEnum;
 import com.samay.game.enums.PokerValueEnum;
@@ -504,7 +504,7 @@ public class CommonRule implements GameRule {
         if(three()) return PokerTypeEnum.TRIPLE;
         if(threeWithOne()) return PokerTypeEnum.TRIPLE_SINGLE;
         if(threeWithTwo()) return PokerTypeEnum.TRIPLE_DOUBLE;
-        if(planeAlone()) return PokerTypeEnum.PLANE_ALONE;
+        if(planeAlone()) return PokerTypeEnum.PLANE;
         if(planeWithSingle()) return PokerTypeEnum.PLANE_SINGLE;
         if(planeWithDouble()) return PokerTypeEnum.PLANE_DOUBLE;
         if(fourWithTwo()) return PokerTypeEnum.BOOM_SINGLE;

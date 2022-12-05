@@ -1,4 +1,4 @@
-package com.samay.game.entity;
+package com.samay.game.bo;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
