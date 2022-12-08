@@ -1,6 +1,7 @@
 // pages/gamePermit/gamePermit.js
 const utils=require('../../utils/util')
-
+// 语音 音频
+const audioUtil=require('../../utils/AudioUtil')
 const app = getApp()
 Page({
 
@@ -67,7 +68,7 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad(options) {
-
+        audioUtil.play_bg()
     },
 
     /**

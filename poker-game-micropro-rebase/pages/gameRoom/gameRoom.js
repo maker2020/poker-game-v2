@@ -38,6 +38,7 @@ Page({
     onLoad(options) {
         curApp=this
         var context = this;
+        audioUtil.sex=app.globalData.userInfo.sex==0?1:app.globalData.userInfo.sex // 语音性别初始化
         this.connectServer('正在加载...')
         // 注册监听数据、回调方法
         app.setWatcher(this.data,this.watch)
