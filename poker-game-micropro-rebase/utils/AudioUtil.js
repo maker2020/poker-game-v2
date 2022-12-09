@@ -2,7 +2,8 @@ const innerAudioContext=wx.createInnerAudioContext({
     useWebAudioImplement: true
 })
 
-const audioSrcUrl='http://172.16.88.58:8080/audios'
+const app=getApp()
+const audioSrcUrl=app.config.serverUrl+'/audios'
 
 // 性别语音区分
 var sex

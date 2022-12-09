@@ -38,5 +38,11 @@ App({
 
   globalData: {
     userInfo: null,
+  },
+  config:{
+      serverIp:'172.16.88.58',
+      serverPort:'8080',
+      serverUrl:'http://172.16.88.58:8080',
+      gameServerUrl:'ws://172.16.88.58:8888/ws'
   }
 })

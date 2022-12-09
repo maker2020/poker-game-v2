@@ -95,7 +95,7 @@ Page({
         // 发送用户个人信息等参数，向服务器的请求连接
         var userInfo=app.globalData.userInfo
         wx.connectSocket({
-            url: 'ws://localhost:8888/ws?user=' + JSON.stringify(userInfo),
+            url: app.config.gameServerUrl+'?user=' + JSON.stringify(userInfo),
             header: {
                 'content-type': 'application/json'
             },

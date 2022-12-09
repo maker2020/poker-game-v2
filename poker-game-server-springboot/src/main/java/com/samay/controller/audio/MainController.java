@@ -18,14 +18,16 @@ public class MainController {
     @RequestMapping("/{audioName}")
     public Object getAudio(@PathVariable("audioName") String fileName,HttpServletResponse response){
         URL resource = getClass().getClassLoader().getResource("audio/"+fileName);
-        try (InputStream openStream = resource.openStream()) {
-            byte[] data=openStream.readAllBytes();
-            OutputStream out=response.getOutputStream();
-            out.write(data);
-            out.flush();
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(resource!=null){
+            try (InputStream openStream = resource.openStream()) {
+                byte[] data=openStream.readAllBytes();
+                OutputStream out=response.getOutputStream();
+                out.write(data);
+                out.flush();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
