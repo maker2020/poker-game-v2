@@ -48,7 +48,7 @@
     function connect() {
 		var userInfo='{"avatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/rgbaiaDTeNzRAmdwmuWyKCB6R6GNRgSZFWL7o5djFyLuznejStvldtDNCHBXMHCJM7iclQlJ4R1sZqhgT8xKzjRg/132","city":"","id":"7799","country":"","sex":"0","language":"zh_CN","nickName":"Samay","province":""}'
 		
-        ws = new WebSocket('ws://localhost:8888/ws?user=' + userInfo);
+        ws = new WebSocket('ws://172.16.88.58:8888/ws?user=' + userInfo);
         ws.onopen = function () {
             var p = document.createElement("p")
             p.textContent = '已连接...'
