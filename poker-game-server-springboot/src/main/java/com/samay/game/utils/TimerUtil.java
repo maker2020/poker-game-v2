@@ -12,7 +12,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.samay.game.Game;
@@ -48,7 +47,6 @@ public class TimerUtil {
 
     private static GameService gameService;
 
-    @Autowired
     public TimerUtil(GameService gameService) {
         TimerUtil.gameService = gameService;
     }

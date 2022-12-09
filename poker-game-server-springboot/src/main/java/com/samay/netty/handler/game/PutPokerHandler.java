@@ -2,7 +2,6 @@ package com.samay.netty.handler.game;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -41,7 +40,6 @@ public class PutPokerHandler extends SimpleChannelInboundHandler<PutPokerDTO> {
     private UserService userService;
     private GameService gameService;
 
-    @Autowired
     public PutPokerHandler(UserService userService,GameService gameService){
         this.userService=userService;
         this.gameService=gameService;

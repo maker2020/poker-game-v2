@@ -1,6 +1,5 @@
 package com.samay.netty.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -38,8 +37,9 @@ public class UserDetailHandler extends SimpleChannelInboundHandler<FullHttpReque
     /**
      * 构造注入以更好的关注分离点或是否需要重构类
      * @param userService
+     * 但是，Spring较新版本规定，当只有一个唯一的构造函数，不需要Autowired
+     * 
      */
-    @Autowired
     public UserDetailHandler(UserService userService){
         this.userService=userService;
     }

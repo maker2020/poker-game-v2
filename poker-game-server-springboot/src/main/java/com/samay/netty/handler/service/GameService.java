@@ -3,7 +3,6 @@ package com.samay.netty.handler.service;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.samay.game.Game;
@@ -36,7 +35,6 @@ public class GameService {
 
     private ItemService itemService;
 
-    @Autowired
     public GameService(ItemService itemService) {
         this.itemService = itemService;
     }

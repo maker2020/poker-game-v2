@@ -3,7 +3,6 @@ package com.samay.netty.handler.filter;
 import java.net.InetSocketAddress;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.samay.netty.handler.utils.RedisUtil;
@@ -34,7 +33,6 @@ public class DoSFilter extends RuleBasedIpFilter {
      */
     private final int maxReqTimes = 15;
 
-    @Autowired
     public DoSFilter(RedisUtil redisUtil) {
         this.redisUtil = redisUtil;
     }

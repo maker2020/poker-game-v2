@@ -1,6 +1,5 @@
 package com.samay.netty.handler.game;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.samay.game.bo.Player;
@@ -26,7 +25,6 @@ public class RoomReadyHandler extends SimpleChannelInboundHandler<RoomReadyDTO>{
 
     private GameService gameService;
 
-    @Autowired
     public RoomReadyHandler(GameService gameService){
         this.gameService=gameService;
     }

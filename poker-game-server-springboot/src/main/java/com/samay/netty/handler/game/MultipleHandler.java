@@ -1,6 +1,5 @@
 package com.samay.netty.handler.game;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.samay.game.bo.Player;
@@ -23,7 +22,6 @@ public class MultipleHandler extends SimpleChannelInboundHandler<MultipleDTO>{
 
     private GameService gameService;
 
-    @Autowired
     public MultipleHandler(GameService gameService){
         this.gameService=gameService;
     }
