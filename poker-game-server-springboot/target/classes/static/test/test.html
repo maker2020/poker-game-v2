@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索</title>
+</head>
+<body>
+    <p>请输入搜索内容</p>
+    <div>
+        <input type="text" name="" id="key">
+        <div id="display">
+    
+        </div>
+    </div>
+</body>
+<script  src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"/></script>
+<script>
+    $("#key").on("input",function(event){
+       $.ajax({
+            url:'http://samay.org:8080/test/search/'+$("#key").val(),
+            method:'get',
+            success:function(res){
+                $("#display").html('')
+                for(let i=0;i<res.length;i++){
+                    $("#display").append('<p>'+res[i]+'</p>')
+                }
+            }
+       })
+    });
+</script>
+</html>
