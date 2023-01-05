@@ -2,7 +2,10 @@ spring:
     # config:
     #     activate:
     #         on-profile: pc
-    # 此配置不生效，由maven启动参数配置
+    # 此配置错误的，由maven启动参数配置或如下
+    profiles:
+        active:
+        - co
 
     application:
         name: poker-game-v2
